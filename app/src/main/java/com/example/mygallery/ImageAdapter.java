@@ -43,17 +43,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String imagePath = imagePaths.get(position);
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-        if (bitmap != null) {
-            holder.imageView.setImageBitmap(bitmap);
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imagePath, options);
 
-            holder.imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        options.inSampleSize = calculetSize(options);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+        holder.imageView.setImageBitmap(bitmap);
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                     listener.onItemClick(position);
                 }
-            });
-        }
+        });
     }
 
     @Override
@@ -72,5 +76,21 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
         }
+    }
+    private int calculetSize(BitmapFactory.Options options){
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > imageSize || width > imageSize){
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) > imageSize && (halfWidth / inSampleSize) > imageSize){
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 }

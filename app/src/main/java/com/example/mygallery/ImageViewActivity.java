@@ -31,7 +31,7 @@ public class ImageViewActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         //Установка позиции
-        initialPosition = getIntent().getIntExtra("position", 0);
+        initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
     }
 }

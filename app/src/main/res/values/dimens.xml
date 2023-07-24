@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="image_layout_margin">2dp</dimen>
+    <dimen name="image_preview_margin_horizontal">10dp</dimen>
+    <dimen name="image_preview_margin_vertical">3dp</dimen>
 </resources>

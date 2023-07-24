@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".AlbumActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewAlbum"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="5dp"
@@ -19,13 +19,25 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-    <TextView
-        android:id="@+id/directoryNameTextView"
-        android:layout_width="300dp"
-        android:layout_height="40dp"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+    <ProgressBar
+        android:id="@+id/recyclerProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.449" />
+
+    <Button
+        android:id="@+id/selectDirectoryButton"
+        android:layout_width="105dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="32dp"
+        android:orientation="vertical"
+        android:text="ScanDirect"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="15dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
