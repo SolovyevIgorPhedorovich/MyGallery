@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.Manifest;
 import android.content.Intent;
@@ -30,7 +31,6 @@ import java.util.List;
 public class AlbumActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
-    private static final int REQUEST_DIRECTORY = 456;
     private List<List<String>> imageDirectoryPaths = new ArrayList<List<String>>();
     private RecyclerView recyclerView;
     private AlbumAdapter albumAdapter;
@@ -46,7 +46,6 @@ public class AlbumActivity extends AppCompatActivity {
         selectDirectoryButton = findViewById(R.id.selectDirectoryButton);
 
         setSizeImage();
-
         selectDirectoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,66 +59,13 @@ public class AlbumActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         } else {
-            openDirectoryPicker();
+            scanImages();
         }
     }
 
-    private void openDirectoryPicker() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        startActivityForResult(Intent.createChooser(intent, "Select Directory"), REQUEST_DIRECTORY);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openDirectoryPicker();
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_DIRECTORY && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            String directoryPath = getDirectoryPathFromUri(uri);
-
-            if (directoryPath != null) {
-                scanImages(directoryPath);
-            }
-        }
-    }
-
-    private String getDirectoryPathFromUri(Uri uri) {
-        if (DocumentsContract.isTreeUri(uri)) {
-            String documentId = DocumentsContract.getTreeDocumentId(uri);
-            String[] split = documentId.split(":");
-            String type = split[0];
-            if ("primary".equalsIgnoreCase(type)) {
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
-            } else {
-                return "/storage/" + split[0] + "/" + split[1];
-            }
-        } else {
-            String[] projection = {MediaStore.MediaColumns.DATA};
-            Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                String path = cursor.getString(columnIndex);
-                cursor.close();
-                return path;
-            }
-        }
-        return null;
-    }
-
-    private void scanImages(String directoryPath){
+    private void scanImages(){
         // Определние пути к директории с изображениями
-        File directory = new File (directoryPath);
+        File directory = new File ("storage/emulated/0/");
 
         if (directory != null && directory.exists()){
             // Рекурсивное сканирование и добавление пути к изображению в список
@@ -137,7 +83,7 @@ public class AlbumActivity extends AppCompatActivity {
 
         // Насторйка RecycleView с использование GridLayoutManager
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         albumAdapter = new AlbumAdapter(this, nameDirect, imagePreviewPaths, countItem, imageWidth, new AlbumAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -152,6 +98,7 @@ public class AlbumActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file: files){
+                if(!file.isHidden()) {continue;}
                 if(file.isDirectory()){
                     scanDirectory(file);
                 }else{

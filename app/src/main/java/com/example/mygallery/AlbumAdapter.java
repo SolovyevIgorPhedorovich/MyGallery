@@ -1,14 +1,8 @@
 package com.example.mygallery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
@@ -45,43 +43,21 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHol
     @Override
     public AlbumAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_image_view, parent, false);
-        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
         countItem = itemView.findViewById(R.id.countImages);
         directoryName = itemView.findViewById(R.id.albumDirectoryName);
-        layoutParams.width = imageWidth;
-        layoutParams.height = imageWidth * 2;
-        itemView.setLayoutParams(layoutParams);
         return new AlbumAdapter.ImageViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        String imagePath = imagePreviewPaths.get(position);
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imagePath, options);
-
-        options.inSampleSize = calculetSize(options);
-        options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+    public void onBindViewHolder(@NonNull ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        Glide.with(holder.imageView)
+                .load(imagePreviewPaths.get(position))
+                .apply(RequestOptions.centerCropTransform())
+                .apply(RequestOptions.bitmapTransform(new RoundedCorners(30)))
+                .into(holder.imageView);
 
         directoryName.setText(imageNameAlbum.get(position));
         countItem.setText(String.valueOf(countItemDirectory.get(position)));
-
-        Bitmap roundedBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(roundedBitmap);
-        //Кисть для рисования и создание прозрачного фона
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(0xFFFFFFFF);
-        //Создание прямоугольника
-        RectF rectF = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        canvas.drawRoundRect(rectF, 20, 20, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-
-
-        holder.imageView.setImageBitmap(roundedBitmap);
 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,20 +85,4 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHol
         }
     }
 
-    private int calculetSize(BitmapFactory.Options options){
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > imageWidth * 2 || width > imageWidth){
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            while ((halfHeight / inSampleSize) > imageWidth * 2  && (halfWidth / inSampleSize) > imageWidth){
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
 }

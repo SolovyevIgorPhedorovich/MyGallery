@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_gravity="center"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/image_preview_margin_horizontal"
     android:layout_marginVertical="@dimen/image_preview_margin_vertical">
@@ -10,8 +10,7 @@
     <ImageView
         android:id="@+id/albumImagePreview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
+        android:layout_height="match_parent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,6 +23,7 @@
             android:id="@+id/albumDirectoryName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
             android:textSize="16sp"/>
 
         <TextView

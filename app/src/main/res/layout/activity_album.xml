@@ -10,9 +10,7 @@
         android:id="@+id/recyclerViewAlbum"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="5dp"
         android:layout_marginTop="60dp"
-        android:layout_marginEnd="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -37,7 +35,8 @@
         android:layout_marginEnd="32dp"
         android:orientation="vertical"
         android:text="ScanDirect"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerViewAlbum"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="15dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
