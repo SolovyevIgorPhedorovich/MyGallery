@@ -4,17 +4,25 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
+
+import java.io.File;
 import java.util.List;
 
 public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAdapter.ImageViewHolder> {
-
     private Context context;
     private List<String> imagePaths;
 
@@ -33,10 +41,19 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        String imagePath = imagePaths.get(position);
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-        if (bitmap != null)
-            holder.imageView.setImageBitmap(bitmap);
+        Glide.with(holder.imageView)
+                .load(imagePaths.get(position))
+                .into(holder.imageView);
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (context instanceof ImageViewActivity){
+                    ImageViewActivity imageViewActivity = (ImageViewActivity) context;
+                    imageViewActivity.toggleMenu();
+                }
+            }
+        });
     }
 
     @Override
@@ -47,7 +64,7 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
     public class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
 
-        public  ImageViewHolder(View itemView) {
+        public ImageViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
         }

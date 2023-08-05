@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
         directoryName = findViewById(R.id.directoryNameTextView);
         setSizeImage();
         viewDirectoryImage();
+
+        findViewById(R.id.buttonBack).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
     }
 

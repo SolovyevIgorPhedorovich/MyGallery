@@ -1,28 +1,20 @@
 package com.example.mygallery;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +26,8 @@ public class AlbumActivity extends AppCompatActivity {
     private List<List<String>> imageDirectoryPaths = new ArrayList<List<String>>();
     private RecyclerView recyclerView;
     private AlbumAdapter albumAdapter;
-    private Button selectDirectoryButton;
+    private ImageButton settingButton;
+    private ProgressBar progressBar;
     private int imageWidth;
 
     @Override
@@ -43,16 +36,11 @@ public class AlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_album);
 
         recyclerView = findViewById(R.id.recyclerViewAlbum);
-        selectDirectoryButton = findViewById(R.id.selectDirectoryButton);
+        progressBar = findViewById(R.id.recyclerProgress);
+        settingButton = findViewById(R.id.buttonSetting);
 
         setSizeImage();
-        selectDirectoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestStoragePermission();
-            }
-        });
-
+        requestStoragePermission();
     }
 
     private void requestStoragePermission() {
@@ -66,7 +54,6 @@ public class AlbumActivity extends AppCompatActivity {
     private void scanImages(){
         // Определние пути к директории с изображениями
         File directory = new File ("storage/emulated/0/");
-
         if (directory != null && directory.exists()){
             // Рекурсивное сканирование и добавление пути к изображению в список
             scanDirectory(directory);
@@ -83,7 +70,11 @@ public class AlbumActivity extends AppCompatActivity {
 
         // Насторйка RecycleView с использование GridLayoutManager
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+
+        StaggeredGridLayoutManager layoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+
+        recyclerView.setLayoutManager(layoutManager);
         albumAdapter = new AlbumAdapter(this, nameDirect, imagePreviewPaths, countItem, imageWidth, new AlbumAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -91,6 +82,8 @@ public class AlbumActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(albumAdapter);
+
+        progressBar.setVisibility(View.GONE);
     }
 
     private void scanDirectory(File directory){
@@ -98,14 +91,14 @@ public class AlbumActivity extends AppCompatActivity {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file: files){
-                if(!file.isHidden()) {continue;}
+                if(file.isHidden() || file.getName().equals("Android")) {continue;}
                 if(file.isDirectory()){
                     scanDirectory(file);
                 }else{
                     //Добавлене файлов изображения в список
                     if (file.getName().endsWith(".jpg") || file.getName().endsWith(".png") || file.getName().endsWith(".jpeg")){
                         if (!flag){
-                            String nameDirectory = directory.getName().split("/")[0];
+                            String nameDirectory = directory.getName();
                             imageDirectoryPaths.add(new ArrayList<>());
                             imageDirectoryPaths.get(imageDirectoryPaths.size()-1).add(nameDirectory);
                             flag = true;

@@ -4,18 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#00FFFFFF"
     tools:context=".AlbumActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAlbum"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </androidx.recyclerview.widget.RecyclerView>
+    <ImageButton
+        android:id="@+id/buttonTypeView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="5dp"
+        android:background="#00FFFFFF"
+        android:src="@android:drawable/btn_star"
+        app:layout_constraintBottom_toTopOf="@+id/searchView"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSetting"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ui_menu_shape_square_4_24_regular" />
 
     <ProgressBar
         android:id="@+id/recyclerProgress"
@@ -28,15 +30,49 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.449" />
 
-    <Button
-        android:id="@+id/selectDirectoryButton"
-        android:layout_width="105dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="32dp"
-        android:orientation="vertical"
-        android:text="ScanDirect"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerViewAlbum"
+    <ImageButton
+        android:id="@+id/buttonSetting"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="5dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/searchView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/settings_gear_32_regular" />
+
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerViewAlbum"
+        app:layout_constraintEnd_toStartOf="@+id/buttonSetting"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonCreatAlbum"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="5dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/searchView"
+        app:layout_constraintEnd_toStartOf="@+id/buttonTypeView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/plus_20_light" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAlbum"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
