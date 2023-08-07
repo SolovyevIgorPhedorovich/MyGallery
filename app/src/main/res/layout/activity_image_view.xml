@@ -11,6 +11,7 @@
         android:clickable="true"/>
 
     <FrameLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/menuViewImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,15 +21,67 @@
         <ImageButton
             android:id="@+id/buttonBack"
             android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/arrow_a_left_24_regular" />
+            android:layout_height="50dp"
+            android:background="#00FFFFFF"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@drawable/arrow_a_left_24_regular"/>
 
         <TextView
             android:id="@+id/itemNameTextView"
             android:layout_width="300dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="50dp"
-            android:textSize="20sp"/>
+            android:layout_height="50dp"
+            android:layout_marginLeft="55dp"
+            android:textSize="20sp"
+            android:gravity="center_vertical|start"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/black">
+
+        <ImageButton
+            android:id="@+id/buttonShare"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:background="#00FFFFFF"
+            android:rotation="-30"
+            app:srcCompat="@drawable/share" />
+
+        <ImageButton
+            android:id="@+id/buttonAddFavorites"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="95dp"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/favorites_32_regular" />
+
+        <ImageButton
+            android:id="@+id/buttonEdit"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="180dp"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/tool_pencil_square_32_regular" />
+
+        <ImageButton
+            android:id="@+id/buttonDelite"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="265dp"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/trash_can_20_light" />
+
+        <ImageButton
+            android:id="@+id/buttonContextMenu"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="350dp"
+            android:background="#00FFFFFF"
+            app:srcCompat="@drawable/ui_menu_shape_square_4_24_regular" />
 
     </FrameLayout>
 

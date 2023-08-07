@@ -21,7 +21,6 @@ public class ImageViewActivity extends AppCompatActivity {
     private List<String> imagePaths;
     private ImageButton imageButton;
     private TextView textView;
-    private FrameLayout menu;
     private  boolean isMenuVisible = true;
     private ImageViewPagerAdapter adapter;
     private int initialPosition;
@@ -34,7 +33,6 @@ public class ImageViewActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
         imageButton = findViewById(R.id.buttonBack);
         textView = findViewById(R.id.itemNameTextView);
-        menu = findViewById(R.id.menuViewImage);
 
 
         //Получение пути изображения
@@ -68,18 +66,24 @@ public class ImageViewActivity extends AppCompatActivity {
     }
 
     public void toggleMenu(){
-        Animation animation;
+        Animation animationTotMenu, animationBottomMenu;
+        FrameLayout menu = findViewById(R.id.menuViewImage),
+                contextMenu = findViewById(R.id.toolBar);
         if (isMenuVisible){
             //Скрыть меню
-            animation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+            animationTotMenu = AnimationUtils.loadAnimation(this, R.anim.slide_up_top);
+            animationBottomMenu = AnimationUtils.loadAnimation(this, R.anim.slide_down_bottom);
             menu.setVisibility(View.GONE);
+            contextMenu.setVisibility(View.GONE);
         }
         else {
-            animation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+            animationTotMenu = AnimationUtils.loadAnimation(this, R.anim.slide_down_top);
+            animationBottomMenu = AnimationUtils.loadAnimation(this, R.anim.slide_up_bottom);
             menu.setVisibility(View.VISIBLE);
+            contextMenu.setVisibility(View.VISIBLE);
         }
-        menu.startAnimation(animation);
-
+        menu.startAnimation(animationTotMenu);
+        contextMenu.startAnimation(animationBottomMenu);
         isMenuVisible = !isMenuVisible;
     }
 

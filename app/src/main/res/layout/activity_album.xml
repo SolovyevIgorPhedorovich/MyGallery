@@ -13,11 +13,10 @@
         android:layout_height="40dp"
         android:layout_marginEnd="5dp"
         android:background="#00FFFFFF"
-        android:src="@android:drawable/btn_star"
         app:layout_constraintBottom_toTopOf="@+id/searchView"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSetting"
+        app:layout_constraintEnd_toStartOf="@+id/buttonContextMenu"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ui_menu_shape_square_4_24_regular" />
+        app:srcCompat="@drawable/ui_menu_shape_square_4_24_regular" />
 
     <ProgressBar
         android:id="@+id/recyclerProgress"
@@ -31,7 +30,7 @@
         app:layout_constraintVertical_bias="0.449" />
 
     <ImageButton
-        android:id="@+id/buttonSetting"
+        android:id="@+id/buttonContextMenu"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginEnd="5dp"
@@ -39,7 +38,7 @@
         app:layout_constraintBottom_toTopOf="@+id/searchView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/settings_gear_32_regular" />
+        app:srcCompat="@drawable/context_menu" />
 
     <SearchView
         android:id="@+id/searchView"
@@ -49,7 +48,7 @@
         android:layout_marginTop="50dp"
         android:layout_marginEnd="5dp"
         app:layout_constraintBottom_toTopOf="@+id/recyclerViewAlbum"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSetting"
+        app:layout_constraintEnd_toStartOf="@+id/buttonContextMenu"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

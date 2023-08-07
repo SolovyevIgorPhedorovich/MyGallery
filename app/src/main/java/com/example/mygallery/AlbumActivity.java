@@ -37,7 +37,7 @@ public class AlbumActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewAlbum);
         progressBar = findViewById(R.id.recyclerProgress);
-        settingButton = findViewById(R.id.buttonSetting);
+        settingButton = findViewById(R.id.buttonContextMenu);
 
         setSizeImage();
         requestStoragePermission();
