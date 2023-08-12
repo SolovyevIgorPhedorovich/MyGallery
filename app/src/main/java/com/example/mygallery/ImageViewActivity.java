@@ -4,12 +4,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -23,17 +29,22 @@ public class ImageViewActivity extends AppCompatActivity {
     private TextView textView;
     private  boolean isMenuVisible = true;
     private ImageViewPagerAdapter adapter;
+    private FrameLayout menu, toolbar;
     private int initialPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_image_view);
 
         viewPager = findViewById(R.id.viewPager);
         imageButton = findViewById(R.id.buttonBack);
         textView = findViewById(R.id.itemNameTextView);
+        menu = findViewById(R.id.menuViewImage);
+        toolbar = findViewById(R.id.toolBar);
 
+        menu.setPadding(0, getStatusBarHeight(), 0, 0);
 
         //Получение пути изображения
         Intent intent = getIntent();
@@ -53,6 +64,7 @@ public class ImageViewActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position){
                 setNameItem(imagePaths.get(position));
+                adapter.resetScaleViewHolder(position);
             }
         });
 
@@ -67,29 +79,46 @@ public class ImageViewActivity extends AppCompatActivity {
 
     public void toggleMenu(){
         Animation animationTotMenu, animationBottomMenu;
-        FrameLayout menu = findViewById(R.id.menuViewImage),
-                contextMenu = findViewById(R.id.toolBar);
+        View decorView = getWindow().getDecorView();
         if (isMenuVisible){
             //Скрыть меню
             animationTotMenu = AnimationUtils.loadAnimation(this, R.anim.slide_up_top);
             animationBottomMenu = AnimationUtils.loadAnimation(this, R.anim.slide_down_bottom);
             menu.setVisibility(View.GONE);
-            contextMenu.setVisibility(View.GONE);
+            toolbar.setVisibility(View.GONE);
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            );
         }
         else {
             animationTotMenu = AnimationUtils.loadAnimation(this, R.anim.slide_down_top);
             animationBottomMenu = AnimationUtils.loadAnimation(this, R.anim.slide_up_bottom);
             menu.setVisibility(View.VISIBLE);
-            contextMenu.setVisibility(View.VISIBLE);
+            toolbar.setVisibility(View.VISIBLE);
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         }
         menu.startAnimation(animationTotMenu);
-        contextMenu.startAnimation(animationBottomMenu);
+        toolbar.startAnimation(animationBottomMenu);
+        viewPager.requestLayout();
         isMenuVisible = !isMenuVisible;
     }
 
     private void setNameItem (String path){
         File file = new File(path);
         textView.setText(file.getName());
+    }
+
+    private int getStatusBarHeight(){
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0){
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return  result;
     }
 
 

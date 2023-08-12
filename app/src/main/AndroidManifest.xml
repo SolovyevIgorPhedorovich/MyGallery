@@ -30,7 +30,11 @@
             android:name=".ImageViewActivity"
             android:exported="false"
             android:label="Image Viewer"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.view.layoutInDisplayCutoutMode"
+                android:value="shortEdges"/>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
