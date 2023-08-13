@@ -4,18 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -64,7 +59,10 @@ public class ImageViewActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position){
                 setNameItem(imagePaths.get(position));
-                adapter.resetScaleViewHolder(position);
+                if (initialPosition != position) {
+                    adapter.notifyItemChanged(initialPosition);
+                    initialPosition = position;
+                }
             }
         });
 
@@ -120,7 +118,5 @@ public class ImageViewActivity extends AppCompatActivity {
         }
         return  result;
     }
-
-
-
 }
+
