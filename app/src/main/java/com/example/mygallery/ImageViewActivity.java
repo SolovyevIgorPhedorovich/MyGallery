@@ -26,6 +26,7 @@ public class ImageViewActivity extends AppCompatActivity {
     private ImageViewPagerAdapter adapter;
     private FrameLayout menu, toolbar;
     private int initialPosition;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +40,47 @@ public class ImageViewActivity extends AppCompatActivity {
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
 
-        menu.setPadding(0, getStatusBarHeight(), 0, 0);
+        int statusBarHeight = getStatusBarHeight();
+        menu.setPadding(0, statusBarHeight, 0, 0);
+        
+        getPathsImages();
+        setAdapter(statusBarHeight);
+        setPosition();
+        registerOnPage();
+        setOnClickListenerButtons();
+    }
 
-        //Получение пути изображения
-        Intent intent = getIntent();
+    //Получение пути изображения
+    private void getPathsImages(){
+        intent = getIntent();
         imagePaths = intent.getStringArrayListExtra("imagePaths");
+    }
 
-        //Установка адаптера для ViewPager
-        adapter = new ImageViewPagerAdapter(this, imagePaths);
+    //Установка адаптера для ViewPager
+    private void setAdapter(int statusBarHeight){
+        adapter = new ImageViewPagerAdapter(this, imagePaths, statusBarHeight);
         viewPager.setAdapter(adapter);
+    }
 
-        //Установка позиции
+    //Установка позиции
+    private void setPosition(){
         initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
-
         setNameItem(imagePaths.get(initialPosition));
+    }
 
+    //Обработка нажатий
+    private void setOnClickListenerButtons(){
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+    }
+
+    //Обработка перелистывания pageViewer2
+    private void registerOnPage(){
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position){
@@ -65,21 +91,12 @@ public class ImageViewActivity extends AppCompatActivity {
                 }
             }
         });
-
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
-
     }
-
+    //Функция сворачивает/разворачивает интерфейс программы и ситемы
     public void toggleMenu(){
         Animation animationTotMenu, animationBottomMenu;
         View decorView = getWindow().getDecorView();
         if (isMenuVisible){
-            //Скрыть меню
             animationTotMenu = AnimationUtils.loadAnimation(this, R.anim.slide_up_top);
             animationBottomMenu = AnimationUtils.loadAnimation(this, R.anim.slide_down_bottom);
             menu.setVisibility(View.GONE);
@@ -102,14 +119,16 @@ public class ImageViewActivity extends AppCompatActivity {
         menu.startAnimation(animationTotMenu);
         toolbar.startAnimation(animationBottomMenu);
         viewPager.requestLayout();
+        viewPager.setPageTransformer(new ZoomOutPageTransformer());
         isMenuVisible = !isMenuVisible;
     }
 
+    //Функция возвращаеть именя файла
     private void setNameItem (String path){
         File file = new File(path);
         textView.setText(file.getName());
     }
-
+    //Функция возвращает высоту статус бара системы
     private int getStatusBarHeight(){
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
