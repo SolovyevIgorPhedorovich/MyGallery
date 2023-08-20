@@ -1,4 +1,4 @@
-package com.example.mygallery;
+package com.example.mygallery.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -9,12 +9,19 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+
+import com.example.mygallery.DataManager;
+import com.example.mygallery.adapters.AlbumAdapter;
+import com.example.mygallery.DatabaseManager;
+import com.example.mygallery.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,12 +30,14 @@ import java.util.List;
 public class AlbumActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
-    private List<List<String>> imageDirectoryPaths = new ArrayList<List<String>>();
+    private DataManager dataManager;
     private RecyclerView recyclerView;
     private AlbumAdapter albumAdapter;
     private ImageButton settingButton;
     private ProgressBar progressBar;
     private int imageWidth;
+    private DatabaseManager DBManager;
+    private SQLiteDatabase Db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,54 +48,81 @@ public class AlbumActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.recyclerProgress);
         settingButton = findViewById(R.id.buttonContextMenu);
 
-        setSizeImage();
-        requestStoragePermission();
+        dataManager = DataManager.getInstance();
+        DBManager = new DatabaseManager(this);
+
+        try{
+            Db = DBManager.getWritableDatabase();
+            createTrashDir();
+            setSizeViewImage();
+            requestStoragePermission();
+        }
+        catch (SQLException e){
+            throw e;
+        }
     }
 
     private void requestStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
         } else {
+            loadFilesOutDataBase();
+        }
+    }
+
+    private void loadFilesOutDataBase(){
+        DBManager.getFolder();
+        DBManager.close();
+        if (dataManager.isDataNamesFolders() && dataManager.isDataCoversFolders() && dataManager.isDataCountFiles()) {
+            setConfigRecycleView();
+            progressBar.setVisibility(View.GONE);
+            createAdapter();
+        }
+        else{
             scanImages();
         }
     }
 
+    private void addFilesDataBase(){
+        DBManager.insertMultipleDataFolders();
+        DBManager.insertMultipleDataPath();
+        DBManager.close();
+    }
+
     private void scanImages(){
-        // Определние пути к директории с изображениями
         File directory = new File ("storage/emulated/0/");
         if (directory != null && directory.exists()){
-            // Рекурсивное сканирование и добавление пути к изображению в список
             scanDirectory(directory);
         }
+        addFilesDataBase();
+        createAdapter();
+        setConfigRecycleView();
+        progressBar.setVisibility(View.GONE);
+    }
 
-        List<String> nameDirect = new ArrayList<String>();
-        List<String> imagePreviewPaths = new ArrayList<String>();
-        List<Integer> countItem = new ArrayList<Integer>();
-        for (List<String> row : imageDirectoryPaths){
-            nameDirect.add(row.get(0));
-            imagePreviewPaths.add(row.get(1));
-            countItem.add(row.size() - 1);
-        }
-
-        // Насторйка RecycleView с использование GridLayoutManager
-        recyclerView.setHasFixedSize(true);
-
-        StaggeredGridLayoutManager layoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-
-        recyclerView.setLayoutManager(layoutManager);
-        albumAdapter = new AlbumAdapter(this, nameDirect, imagePreviewPaths, countItem, imageWidth, new AlbumAdapter.OnItemClickListener() {
+    //Создание адаптера
+    private  void createAdapter(){
+        albumAdapter = new AlbumAdapter(this, imageWidth, new AlbumAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 openDirectoryImage(position);
             }
         });
         recyclerView.setAdapter(albumAdapter);
-
-        progressBar.setVisibility(View.GONE);
     }
 
+    // Насторйка RecycleView с использование GridLayoutManager
+    private void setConfigRecycleView(){
+        recyclerView.setHasFixedSize(true);
+        StaggeredGridLayoutManager layoutManager= new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+    // Рекурсивное сканирование и добавление пути к изображению в список
     private void scanDirectory(File directory){
+        int colum = 0;
         boolean flag = false;
         File[] files = directory.listFiles();
         if (files != null) {
@@ -97,19 +133,24 @@ public class AlbumActivity extends AppCompatActivity {
                 }else{
                     //Добавлене файлов изображения в список
                     if (file.getName().endsWith(".jpg") || file.getName().endsWith(".png") || file.getName().endsWith(".jpeg")){
+                        ++colum;
                         if (!flag){
                             String nameDirectory = directory.getName();
-                            imageDirectoryPaths.add(new ArrayList<>());
-                            imageDirectoryPaths.get(imageDirectoryPaths.size()-1).add(nameDirectory);
+                            dataManager.addDataInNamesFolders(nameDirectory);
+                            dataManager.addDataPathsFolders(directory.getPath());
+                            dataManager.addDataInCoversFolders(file.getAbsolutePath());
                             flag = true;
                         }
-                        imageDirectoryPaths.get(imageDirectoryPaths.size()-1).add(file.getAbsolutePath());
+                        dataManager.addDataInPathsFiles(file.getAbsolutePath());
                     }
                 }
             }
+            if (flag) {
+                dataManager.addDataInCountFiles(colum);
+            }
         }
     }
-    private void setSizeImage() {
+    private void setSizeViewImage() {
         //Получение ширины экрна
         Display display = getWindowManager().getDefaultDisplay();
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -125,9 +166,22 @@ public class AlbumActivity extends AppCompatActivity {
 
     private void openDirectoryImage(int position) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putStringArrayListExtra("imagePaths", (ArrayList<String>) imageDirectoryPaths.get(position));
+        DBManager.getFileInFolder(position);
+        dataManager.position = position;
         startActivity(intent);
     }
 
+    private void createTrashDir(){
+        File binFolder = new File(getFilesDir(), "Корзина");
+        if (!binFolder.exists()){
+            if (binFolder.mkdir()){
+                DBManager.insertFolders("Корзина", 0, binFolder.getPath());
+                DBManager.close();
+            }
+            else {
+
+            }
+        }
+    }
 
 }

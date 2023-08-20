@@ -1,34 +1,32 @@
-package com.example.mygallery;
+package com.example.mygallery.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.mygallery.DataManager;
+import com.example.mygallery.R;
 
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
     private Context context;
-    private List<String> imagePaths;
+    private DataManager dataManager;
     private int imageSize;
     private OnItemClickListener listener;
 
-    public ImageAdapter(Context context, List<String> imagePaths, int imageSize, OnItemClickListener listener){
+    public ImageAdapter(Context context, int imageSize, OnItemClickListener listener){
         this.context = context;
-        this.imagePaths = imagePaths;
+        this.dataManager = DataManager.getInstance();
         this.imageSize = imageSize;
         this.listener = listener;
     }
@@ -47,7 +45,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Glide.with(holder.imageView)
-                .load(imagePaths.get(position))
+                .load(dataManager.getPathsFiles().get(position))
                 .apply(RequestOptions.overrideOf(imageSize))
                 .into(holder.imageView);
 
@@ -61,7 +59,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public int getItemCount() {
-        return imagePaths.size();
+        return dataManager.getPathsFiles().size();
     }
 
     public interface OnItemClickListener {

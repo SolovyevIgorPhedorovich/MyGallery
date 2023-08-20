@@ -1,8 +1,7 @@
-package com.example.mygallery;
+package com.example.mygallery.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,30 +12,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.mygallery.DataManager;
+import com.example.mygallery.R;
 
 import java.util.List;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHolder> {
 
-    private Context context;
-    private List<String> imageNameAlbum;
-    private List<String> imagePreviewPaths;
-    private List<Integer> countItemDirectory;
+    private final Context context;
+    private DataManager dataManager;
     private TextView directoryName;
     private TextView countItem;
-    private int imageWidth;
+    private final int imageWidth;
     private AlbumAdapter.OnItemClickListener listener;
 
-    public AlbumAdapter(Context context, List<String> imageNameAlbum, List<String> imagePreviewPaths, List<Integer> countItemDirectory, int imageWidth, AlbumAdapter.OnItemClickListener listener){
+    public AlbumAdapter(Context context, int imageWidth, AlbumAdapter.OnItemClickListener listener){
         this.context = context;
-        this.imageNameAlbum = imageNameAlbum;
-        this.imagePreviewPaths = imagePreviewPaths;
-        this.countItemDirectory = countItemDirectory;
         this.imageWidth = imageWidth;
         this.listener = listener;
+        dataManager = DataManager.getInstance();
     }
 
     @NonNull
@@ -51,13 +47,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Glide.with(holder.imageView)
-                .load(imagePreviewPaths.get(position))
+                .load(dataManager.getCoversFolders().get(position))
                 .apply(RequestOptions.centerCropTransform())
                 .apply(RequestOptions.bitmapTransform(new RoundedCorners(30)))
                 .into(holder.imageView);
 
-        directoryName.setText(imageNameAlbum.get(position));
-        countItem.setText(String.valueOf(countItemDirectory.get(position)));
+        directoryName.setText(dataManager.getNamesFolders().get(position));
+        countItem.setText(String.valueOf(dataManager.getCountFiles().get(position)));
 
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +65,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHol
 
     @Override
     public int getItemCount() {
-        return imageNameAlbum.size();
+        return dataManager.getNamesFolders().size();
     }
 
     public interface OnItemClickListener {

@@ -1,4 +1,4 @@
-package com.example.mygallery;
+package com.example.mygallery.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -13,14 +13,19 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.mygallery.DataManager;
+import com.example.mygallery.adapters.ImageViewPagerAdapter;
+import com.example.mygallery.R;
+import com.example.mygallery.ZoomOutPageTransformer;
+
 import java.io.File;
 import java.util.List;
 
 public class ImageViewActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
-    private List<String> imagePaths;
-    private ImageButton imageButton;
+    private DataManager dataManager;
+    private ImageButton imageButtonBack;
     private TextView textView;
     private  boolean isMenuVisible = true;
     private ImageViewPagerAdapter adapter;
@@ -35,43 +40,38 @@ public class ImageViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_view);
 
         viewPager = findViewById(R.id.viewPager);
-        imageButton = findViewById(R.id.buttonBack);
+        imageButtonBack = findViewById(R.id.buttonBack);
         textView = findViewById(R.id.itemNameTextView);
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
 
+        dataManager = DataManager.getInstance();
         int statusBarHeight = getStatusBarHeight();
         menu.setPadding(0, statusBarHeight, 0, 0);
-        
-        getPathsImages();
+
         setAdapter(statusBarHeight);
         setPosition();
         registerOnPage();
         setOnClickListenerButtons();
     }
 
-    //Получение пути изображения
-    private void getPathsImages(){
-        intent = getIntent();
-        imagePaths = intent.getStringArrayListExtra("imagePaths");
-    }
-
     //Установка адаптера для ViewPager
     private void setAdapter(int statusBarHeight){
-        adapter = new ImageViewPagerAdapter(this, imagePaths, statusBarHeight);
+        adapter = new ImageViewPagerAdapter(this, statusBarHeight);
         viewPager.setAdapter(adapter);
     }
 
     //Установка позиции
     private void setPosition(){
+        intent = getIntent();
         initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
-        setNameItem(imagePaths.get(initialPosition));
+        setNameItem(dataManager.getPathsFiles().get(initialPosition));
     }
 
     //Обработка нажатий
     private void setOnClickListenerButtons(){
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        imageButtonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();
@@ -84,7 +84,7 @@ public class ImageViewActivity extends AppCompatActivity {
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position){
-                setNameItem(imagePaths.get(position));
+                setNameItem(dataManager.getPathsFiles().get(position));
                 if (initialPosition != position) {
                     adapter.notifyItemChanged(initialPosition);
                     initialPosition = position;

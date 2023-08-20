@@ -1,4 +1,4 @@
-package com.example.mygallery;
+package com.example.mygallery.adapters;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.mygallery.DataManager;
+import com.example.mygallery.R;
+import com.example.mygallery.activities.ImageViewActivity;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.List;
@@ -20,12 +23,12 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
     private final Context context;
     private boolean isVisibleInterface = true;
     private boolean isScaled = false;
-    private final List<String> imagePaths;
+    private DataManager dataManager;
     private final float WIDTH, HEIGHT;
 
-    public ImageViewPagerAdapter(Context context, List<String> imagePaths, int statusBarHeight){
+    public ImageViewPagerAdapter(Context context, int statusBarHeight){
         this.context = context;
-        this.imagePaths = imagePaths;
+        this.dataManager = DataManager.getInstance();
         this.WIDTH = context.getResources().getDisplayMetrics().widthPixels;
         this.HEIGHT = context.getResources().getDisplayMetrics().heightPixels + statusBarHeight;
     }
@@ -40,13 +43,13 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        loadImage(imagePaths.get(position), holder.imageView);
+        loadImage(dataManager.getPathsFiles().get(position), holder.imageView);
         setTouchListener(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return imagePaths.size();
+        return dataManager.getPathsFiles().size();
     }
 
     public void loadImage(String imageUrl, PhotoView imageView) {

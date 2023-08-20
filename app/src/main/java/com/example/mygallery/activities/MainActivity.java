@@ -1,4 +1,4 @@
-package com.example.mygallery;
+package com.example.mygallery.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -11,6 +11,10 @@ import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.mygallery.DataManager;
+import com.example.mygallery.adapters.ImageAdapter;
+import com.example.mygallery.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
     protected RecyclerView recyclerView;
     private TextView directoryName;
     protected ImageAdapter imageAdapter;
-    private List<String> imagePaths;
     private int imageSize;
+    private DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         directoryName = findViewById(R.id.directoryNameTextView);
+        dataManager = DataManager.getInstance();
+
         setSizeImage();
         viewDirectoryImage();
-
         findViewById(R.id.buttonBack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -41,15 +46,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewDirectoryImage(){
-
-        imagePaths = getIntent().getStringArrayListExtra("imagePaths");
-        directoryName.setText(imagePaths.get(0));
-        imagePaths.remove(0);
+        directoryName.setText(dataManager.getNamesFolders().get(dataManager.position));
 
         // Насторйка RecycleView с использование GridLayoutManager
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        imageAdapter = new ImageAdapter(this, imagePaths, imageSize, new ImageAdapter.OnItemClickListener() {
+        imageAdapter = new ImageAdapter(this, imageSize, new ImageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 openImageViewer(position);
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
     }
     private void openImageViewer(int position) {
         Intent intent = new Intent(this, ImageViewActivity.class);
-        intent.putStringArrayListExtra("imagePaths", (ArrayList<String>) imagePaths);
         intent.putExtra("position", position);
         startActivity(intent);
     }
