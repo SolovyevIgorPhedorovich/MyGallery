@@ -11,12 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.mygallery.DataManager;
+import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.ImageViewActivity;
 import com.github.chrisbanes.photoview.PhotoView;
 
-import java.util.List;
+import java.io.File;
 
 public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAdapter.ImageViewHolder> {
     final float MIN_SCALE = 1.0f;
@@ -52,7 +52,7 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
         return dataManager.getPathsFiles().size();
     }
 
-    public void loadImage(String imageUrl, PhotoView imageView) {
+    public void loadImage(File imageUrl, PhotoView imageView) {
         Glide.with(context)
                 .load(imageUrl)
                 .into(imageView);

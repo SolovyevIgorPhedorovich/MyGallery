@@ -1,5 +1,8 @@
-package com.example.mygallery;
+package com.example.mygallery.managers;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,20 +11,25 @@ public class DataManager {
     public static final int PATH = 1;
     public static final int COUNT = 2;
     public static final int COVERS = 3;
+    public static final int INVALIDS = 4;
+    public static final int PATH_FOLDERS = 5;
     private static DataManager instance;
     private List<String> namesFolders;
-    private List<String> pathsFiles;
+    private List<File> pathsFiles;
     private List<Integer> countFiles;
     private List<String> coversFolders;
+    private List<String> invalidsPathFile;
 
-    public List<String> pathsFolders;
+    private List<String> pathsFolders;
     public int position;
     public DataManager(){
         namesFolders = new ArrayList<>();
         pathsFiles = new ArrayList<>();
+        pathsFolders = new ArrayList<>();
         coversFolders = new ArrayList<>();
         countFiles = new ArrayList<>();
         pathsFolders = new ArrayList<>();
+        invalidsPathFile = new ArrayList<>();
         instance = this;
     }
 
@@ -36,21 +44,20 @@ public class DataManager {
         pathsFolders.add(path);
     }
 
-    public void setData(List<String> namesFolders, List<String> pathsFiles, List<Integer> countFiles, List<String> coversFolders){
+    public void setData(List<String> namesFolders, List<Integer> countFiles, List<String> coversFolders){
         this.namesFolders = namesFolders;
-        this.pathsFiles = pathsFiles;
         this.countFiles = countFiles;
         this.coversFolders = coversFolders;
     }
 
-
+    public void setPathsFolders(List<String> pathsFolders){this.pathsFolders = pathsFolders;}
 
     public void  setNamesFolders(List<String> namesFolders){
         this.namesFolders = namesFolders;
     }
 
-    public void setPathsFiles(List<String> pathsFiles){
-        this.pathsFiles = pathsFiles;
+    public void setPathsFiles(File pathsFolder){
+        this.pathsFiles = (List<File>) FileUtils.listFiles(pathsFolder, new String[]{"png", "jpg", "jpeg"}, false);
     }
 
     public void setCountFiles(List<Integer> countFiles){
@@ -65,7 +72,7 @@ public class DataManager {
         return namesFolders;
     }
 
-    public List<String> getPathsFiles(){
+    public List<File> getPathsFiles(){
         return pathsFiles;
     }
 
@@ -77,25 +84,23 @@ public class DataManager {
         return  coversFolders;
     }
 
+    public List<String> getInvalidsPathFile() {return invalidsPathFile;}
+
+    public List<String> getPathsFolders(){return pathsFolders;}
+
     public void addDataInNamesFolders(String name){
         namesFolders.add(name);
     }
 
+    public void addDataInvalidsPathFile(String path){
+        invalidsPathFile.add(path);
+    }
     public void addDataInNamesFolders(List<String> names){
         for (String name:names) {
             namesFolders.add(name);
         }
     }
 
-    public void addDataInPathsFiles(String path){
-        pathsFiles.add(path);
-    }
-
-    public void addDataInPathsFiles(List<String> paths){
-        for (String path:paths) {
-            pathsFiles.add(path);
-        }
-    }
 
     public void addDataInCountFiles(int count){
         countFiles.add(count);
@@ -129,7 +134,13 @@ public class DataManager {
     }
 
     public boolean isDataPathsFiles(){
-        return !this.pathsFiles.isEmpty();
+        if (pathsFiles != null){
+            return true;
+        }
+        else{
+            return false;
+        }
+
     }
 
     public boolean isDataCountFiles(){
@@ -145,6 +156,7 @@ public class DataManager {
         pathsFiles.clear();
         countFiles.clear();
         coversFolders.clear();
+        pathsFolders.clear();
     }
 
     public void clearData(int id){
@@ -160,6 +172,11 @@ public class DataManager {
         else if (id == COVERS)
         {
             coversFolders.clear();
+        } else if (id == INVALIDS) {
+            invalidsPathFile.clear();
+        }
+        else if (id == PATH_FOLDERS){
+            pathsFolders.clear();
         }
     }
 

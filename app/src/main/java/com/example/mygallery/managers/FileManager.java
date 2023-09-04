@@ -1,6 +1,8 @@
-package com.example.mygallery;
+package com.example.mygallery.managers;
 
-import android.content.SharedPreferences;
+import android.content.Context;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +12,16 @@ import java.util.List;
 
 public class FileManager {
     private  List<String> filePaths;
-    private String trashPath;
+    private DatabaseManager databaseManager;
+    private DataManager dataManager;
 
-    public FileManager(String path){
-        trashPath = path;
+    public FileManager(Context context){
+        databaseManager = DatabaseManager.getInstance(context);
     }
 
-    public FileManager(List<String> selectedFilePaths){
+    public FileManager(Context context, List<String> selectedFilePaths){
+        databaseManager = DatabaseManager.getInstance(context);
+        dataManager = DataManager.getInstance();
         filePaths = new ArrayList<>(selectedFilePaths);
     }
 
@@ -33,14 +38,14 @@ public class FileManager {
     }
 
     //Удаление файла
-    public void deleteFile(String filePath){
-        File file = new File(filePath);
-        File fileTrash = new File("");
-        if(file.renameTo(fileTrash)){
-
-        }
-        else{
-
+    public void deleteFile(File filePath){
+        File fileTrashPath = new File (databaseManager.getFolderPath("Корзина") + "/" + filePath.getName());
+        try {
+            FileUtils.copyFile(filePath, fileTrashPath);
+            dataManager.getPathsFiles().remove(filePath);
+            FileUtils.delete(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -13,19 +13,21 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.mygallery.DataManager;
+import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.adapters.ImageViewPagerAdapter;
 import com.example.mygallery.R;
 import com.example.mygallery.ZoomOutPageTransformer;
+import com.example.mygallery.managers.FileManager;
 
 import java.io.File;
-import java.util.List;
 
 public class ImageViewActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
     private DataManager dataManager;
-    private ImageButton imageButtonBack;
+    private FileManager fileManager;
+    private ImageButton imageButtonBack,
+                        buttonRemoveFile;
     private TextView textView;
     private  boolean isMenuVisible = true;
     private ImageViewPagerAdapter adapter;
@@ -41,11 +43,13 @@ public class ImageViewActivity extends AppCompatActivity {
 
         viewPager = findViewById(R.id.viewPager);
         imageButtonBack = findViewById(R.id.buttonBack);
+        buttonRemoveFile = findViewById(R.id.buttonRemove);
         textView = findViewById(R.id.itemNameTextView);
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
 
         dataManager = DataManager.getInstance();
+        fileManager = new FileManager(this);
         int statusBarHeight = getStatusBarHeight();
         menu.setPadding(0, statusBarHeight, 0, 0);
 
@@ -66,7 +70,7 @@ public class ImageViewActivity extends AppCompatActivity {
         intent = getIntent();
         initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
-        setNameItem(dataManager.getPathsFiles().get(initialPosition));
+       // setNameItem(dataManager.getPathsFiles().get(initialPosition));
     }
 
     //Обработка нажатий
@@ -77,6 +81,15 @@ public class ImageViewActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        buttonRemoveFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                adapter.notifyItemRemoved(initialPosition);
+                fileManager.deleteFile(dataManager.getPathsFiles().get(initialPosition));
+
+            }
+        });
     }
 
     //Обработка перелистывания pageViewer2
@@ -84,7 +97,7 @@ public class ImageViewActivity extends AppCompatActivity {
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position){
-                setNameItem(dataManager.getPathsFiles().get(position));
+               setNameItem(dataManager.getPathsFiles().get(position).getName());
                 if (initialPosition != position) {
                     adapter.notifyItemChanged(initialPosition);
                     initialPosition = position;

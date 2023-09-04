@@ -69,7 +69,7 @@
             app:srcCompat="@drawable/tool_pencil_square_32_regular" />
 
         <ImageButton
-            android:id="@+id/buttonDelite"
+            android:id="@+id/buttonRemove"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="265dp"

@@ -6,23 +6,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.mygallery.DataManager;
+import com.example.mygallery.InvalidsPathRemoved;
+import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.adapters.ImageAdapter;
 import com.example.mygallery.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     protected RecyclerView recyclerView;
     private TextView directoryName;
     protected ImageAdapter imageAdapter;
     private int imageSize;
+    private Intent intent;
     private DataManager dataManager;
 
     @Override
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         directoryName = findViewById(R.id.directoryNameTextView);
         dataManager = DataManager.getInstance();
+        intent = getIntent();
 
         setSizeImage();
         viewDirectoryImage();
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewDirectoryImage(){
-        directoryName.setText(dataManager.getNamesFolders().get(dataManager.position));
+        directoryName.setText(intent.getStringExtra("nameFolder"));
 
         // Насторйка RecycleView с использование GridLayoutManager
         recyclerView.setHasFixedSize(true);
@@ -58,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(imageAdapter);
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(() -> {
+            //InvalidsPathRemoved invalidsPathRemoved = new InvalidsPathRemoved(this, );
+            //invalidsPathRemoved.start();
+        });
     }
 
     private void setSizeImage() {
