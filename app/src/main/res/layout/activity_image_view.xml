@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_image_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -25,7 +26,7 @@
             android:layout_height="50dp"
             android:background="#00FFFFFF"
             android:layout_marginLeft="5dp"
-            app:srcCompat="@drawable/arrow_a_left_24_regular"/>
+            app:srcCompat="@drawable/arrow_a_left_32"/>
 
         <TextView
             android:id="@+id/itemNameTextView"
@@ -50,7 +51,7 @@
             android:layout_marginLeft="10dp"
             android:background="#00FFFFFF"
             android:rotation="-30"
-            app:srcCompat="@drawable/share" />
+            app:srcCompat="@drawable/share_32" />
 
         <ImageButton
             android:id="@+id/buttonAddFavorites"
@@ -66,7 +67,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="180dp"
             android:background="#00FFFFFF"
-            app:srcCompat="@drawable/tool_pencil_square_32_regular" />
+            app:srcCompat="@drawable/tool_pencil_square_32" />
 
         <ImageButton
             android:id="@+id/buttonRemove"
@@ -74,7 +75,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="265dp"
             android:background="#00FFFFFF"
-            app:srcCompat="@drawable/trash_can_20_light" />
+            app:srcCompat="@drawable/trash_can_32" />
 
         <ImageButton
             android:id="@+id/buttonContextMenu"

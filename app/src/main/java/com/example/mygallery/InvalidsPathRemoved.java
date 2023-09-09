@@ -14,7 +14,7 @@ public class InvalidsPathRemoved extends Thread {
     private CountDownLatch adapterLatch;
 
     public InvalidsPathRemoved(Context context, CountDownLatch adapterLatch) {
-        invalidsPath = DataManager.getInstance().getInvalidsPathFile();
+        invalidsPath = DataManager.getInstance(context).getInvalidsPathFile();
         databaseManager = DatabaseManager.getInstance(context);
         this.adapterLatch = adapterLatch;
     }
@@ -24,7 +24,7 @@ public class InvalidsPathRemoved extends Thread {
         try{
             adapterLatch.await();
             databaseManager.removedOldFile(invalidsPath);
-            DataManager.getInstance().clearData(DataManager.INVALIDS);
+            //DataManager.getInstance().clearData(DataManager.INVALIDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

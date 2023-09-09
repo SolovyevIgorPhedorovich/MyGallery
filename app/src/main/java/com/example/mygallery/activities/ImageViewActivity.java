@@ -1,39 +1,57 @@
 package com.example.mygallery.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.mygallery.fragment.ActionFileFragment;
 import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.adapters.ImageViewPagerAdapter;
 import com.example.mygallery.R;
 import com.example.mygallery.ZoomOutPageTransformer;
+import com.example.mygallery.managers.DatabaseManager;
 import com.example.mygallery.managers.FileManager;
 
 import java.io.File;
 
-public class ImageViewActivity extends AppCompatActivity {
-
+public class ImageViewActivity extends AppCompatActivity implements ActionFileFragment.FolderSelectionListener {
+    private static final int MOVE = 0;
+    private static final int COPY = 1;
     private ViewPager2 viewPager;
     private DataManager dataManager;
     private FileManager fileManager;
     private ImageButton imageButtonBack,
-                        buttonRemoveFile;
+                        buttonRemoveFile,
+                        buttonContextMenu;
+    private Button buttonMoveFile, buttonCopyFile;
     private TextView textView;
+    private int idFolder = -1;
     private  boolean isMenuVisible = true;
     private ImageViewPagerAdapter adapter;
     private FrameLayout menu, toolbar;
     private int initialPosition;
     private Intent intent;
+    private Context context;
+    private PopupWindow popupWindow;
+    private int typeAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +62,13 @@ public class ImageViewActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
         imageButtonBack = findViewById(R.id.buttonBack);
         buttonRemoveFile = findViewById(R.id.buttonRemove);
+        buttonContextMenu = findViewById(R.id.buttonContextMenu);
         textView = findViewById(R.id.itemNameTextView);
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
+        context = this;
 
-        dataManager = DataManager.getInstance();
+        dataManager = DataManager.getInstance(this);
         fileManager = new FileManager(this);
         int statusBarHeight = getStatusBarHeight();
         menu.setPadding(0, statusBarHeight, 0, 0);
@@ -70,11 +90,19 @@ public class ImageViewActivity extends AppCompatActivity {
         intent = getIntent();
         initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
-       // setNameItem(dataManager.getPathsFiles().get(initialPosition));
+        setNameItem(dataManager.getPathsFiles().get(initialPosition).getName());
+    }
+
+    public int getPositionAlbum(){
+        DatabaseManager DBManger = DatabaseManager.getInstance(this);
+        if (idFolder == -1){
+            idFolder = (int) DBManger.getIdFolder(intent.getStringExtra("nameFolder")) - 2;
+        }
+        return idFolder;
     }
 
     //Обработка нажатий
-    private void setOnClickListenerButtons(){
+    private void setOnClickListenerButtons() {
         imageButtonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +115,91 @@ public class ImageViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 adapter.notifyItemRemoved(initialPosition);
                 fileManager.deleteFile(dataManager.getPathsFiles().get(initialPosition));
+            }
+        });
 
+        buttonContextMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showContextMenuAction(view);
+            }
+        });
+    }
+
+    private void setOnClickListenerContextMenu(){
+        buttonCopyFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                typeAction = 1;
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ActionFileFragment actionFileFragment = new ActionFileFragment(context, true);
+                fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                popupWindow.dismiss();
+            }
+        });
+
+        buttonMoveFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                typeAction = 0;
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                ActionFileFragment actionFileFragment = new ActionFileFragment(context, false);
+                fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    private void showContextMenuAction(View view){
+
+        popupWindow = new PopupWindow(this);
+
+        //Загрузка XML-макета
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View menuView = inflater.inflate(R.layout.context_menu_action_file, null);
+
+        //Установка содержимого
+        popupWindow.setContentView(menuView);
+
+        //Установка размеров меню
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, location[0]+view.getHeight(), location[1]-popupWindow.getWidth());
+        createBackgroundView();
+        buttonMoveFile = menuView.findViewById(R.id.moveFile);
+        buttonCopyFile = menuView.findViewById(R.id.copyFile);
+        setOnClickListenerContextMenu();
+    }
+
+    //Создание фонового view
+    private void createBackgroundView(){
+        final View backgroundView = new View(this);
+        backgroundView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        backgroundView.setBackgroundColor(Color.parseColor("#00000000"));
+        ((ViewGroup) getWindow().getDecorView()).addView(backgroundView);
+
+        backgroundView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (popupWindow != null && popupWindow.isShowing()){
+                    popupWindow.dismiss();
+                }
+            }
+        });
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                ((ViewGroup) getWindow().getDecorView()).removeView(backgroundView);
             }
         });
     }
@@ -142,13 +254,23 @@ public class ImageViewActivity extends AppCompatActivity {
         textView.setText(file.getName());
     }
     //Функция возвращает высоту статус бара системы
-    private int getStatusBarHeight(){
+    public int getStatusBarHeight(){
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0){
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return  result;
+    }
+
+    @Override
+    public void onFolderSelected(File folderPath){
+        if (typeAction == MOVE){
+            adapter.notifyItemRemoved(initialPosition);
+            fileManager.moveFile(dataManager.getPathsFiles().get(initialPosition), folderPath);
+        } else if (typeAction == COPY) {
+            fileManager.copyFile(dataManager.getPathsFiles().get(initialPosition), folderPath);
+        }
     }
 }
 

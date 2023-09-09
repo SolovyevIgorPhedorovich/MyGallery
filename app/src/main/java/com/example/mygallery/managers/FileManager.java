@@ -1,6 +1,8 @@
 package com.example.mygallery.managers;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.net.Uri;
 
 import org.apache.commons.io.FileUtils;
 
@@ -12,64 +14,62 @@ import java.util.List;
 
 public class FileManager {
     private  List<String> filePaths;
+    private Context context;
     private DatabaseManager databaseManager;
     private DataManager dataManager;
 
     public FileManager(Context context){
+        this.context = context;
         databaseManager = DatabaseManager.getInstance(context);
+        dataManager = DataManager.getInstance(context);
     }
 
     public FileManager(Context context, List<String> selectedFilePaths){
         databaseManager = DatabaseManager.getInstance(context);
-        dataManager = DataManager.getInstance();
+        dataManager = DataManager.getInstance(context);
         filePaths = new ArrayList<>(selectedFilePaths);
     }
 
     //Перемещение файла
-    public void moveFile(String sourcePath, String destPath){
-        File sourceFile = new File(sourcePath);
-        File destFile = new File(destPath);
-        if (sourceFile.renameTo(destFile)) {
-
-        }
-        else{
-
-        }
+    public void moveFile(File sourcePath, File destPath){
+        destPath = new File(destPath.getAbsolutePath()+"/"+sourcePath.getName());
+        renameFile(sourcePath, destPath);
     }
 
     //Удаление файла
     public void deleteFile(File filePath){
-        File fileTrashPath = new File (databaseManager.getFolderPath("Корзина") + "/" + filePath.getName());
-        try {
-            FileUtils.copyFile(filePath, fileTrashPath);
-            dataManager.getPathsFiles().remove(filePath);
-            FileUtils.delete(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        File trashPath = new File (databaseManager.getFolderPath("Корзина") + "/" + filePath.getName());
+        if (filePath != trashPath){
+            renameFile(filePath, trashPath);
+        }
+        else{
+            try {
+                FileUtils.delete(filePath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     //Копирование файла
-    public void copyFile(String sourcePath, String destPath){
-        File sourceFile = new File(sourcePath);
-        File destFile = new File(destPath);
+    public void copyFile(File sourcePath, File destPath){
+        destPath = new File (destPath.getAbsolutePath() + "/"+ sourcePath.getName());
         try{
-            Files.copy(sourceFile.toPath(), destFile.toPath());
+            FileUtils.copyFile(sourcePath, destPath);
         }
         catch (IOException e){
-
+            throw new RuntimeException(e);
         }
     }
 
     //Переименование файла
-    public void renameFile(String filePath, String newFileName){
-        File file = new File(filePath);
-        File newFile = new File(newFileName);
-        if (file.renameTo(newFile)){
-
-        }
-        else{
-
+    public void renameFile(File filePath, File newFile){
+        try {
+            FileUtils.copyFile(filePath, newFile);
+            dataManager.getPathsFiles().remove(filePath);
+            FileUtils.delete(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

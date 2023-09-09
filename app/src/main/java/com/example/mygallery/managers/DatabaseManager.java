@@ -37,7 +37,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
         this.context = context;
         copyDataBase();
         this.getReadableDatabase();
-        dataManager = DataManager.getInstance();
+        dataManager = DataManager.getInstance(context);
         instance = this;
     }
 

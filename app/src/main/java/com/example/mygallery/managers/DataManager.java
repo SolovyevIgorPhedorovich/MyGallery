@@ -1,10 +1,16 @@
 package com.example.mygallery.managers;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 
 public class DataManager {
     public static final int NAME = 0;
@@ -14,6 +20,7 @@ public class DataManager {
     public static final int INVALIDS = 4;
     public static final int PATH_FOLDERS = 5;
     private static DataManager instance;
+    private Context context;
     private List<String> namesFolders;
     private List<File> pathsFiles;
     private List<Integer> countFiles;
@@ -22,20 +29,21 @@ public class DataManager {
 
     private List<String> pathsFolders;
     public int position;
-    public DataManager(){
-        namesFolders = new ArrayList<>();
-        pathsFiles = new ArrayList<>();
-        pathsFolders = new ArrayList<>();
-        coversFolders = new ArrayList<>();
-        countFiles = new ArrayList<>();
-        pathsFolders = new ArrayList<>();
-        invalidsPathFile = new ArrayList<>();
-        instance = this;
+    public DataManager(Context context){
+        this.namesFolders = new ArrayList<>();
+        this.pathsFiles = new ArrayList<>();
+        this.pathsFolders = new ArrayList<>();
+        this.coversFolders = new ArrayList<>();
+        this.countFiles = new ArrayList<>();
+        this.pathsFolders = new ArrayList<>();
+        this.invalidsPathFile = new ArrayList<>();
+        this.context = context;
+        this.instance = this;
     }
 
-    public static DataManager getInstance(){
+    public static DataManager getInstance(Context context){
         if (instance == null){
-            instance = new DataManager();
+            instance = new DataManager(context);
         }
         return instance;
     }
@@ -56,8 +64,35 @@ public class DataManager {
         this.namesFolders = namesFolders;
     }
 
-    public void setPathsFiles(File pathsFolder){
+    private void scanMediaStore(File pathsFolder){
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {MediaStore.Images.Media.DATA};
+        String selection = MediaStore.Images.Media.DATA + " LIKE ?";
+        String[] selectionArgs = new String[]{pathsFolder.getAbsolutePath()+"%"};
+        String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
+
+        Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
+
+        if (cursor != null && cursor.moveToFirst()){
+            int dataIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+            do{
+                this.pathsFiles.add(new File(cursor.getString(dataIndex)));
+            }
+            while (cursor.moveToNext());
+        }
+    }
+
+    private void scanFileUtils(File pathsFolder){
         this.pathsFiles = (List<File>) FileUtils.listFiles(pathsFolder, new String[]{"png", "jpg", "jpeg"}, false);
+    }
+
+    public void setPathsFiles(File pathsFolder, int position){
+        if (countFiles.get(position) <= 100){
+            scanFileUtils(pathsFolder);
+        }
+        else{
+            scanMediaStore(pathsFolder);
+        }
     }
 
     public void setCountFiles(List<Integer> countFiles){
@@ -177,6 +212,12 @@ public class DataManager {
         }
         else if (id == PATH_FOLDERS){
             pathsFolders.clear();
+        }
+    }
+
+    public void remove(int id, int position){
+        if (id == PATH){
+            pathsFiles.remove(position);
         }
     }
 

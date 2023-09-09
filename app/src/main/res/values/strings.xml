@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MyGallery</string>
+    
+    <string name="move_file">Переместить файл</string>
+    <string name="copy_file">Копировать файл</string>
+
+    <string name="move_file_in">Переместить в</string>
+    <string name="copy_file_in">Копировать в</string>
 </resources>

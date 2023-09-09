@@ -33,14 +33,14 @@
             android:layout_height="50dp"
             android:background="#00FFFFFF"
             android:layout_marginStart="300dp"
-            app:srcCompat="@drawable/ui_filter_sort_a_default_24_regular" />
+            app:srcCompat="@drawable/ui_filter_sort_a_default_32" />
 
         <ImageButton
             android:id="@+id/buttonBack"
             android:layout_width="40dp"
             android:layout_height="50dp"
             android:background="#00FFFFFF"
-            app:srcCompat="@drawable/arrow_a_left_24_regular" />
+            app:srcCompat="@drawable/arrow_a_left_32" />
 
         <TextView
             android:id="@+id/directoryNameTextView"

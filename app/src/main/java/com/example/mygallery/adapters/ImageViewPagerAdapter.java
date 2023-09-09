@@ -28,7 +28,7 @@ public class ImageViewPagerAdapter extends RecyclerView.Adapter<ImageViewPagerAd
 
     public ImageViewPagerAdapter(Context context, int statusBarHeight){
         this.context = context;
-        this.dataManager = DataManager.getInstance();
+        this.dataManager = DataManager.getInstance(context);
         this.WIDTH = context.getResources().getDisplayMetrics().widthPixels;
         this.HEIGHT = context.getResources().getDisplayMetrics().heightPixels + statusBarHeight;
     }

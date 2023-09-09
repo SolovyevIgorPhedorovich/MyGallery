@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView directoryName;
     protected ImageAdapter imageAdapter;
     private int imageSize;
-    private Intent intent;
+    private Intent mIntent;
     private DataManager dataManager;
 
     @Override
@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         directoryName = findViewById(R.id.directoryNameTextView);
-        dataManager = DataManager.getInstance();
-        intent = getIntent();
+        dataManager = DataManager.getInstance(this);
+        mIntent = getIntent();
 
         setSizeImage();
         viewDirectoryImage();
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewDirectoryImage(){
-        directoryName.setText(intent.getStringExtra("nameFolder"));
+        directoryName.setText(mIntent.getStringExtra("nameFolder"));
 
         // Насторйка RecycleView с использование GridLayoutManager
         recyclerView.setHasFixedSize(true);
@@ -60,11 +60,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         recyclerView.setAdapter(imageAdapter);
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(() -> {
-            //InvalidsPathRemoved invalidsPathRemoved = new InvalidsPathRemoved(this, );
-            //invalidsPathRemoved.start();
-        });
     }
 
     private void setSizeImage() {
@@ -83,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private void openImageViewer(int position) {
         Intent intent = new Intent(this, ImageViewActivity.class);
         intent.putExtra("position", position);
+        intent.putExtra("nameFolder", mIntent.getStringExtra("nameFolder"));
         startActivity(intent);
     }
 }

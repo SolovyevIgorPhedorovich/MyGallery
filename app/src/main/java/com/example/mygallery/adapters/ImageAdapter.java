@@ -30,7 +30,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     public ImageAdapter(Context context, int imageSize, OnItemClickListener listener){
         this.context = context;
-        this.dataManager = DataManager.getInstance();
+        this.dataManager = DataManager.getInstance(context);
         this.imageSize = imageSize;
         this.listener = listener;
     }
