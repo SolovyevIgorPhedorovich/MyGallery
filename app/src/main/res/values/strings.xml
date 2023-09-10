@@ -1,8 +1,15 @@
 <resources>
     <string name="app_name">MyGallery</string>
     
-    <string name="move_file">Переместить файл</string>
-    <string name="copy_file">Копировать файл</string>
+    <string name="move_file">Переместить в альбом</string>
+    <string name="copy_file">Копировать в альбом</string>
+    <string name="add_note">Добавить заметку</string>
+    <string name="slide_show">Слайд-шоу</string>
+    <string name="print_or_export_in_pdf">Печать или экспорт в pdf</string>
+    <string name="rename_file">Переименовать</string>
+    <string name="set_as">Установить как</string>
+    <string name="rotation">Поворот</string>
+    <string name="choose_as_the_album_artwork">Выбрать в качестве обложки альбома</string>
 
     <string name="move_file_in">Переместить в</string>
     <string name="copy_file_in">Копировать в</string>

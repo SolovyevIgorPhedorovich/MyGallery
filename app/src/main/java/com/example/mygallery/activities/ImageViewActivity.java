@@ -41,7 +41,14 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private ImageButton imageButtonBack,
                         buttonRemoveFile,
                         buttonContextMenu;
-    private Button buttonMoveFile, buttonCopyFile;
+    private Button buttonMoveFile,
+            buttonCopyFile,
+            buttonStartSlideShow,
+            buttonPrint,
+            buttonRenameTo,
+            buttonSetAs,
+            buttonRotation,
+            buttonChooseArtworkAlbum;
     private TextView textView;
     private int idFolder = -1;
     private  boolean isMenuVisible = true;
@@ -154,6 +161,48 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
                 popupWindow.dismiss();
             }
         });
+
+        buttonStartSlideShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonPrint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonRenameTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonSetAs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonRotation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonChooseArtworkAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     private void showContextMenuAction(View view){
@@ -173,10 +222,26 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
 
         int[] location = new int[2];
         view.getLocationOnScreen(location);
-        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, location[0]+view.getHeight(), location[1]-popupWindow.getWidth());
+        int x = menuView.findViewById(R.id.contextMenu).getHeight();
+        popupWindow.setAnimationStyle(R.anim.popup_scale_in);
+        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, location[0], location[1]-x);
         createBackgroundView();
+
         buttonMoveFile = menuView.findViewById(R.id.moveFile);
         buttonCopyFile = menuView.findViewById(R.id.copyFile);
+        buttonStartSlideShow =  menuView.findViewById(R.id.slide_show);
+        buttonPrint =  menuView.findViewById(R.id.print);
+        buttonRenameTo =  menuView.findViewById(R.id.rename_file);
+        buttonSetAs =  menuView.findViewById(R.id.set);
+        buttonRotation =  menuView.findViewById(R.id.rotation);
+        buttonChooseArtworkAlbum =  menuView.findViewById(R.id.choose);
+        buttonStartSlideShow =  menuView.findViewById(R.id.slide_show);
+        buttonPrint =  menuView.findViewById(R.id.print);
+        buttonRenameTo =  menuView.findViewById(R.id.rename_file);
+        buttonSetAs =  menuView.findViewById(R.id.set);
+        buttonRotation =  menuView.findViewById(R.id.rotation);
+        buttonChooseArtworkAlbum = menuView.findViewById(R.id.choose);
+
         setOnClickListenerContextMenu();
     }
 

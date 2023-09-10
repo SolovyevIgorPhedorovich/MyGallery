@@ -1,18 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contextMenu"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/popupbg">
 
 
     <Button
         android:id="@+id/moveFile"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/move_file"/>
+        android:background="#00FFFFFF"
+        android:text="@string/move_file"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
     <Button
         android:id="@+id/copyFile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/copy_file"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/slide_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/slide_show"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/print"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/print_or_export_in_pdf"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/rename_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/rename_file"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/set"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/set_as"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/rotation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:text="@string/rotation"
+        android:textColor="@color/white"
+        android:textAlignment="viewStart"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
+
+    <Button
+        android:id="@+id/choose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/copy_file"/>
+        android:background="#00FFFFFF"
+        android:text="@string/choose_as_the_album_artwork"
+        android:textAlignment="viewStart"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_context_menu"
+        style="@style/Widget.Material3.Button.TextButton"/>
 </LinearLayout>

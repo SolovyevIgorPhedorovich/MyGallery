@@ -3,5 +3,6 @@
     <dimen name="image_layout_margin">2dp</dimen>
     <dimen name="image_preview_margin_horizontal">10dp</dimen>
     <dimen name="image_preview_margin_vertical">3dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
+    <dimen name="text_margin">16sp</dimen>
+    <dimen name="text_size_context_menu">15sp</dimen>
 </resources>
