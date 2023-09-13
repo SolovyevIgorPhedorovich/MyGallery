@@ -66,52 +66,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
     }
 
-    public void getFileInFolder(String nameFolder){
-        if (openDataBase()){
-            Cursor cursor = mDataBase.rawQuery("SELECT path FROM paths WHERE folder_id=?", new String[]{String.valueOf(getIdFolder(nameFolder))});
-            dataManager.clearData(DataManager.PATH);
-            if (cursor != null){
-                while (cursor.moveToNext()){
-                    //dataManager.getPathsFiles().add(cursor.getString(cursor.getColumnIndexOrThrow("path")));
-                }
-            }
-            cursor.close();
-        }
-    }
-
-    private List<String> getAllFiles(){
-        List<String> path = null;
-        if (openDataBase()){
-            Cursor cursor = mDataBase.rawQuery("SELECT path FROM paths WHERE folder_id !=?", new String[]{"1"});
-            if (cursor != null){
-                path = new ArrayList<>();
-                while (cursor.moveToNext()){
-                    path.add(cursor.getString(cursor.getColumnIndexOrThrow("path")));
-                }
-            }
-            cursor.close();
-        }
-        close();
-        return path;
-    }
-
-    private List<String> getAllFilesFolder(){
-        List<String> path = null;
-        if (openDataBase()){
-            Cursor cursor = mDataBase.rawQuery("SELECT path FROM paths", new String[]{});
-            dataManager.clearData(DataManager.PATH);
-            if (cursor != null){
-                path = new ArrayList<>();
-                while (cursor.moveToNext()){
-                    path.add(cursor.getString(cursor.getColumnIndexOrThrow("path")));
-                }
-            }
-            cursor.close();
-        }
-        close();
-        return path;
-    }
-
     private void copyDataBaseFile() throws IOException{
         InputStream input = context.getAssets().open(DB_NAME);
         OutputStream output = new FileOutputStream(DB_PATH + DB_NAME);
@@ -151,25 +105,15 @@ public class DatabaseManager extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put("name", nameFolder);
             values.put("count_files", countFiles);
-            values.put("path_folder", path);
+            values.put("path", path);
             id = mDataBase.insert("folders", null, values);
         }
         return id;
     }
 
-    public void setCoverAlbum(String path, String nameFolder, int countFiles){
-        if (openDataBase()){
-            ContentValues values = new ContentValues();
-            values.put("path", path);
-            values.put("folder_id",getIdFolder(nameFolder));
-            mDataBase.insert("paths", null, values);
-        }
-    }
-
     public void insertMultipleDataFolders(){
         String name, path_folder, path_covers;
         int count;
-        long new_id = -1;
         if(openDataBase()){
             mDataBase.beginTransaction();
             try{
@@ -178,36 +122,16 @@ public class DatabaseManager extends SQLiteOpenHelper {
                     count = dataManager.getCountFiles().get(i);
                     path_folder = dataManager.getPathsFolders().get(i);
                     path_covers = dataManager.getCoversFolders().get(i);
-                    ContentValues values_folders = new ContentValues();
-                    ContentValues values_paths = new ContentValues();
-                    values_folders.put("name", name);
-                    values_folders.put("count_files", count);
-                    values_folders.put("path_folder", path_folder);
-                    values_paths.put("path", path_covers);
-                    try {
-                        new_id = mDataBase.insert("folders", null, values_folders);
-                        values_paths.put("folder_id", new_id);
-                        mDataBase.insert("paths_file", null, values_paths);
-                    } catch (SQLiteConstraintException e) {
-                        String errorMessage = e.getMessage();
 
-                        // Обработка ошибки, например, изменение имени папки и повторная вставка
-                        if (errorMessage.contains("UNIQUE constraint")) {
-                            Cursor cursor = mDataBase.query("folders", null, "name LIKE ?", new String[]{name + "%"}, null, null, null);
+                    ContentValues valuesFolders = new ContentValues();
+                    ContentValues valuesArtwork = new ContentValues();
 
-                            if (cursor != null){
-                                // Изменяем имя папки, например, добавляем нумерацию
-                                String newName = name+" ("+cursor.getCount()+")";
-                                values_folders.put("name", newName);
+                    valuesFolders.put("name", name);
+                    valuesFolders.put("count_files", count);
+                    valuesFolders.put("path", path_folder);
+                    valuesArtwork.put("path", path_covers);
 
-                                // Повторно пытаемся вставить данные
-                                new_id = mDataBase.insert("folders", null, values_folders);
-                                values_paths.put("folder_id", new_id);
-                                mDataBase.insert("paths_file", null, values_paths);
-                            }
-                            cursor.close();
-                        }
-                    }
+                    insertDataFolders(valuesFolders, valuesArtwork, name);
                 }
                 mDataBase.setTransactionSuccessful();
             }
@@ -218,13 +142,39 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
     }
 
-    private String getNameFolder(String path){
-        String[] pathParts = path.split("/");
-        return pathParts[pathParts.length - 2];
+    private void insertDataFolders(ContentValues valuesFolders, ContentValues valuesArtwork, String name){
+        long newId = -1;
+        try {
+            newId = mDataBase.insert("folders", null, valuesFolders);
+            valuesArtwork.put("id_folder", newId);
+            mDataBase.insert("artwork", null, valuesArtwork);
+        } catch (SQLiteConstraintException e) {
+            String errorMessage = e.getMessage();
+
+            // Обработка ошибки, например, изменение имени папки и повторная вставка
+            if (errorMessage.contains("UNIQUE constraint")) {
+                renameNameDataFolder(valuesFolders,valuesArtwork, name);
+            }
+        }
+    }
+
+    private void renameNameDataFolder(ContentValues valuesFolders, ContentValues valuesArtwork, String name){
+        long newId = -1;
+        Cursor cursor = mDataBase.query("folders", null, "name LIKE ?", new String[]{name + "%"}, null, null, null);
+
+        if (cursor != null){
+            // Изменяем имя папки, например, добавляем нумерацию
+            String newName = name+" ("+cursor.getCount()+")";
+            valuesFolders.put("name", newName);
+
+            // Повторно пытаемся вставить данные
+            insertDataFolders(valuesFolders, valuesArtwork, name);
+        }
+        cursor.close();
     }
 
     private void getCoversAlbumPaths() {
-        Cursor cursor = mDataBase.rawQuery("SELECT path FROM paths_file GROUP BY folder_id", null);
+        Cursor cursor = mDataBase.rawQuery("SELECT path FROM artwork GROUP BY id_folder", null);
         if (cursor != null){
             while (cursor.moveToNext()){
                 dataManager.addDataInCoversFolders(cursor.getString(cursor.getColumnIndexOrThrow("path")));
@@ -250,9 +200,9 @@ public class DatabaseManager extends SQLiteOpenHelper {
     public String getFolderPath(String name){
         String path = null;
         if (openDataBase()){
-            Cursor cursor = mDataBase.rawQuery("SELECT path_folder FROM folders WHERE name=?", new String[]{name});
+            Cursor cursor = mDataBase.rawQuery("SELECT path FROM folders WHERE name=?", new String[]{name});
             if (cursor.moveToFirst()){
-                path = cursor.getString(cursor.getColumnIndexOrThrow("path_folder"));
+                path = cursor.getString(cursor.getColumnIndexOrThrow("path"));
             }
             cursor.close();
             close();
@@ -260,14 +210,15 @@ public class DatabaseManager extends SQLiteOpenHelper {
         return path;
     }
 
-    public void updatePath (String oldPath, String newPath){
+    public int updatePath (String name, String newPath){
+        long id= -1;
         if (openDataBase()){
             ContentValues values = new ContentValues();
-            values.put("folder_id", getIdFolder(getNameFolder(newPath)));
             values.put("path", newPath);
-            mDataBase.update("paths", values, "path = ?", new String[]{oldPath});
+            id = mDataBase.update("artwork", values, "folder_id = ?", new String[]{String.valueOf(getIdFolder(name))});
             close();
         }
+        return (int)id;
     }
 
     private List<String> getAllPath(){

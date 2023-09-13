@@ -3,6 +3,15 @@
     <dimen name="image_layout_margin">2dp</dimen>
     <dimen name="image_preview_margin_horizontal">10dp</dimen>
     <dimen name="image_preview_margin_vertical">3dp</dimen>
+
     <dimen name="text_margin">16sp</dimen>
     <dimen name="text_size_context_menu">15sp</dimen>
+
+    <dimen name="text_header_popup_window">22sp</dimen>
+    <dimen name="padding_top_header_text_popup_window">3dp</dimen>
+    <dimen name="padding_horizontal_header_text_popup_window">15dp</dimen>
+
+    <dimen name="height_button_context_menu">45dp</dimen>
+    <dimen name="height_dividing_line">1dp</dimen>
+    <dimen name="width_dividing_line">270dp</dimen>
 </resources>

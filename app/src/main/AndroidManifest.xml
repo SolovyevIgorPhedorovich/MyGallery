@@ -31,7 +31,8 @@
             android:name=".activities.ImageViewActivity"
             android:exported="false"
             android:label="Image Viewer"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.view.layoutInDisplayCutoutMode"
                 android:value="shortEdges"/>

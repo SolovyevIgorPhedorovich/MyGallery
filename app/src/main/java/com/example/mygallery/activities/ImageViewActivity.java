@@ -1,13 +1,14 @@
 package com.example.mygallery.activities;
 
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,11 +17,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import com.example.mygallery.fragment.ActionFileFragment;
 import com.example.mygallery.managers.DataManager;
@@ -29,6 +25,7 @@ import com.example.mygallery.R;
 import com.example.mygallery.ZoomOutPageTransformer;
 import com.example.mygallery.managers.DatabaseManager;
 import com.example.mygallery.managers.FileManager;
+import com.example.mygallery.managers.PopupWindowManager;
 
 import java.io.File;
 
@@ -41,14 +38,6 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private ImageButton imageButtonBack,
                         buttonRemoveFile,
                         buttonContextMenu;
-    private Button buttonMoveFile,
-            buttonCopyFile,
-            buttonStartSlideShow,
-            buttonPrint,
-            buttonRenameTo,
-            buttonSetAs,
-            buttonRotation,
-            buttonChooseArtworkAlbum;
     private TextView textView;
     private int idFolder = -1;
     private  boolean isMenuVisible = true;
@@ -59,6 +48,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private Context context;
     private PopupWindow popupWindow;
     private int typeAction;
+    private PopupWindowManager mPopupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +64,9 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
         context = this;
+
+        viewPager.requestLayout();
+        viewPager.setPageTransformer(new ZoomOutPageTransformer());
 
         dataManager = DataManager.getInstance(this);
         fileManager = new FileManager(this);
@@ -133,140 +126,86 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         });
     }
 
-    private void setOnClickListenerContextMenu(){
-        buttonCopyFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                typeAction = 1;
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                ActionFileFragment actionFileFragment = new ActionFileFragment(context, true);
-                fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-                popupWindow.dismiss();
+    public void moveFile(){
+        typeAction = 0;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ActionFileFragment actionFileFragment = new ActionFileFragment(context, true);
+        fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    public void copyFile(){
+        typeAction = 1;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ActionFileFragment actionFileFragment = new ActionFileFragment(context, false);
+        fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    public void startSlaidShow(){
+
+    }
+
+    public void print(){
+
+    }
+
+    public void rename(View view){
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View menuView = inflater.inflate(R.layout.input_line_new_name, null);
+        EditText inputText = menuView.findViewById(R.id.newName);
+        inputText.setText(dataManager.getPathsFiles().get(initialPosition).getName());
+
+        //Установка содержимого
+        mPopupWindow.setContentViewPopupWindow(menuView);
+        mPopupWindow.setPosition(0,50);
+        mPopupWindow.showPopupWindow(view, menuView);
+
+    }
+
+    public void rename(String newName){
+        if (!newName.isEmpty()){
+
+            File pathFile = dataManager.getPathsFiles().get(initialPosition);
+            File newNamePathFile = new File(pathFile.getParent() + "/" + newName);
+
+            if (newNamePathFile.compareTo(pathFile) != 0){
+                fileManager.renameFile(pathFile, newNamePathFile);
             }
-        });
+        }
+    }
 
-        buttonMoveFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                typeAction = 0;
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                ActionFileFragment actionFileFragment = new ActionFileFragment(context, false);
-                fragmentTransaction.replace(R.id.activity_image_view, actionFileFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-                popupWindow.dismiss();
-            }
-        });
+    public void setAs(){
 
-        buttonStartSlideShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+    }
 
-            }
-        });
+    public void rotation(){
+        adapter.rotation(initialPosition);
+    }
 
-        buttonPrint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        buttonRenameTo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        buttonSetAs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        buttonRotation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        buttonChooseArtworkAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+    public void choose(){
+        String pathArtwork = dataManager.getPathsFiles().get(initialPosition).getAbsolutePath();
+        DatabaseManager DBManager = new DatabaseManager(context);
+        int id = DBManager.updatePath(String.valueOf(textView.getText()), pathArtwork);
+        DBManager.close();
+        dataManager.getCoversFolders().set(id-1, pathArtwork);
     }
 
     private void showContextMenuAction(View view){
 
-        popupWindow = new PopupWindow(this);
+        mPopupWindow = new PopupWindowManager(this);
 
         //Загрузка XML-макета
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View menuView = inflater.inflate(R.layout.context_menu_action_file, null);
 
-        //Установка содержимого
-        popupWindow.setContentView(menuView);
-
-        //Установка размеров меню
-        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
-        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        int[] location = new int[2];
-        view.getLocationOnScreen(location);
-        int x = menuView.findViewById(R.id.contextMenu).getHeight();
-        popupWindow.setAnimationStyle(R.anim.popup_scale_in);
-        popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, location[0], location[1]-x);
-        createBackgroundView();
-
-        buttonMoveFile = menuView.findViewById(R.id.moveFile);
-        buttonCopyFile = menuView.findViewById(R.id.copyFile);
-        buttonStartSlideShow =  menuView.findViewById(R.id.slide_show);
-        buttonPrint =  menuView.findViewById(R.id.print);
-        buttonRenameTo =  menuView.findViewById(R.id.rename_file);
-        buttonSetAs =  menuView.findViewById(R.id.set);
-        buttonRotation =  menuView.findViewById(R.id.rotation);
-        buttonChooseArtworkAlbum =  menuView.findViewById(R.id.choose);
-        buttonStartSlideShow =  menuView.findViewById(R.id.slide_show);
-        buttonPrint =  menuView.findViewById(R.id.print);
-        buttonRenameTo =  menuView.findViewById(R.id.rename_file);
-        buttonSetAs =  menuView.findViewById(R.id.set);
-        buttonRotation =  menuView.findViewById(R.id.rotation);
-        buttonChooseArtworkAlbum = menuView.findViewById(R.id.choose);
-
-        setOnClickListenerContextMenu();
-    }
-
-    //Создание фонового view
-    private void createBackgroundView(){
-        final View backgroundView = new View(this);
-        backgroundView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        backgroundView.setBackgroundColor(Color.parseColor("#00000000"));
-        ((ViewGroup) getWindow().getDecorView()).addView(backgroundView);
-
-        backgroundView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (popupWindow != null && popupWindow.isShowing()){
-                    popupWindow.dismiss();
-                }
-            }
-        });
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                ((ViewGroup) getWindow().getDecorView()).removeView(backgroundView);
-            }
-        });
+        mPopupWindow.setContentViewPopupWindow(menuView);
+        mPopupWindow.setPosition(toolbar.getWidth()/8, toolbar.getHeight()+30);
+        mPopupWindow.showPopupWindow(view, menuView);
     }
 
     //Обработка перелистывания pageViewer2
@@ -276,7 +215,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
             public void onPageSelected(int position){
                setNameItem(dataManager.getPathsFiles().get(position).getName());
                 if (initialPosition != position) {
-                    adapter.notifyItemChanged(initialPosition);
+                    adapter.notifyItemChanged(initialPosition); // вынести в отдельный поток с задржкой
                     initialPosition = position;
                 }
             }
@@ -308,8 +247,6 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         }
         menu.startAnimation(animationTotMenu);
         toolbar.startAnimation(animationBottomMenu);
-        viewPager.requestLayout();
-        viewPager.setPageTransformer(new ZoomOutPageTransformer());
         isMenuVisible = !isMenuVisible;
     }
 

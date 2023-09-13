@@ -13,4 +13,10 @@
 
     <string name="move_file_in">Переместить в</string>
     <string name="copy_file_in">Копировать в</string>
+    <string name="rename">Преименовать</string>
+
+    <string name="hint">Название файла</string>
+
+    <string name="OK">ОК</string>
+    <string name="cancel">Отмена</string>
 </resources>
