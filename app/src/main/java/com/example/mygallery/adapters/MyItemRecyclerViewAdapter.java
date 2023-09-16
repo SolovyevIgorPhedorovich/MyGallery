@@ -46,13 +46,13 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         this.names = new ArrayList<>(DataManager.getInstance(context).getNamesFolders());
         this.covers =new ArrayList<>(DataManager.getInstance(context).getCoversFolders());
         this.count = new ArrayList<>(DataManager.getInstance(context).getCountFiles());
-        s();
+        removeInitialPosition();
     }
 
-    private void s(){
+    private void removeInitialPosition(){
         if (context instanceof ImageViewActivity){
             ImageViewActivity imageViewActivity = (ImageViewActivity) context;
-            int position = imageViewActivity.getPositionAlbum();
+            int position = imageViewActivity.getPosition();
 
             names.remove(position);
             covers.remove(position);

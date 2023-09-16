@@ -95,6 +95,10 @@ public class DataManager {
         }
     }
 
+    public void setPathsFiles(List<File> pathsFiles){
+        this.pathsFiles = new ArrayList<>(pathsFiles);
+    }
+
     public void setCountFiles(List<Integer> countFiles){
         this.countFiles = countFiles;
     }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_create_album"
+        android:icon="@drawable/plus_32"
+        android:title="Создвать"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_view_type"
+        android:icon="@drawable/ui_menu_shape_square_4_24_regular"
+        android:title="Тип отображения"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_open_context_menu"
+        android:icon="@drawable/context_menu"
+        android:title="Ещё"
+        app:showAsAction="always"/>
+</menu>

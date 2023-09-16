@@ -142,6 +142,21 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
     }
 
+    public List<File> getFavorites(){
+        List<File> pathFavorites = new ArrayList<>();
+        if (openDataBase()){
+            Cursor cursor = mDataBase.rawQuery("SELECT path FROM favorites", null);
+            if (cursor != null){
+                while (cursor.moveToNext()){
+                    pathFavorites.add(new File(cursor.getString(cursor.getColumnIndexOrThrow("path"))));
+                }
+            }
+            cursor.close();
+        }
+        close();
+        return pathFavorites;
+    }
+
     private void insertDataFolders(ContentValues valuesFolders, ContentValues valuesArtwork, String name){
         long newId = -1;
         try {
@@ -293,6 +308,15 @@ public class DatabaseManager extends SQLiteOpenHelper {
                 mDataBase.endTransaction();
                 close();
             }
+        }
+    }
+
+    public void addFavorites(String path){
+        if (openDataBase()){
+            ContentValues values = new ContentValues();
+            values.put("path",path);
+            mDataBase.insert("favorites", null, values);
+            close();
         }
     }
 

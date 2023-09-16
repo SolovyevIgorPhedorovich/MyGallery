@@ -14,14 +14,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.mygallery.InvalidsPathRemoved;
+import com.example.mygallery.fragment.RecyclerViewFragment;
 import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.adapters.ImageAdapter;
 import com.example.mygallery.R;
 
 public class MainActivity extends AppCompatActivity {
-    protected RecyclerView recyclerView;
     private TextView directoryName;
-    protected ImageAdapter imageAdapter;
     private int imageSize;
     private Intent mIntent;
     private DataManager dataManager;
@@ -31,12 +30,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.recyclerView);
         directoryName = findViewById(R.id.directoryNameTextView);
         dataManager = DataManager.getInstance(this);
         mIntent = getIntent();
 
-        setSizeImage();
         viewDirectoryImage();
         findViewById(R.id.buttonBack).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,36 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void viewDirectoryImage(){
         directoryName.setText(mIntent.getStringExtra("nameFolder"));
-
-        // Насторйка RecycleView с использование GridLayoutManager
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
-        imageAdapter = new ImageAdapter(this, imageSize, new ImageAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                openImageViewer(position);
-            }
-        });
-        recyclerView.setAdapter(imageAdapter);
+        RecyclerViewFragment fragment = new RecyclerViewFragment(this, RecyclerViewFragment.IMAGES);
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragmentContainer, fragment)
+                .commit();
     }
 
-    private void setSizeImage() {
-        //Получение ширины экрна
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        display.getMetrics(displayMetrics);
-        int screenWidth = displayMetrics.widthPixels;
-
-        //Получение ширины отступа
-        int imageMargin = getResources().getDimensionPixelSize(R.dimen.image_layout_margin);
-
-        //Вычисление ширины для отображения изображения в сетке
-        imageSize = (screenWidth - (2*imageMargin)) / 4;
-    }
-    private void openImageViewer(int position) {
-        Intent intent = new Intent(this, ImageViewActivity.class);
-        intent.putExtra("position", position);
-        intent.putExtra("nameFolder", mIntent.getStringExtra("nameFolder"));
-        startActivity(intent);
-    }
 }

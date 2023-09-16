@@ -1,5 +1,6 @@
 package com.example.mygallery.activities;
 
+import android.os.Handler;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -37,7 +38,8 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private FileManager fileManager;
     private ImageButton imageButtonBack,
                         buttonRemoveFile,
-                        buttonContextMenu;
+                        buttonContextMenu,
+                        buttonAddFavorites;
     private TextView textView;
     private int idFolder = -1;
     private  boolean isMenuVisible = true;
@@ -46,9 +48,10 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private int initialPosition;
     private Intent intent;
     private Context context;
-    private PopupWindow popupWindow;
     private int typeAction;
     private PopupWindowManager mPopupWindow;
+    private Handler handler;
+    private Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         imageButtonBack = findViewById(R.id.buttonBack);
         buttonRemoveFile = findViewById(R.id.buttonRemove);
         buttonContextMenu = findViewById(R.id.buttonContextMenu);
+        buttonAddFavorites = findViewById(R.id.buttonAddFavorites);
         textView = findViewById(R.id.itemNameTextView);
         menu = findViewById(R.id.menuViewImage);
         toolbar = findViewById(R.id.toolBar);
@@ -93,10 +97,10 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         setNameItem(dataManager.getPathsFiles().get(initialPosition).getName());
     }
 
-    public int getPositionAlbum(){
+    public int getPosition(){
         DatabaseManager DBManger = DatabaseManager.getInstance(this);
         if (idFolder == -1){
-            idFolder = (int) DBManger.getIdFolder(intent.getStringExtra("nameFolder")) - 2;
+            idFolder = (int) DBManger.getIdFolder(dataManager.getPathsFiles().get(initialPosition).getParent()) - 1;
         }
         return idFolder;
     }
@@ -115,6 +119,15 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
             public void onClick(View view) {
                 adapter.notifyItemRemoved(initialPosition);
                 fileManager.deleteFile(dataManager.getPathsFiles().get(initialPosition));
+            }
+        });
+
+        buttonAddFavorites.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String path = dataManager.getPathsFiles().get(initialPosition).getAbsolutePath();
+                DatabaseManager db = new DatabaseManager(context);
+                db.addFavorites(path);
             }
         });
 
@@ -146,8 +159,34 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         fragmentTransaction.commit();
     }
 
-    public void startSlaidShow(){
+    public void creatView(){
+        View view = new View(this);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ((ViewGroup) getWindow().getDecorView()).addView(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handler.removeCallbacks(runnable);
+                ((ViewGroup) getWindow().getDecorView()).removeView(view);
+                toggleMenu();
+            }
+        });
+    }
 
+    public void startSlaidShow(){
+        creatView();
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                int position = (initialPosition < adapter.getItemCount() - 1)? initialPosition + 1 : 0;
+                viewPager.setCurrentItem(position);
+                initialPosition = viewPager.getCurrentItem();
+                handler.postDelayed(this, 2000);
+            }
+        };
+        handler.postDelayed(runnable, 2000);
+        toggleMenu();
     }
 
     public void print(){

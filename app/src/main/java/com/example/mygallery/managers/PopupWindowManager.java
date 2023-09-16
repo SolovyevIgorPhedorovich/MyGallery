@@ -16,6 +16,7 @@ import com.example.mygallery.activities.ImageViewActivity;
 public class PopupWindowManager {
     PopupWindow popupWindow;
     Context context;
+    View bgView;
     int x,y;
 
     public PopupWindowManager(Context context){
