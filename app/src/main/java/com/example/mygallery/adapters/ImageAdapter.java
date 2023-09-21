@@ -1,28 +1,17 @@
 package com.example.mygallery.adapters;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
-import com.example.mygallery.activities.AlbumActivity;
-import com.example.mygallery.activities.MainActivity;
-import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.R;
 
 import java.io.File;
@@ -30,21 +19,23 @@ import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
-    private Context context;
-    private List<File> imagePaths;
-    private int imageSize;
-    private OnItemClickListener listener;
+    private final Context context;
+    private final int imageSize;
+    private final OnItemClickListener listener;
+    private final List<File> imagePathsList;
 
-    public ImageAdapter(Context context, List<File> imagePaths, OnItemClickListener listener){
+    // Конструктор
+    public ImageAdapter(Context context, List<File> imagePathsList, OnItemClickListener listener) {
         this.context = context;
-        this.imagePaths = imagePaths;
-        this.imageSize = setSizeImage();
+        this.imagePathsList = imagePathsList;
         this.listener = listener;
+        this.imageSize = calculateImageSize();
     }
 
+    // Метод для создания нового ViewHolder
     @NonNull
     @Override
-    public ImageAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gallery, parent, false);
         ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
         layoutParams.width = imageSize;
@@ -53,30 +44,35 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return new ImageViewHolder(itemView);
     }
 
+    // Метод для связывания данных с ViewHolder
     @Override
-    public void onBindViewHolder(@NonNull ImageAdapter.ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         Glide.with(holder.imageView)
-                .load(imagePaths.get(position))
+                .load(imagePathsList.get(position))
                 .apply(RequestOptions.overrideOf(imageSize))
                 .into(holder.imageView);
 
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    listener.onItemClick(position);
-                }
-        });
+        holder.imageView.setOnClickListener(v -> listener.onItemClick(position));
     }
 
+    // Метод для получения общего количества элементов в списке
     @Override
     public int getItemCount() {
-        return imagePaths.size();
+        return imagePathsList.size();
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position);
+    // Метод для вычисления размера изображения в сетке
+    private int calculateImageSize() {
+        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+
+        // Вычисление ширины для отображения изображения в сетке (предполагая, что у вас 4 столбца)
+        return screenWidth / 4;
     }
 
+    // ViewHolder
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
 
@@ -84,23 +80,5 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
         }
-    }
-
-    private int setSizeImage() {
-        //Получение ширины экрна
-        Display display;
-        if (context instanceof AlbumActivity)
-            display = ((AlbumActivity)context).getWindowManager().getDefaultDisplay();
-        else
-            display = ((MainActivity)context).getWindowManager().getDefaultDisplay();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        display.getMetrics(displayMetrics);
-        int screenWidth = displayMetrics.widthPixels;
-
-        //Получение ширины отступа
-        //int imageMargin = ((MainActivity)context).getDimensionPixelSize(R.dimen.image_layout_margin);
-
-        //Вычисление ширины для отображения изображения в сетке
-        return imageSize = screenWidth / 4;
     }
 }

@@ -1,124 +1,94 @@
 package com.example.mygallery.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
-import com.example.mygallery.activities.AlbumActivity;
-import com.example.mygallery.activities.ImageViewActivity;
-import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.R;
+import com.example.mygallery.managers.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ImageViewHolder> {
 
+    // Поля класса
     private final Context context;
-    private List<String> names;
-    private List<String> covers;
-    private List<Integer> count;
+    private final OnItemClickListener listener;
+    private List<String> folderNamesList;
+    private List<String> folderCoversList;
     private final int imageWidth;
-    private AlbumAdapter.OnItemClickListener listener;
+    private List<Integer> folderCountsList;
 
-    public AlbumAdapter(Context context, int imageWidth, AlbumAdapter.OnItemClickListener listener){
+    // Конструктор класса
+    public AlbumAdapter(Context context, int imageWidth, OnItemClickListener listener) {
         this.context = context;
         this.imageWidth = imageWidth;
         this.listener = listener;
-        this.names = new ArrayList<>(DataManager.getInstance(context).getNamesFolders());
-        this.covers =new ArrayList<>(DataManager.getInstance(context).getCoversFolders());
-        this.count = new ArrayList<>(DataManager.getInstance(context).getCountFiles());
+        updateData(); // Обновляем данные при создании адаптера
     }
 
-    public void updateDataAdapter(){
-        this.names = new ArrayList<>(DataManager.getInstance(context).getNamesFolders());
-        this.covers =new ArrayList<>(DataManager.getInstance(context).getCoversFolders());
-        this.count = new ArrayList<>(DataManager.getInstance(context).getCountFiles());
+    // Обновление данных из DataManager
+    public void updateData() {
+        DataManager dataManager = DataManager.getInstance(context);
+        this.folderNamesList = new ArrayList<>(dataManager.getFolderNamesList());
+        this.folderCoversList = new ArrayList<>(dataManager.getFolderCoversList());
+        this.folderCountsList = new ArrayList<>(dataManager.getFileCountList());
     }
 
+    // Создание нового View Holder'а
     @NonNull
     @Override
-    public AlbumAdapter.ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_image_view, parent, false);
         ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
         layoutParams.width = imageWidth;
-        layoutParams.height = (int)(imageWidth * 1.5);
+        layoutParams.height = (int) (imageWidth * 1.5);
         itemView.setLayoutParams(layoutParams);
-        return new AlbumAdapter.ImageViewHolder(itemView);
+        return new ImageViewHolder(itemView);
     }
 
-    private void loadImageView(ImageView imageView, int position){
+    // Загрузка изображения в ImageView с использованием Glide
+    private void loadImageView(ImageView imageView, int position) {
         Glide.with(imageView)
-                .load(covers.get(position))
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        //Glide.with(imageView)
-                        //     .load(R.drawable.invalid_image)
-                        //     .into(imageView);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
+                .load(folderCoversList.get(position))
                 .into(imageView);
     }
 
+    // Настройка элементов View Holder'а
     @Override
-    public void onBindViewHolder(@NonNull ImageViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         loadImageView(holder.imageView, position);
 
-        holder.directoryName.setText(names.get(position));
-        holder.countItem.setText(String.valueOf(count.get(position)));
+        holder.folderName.setText(folderNamesList.get(position));
+        holder.folderCount.setText(String.valueOf(folderCountsList.get(position)));
 
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onItemClick(names.get(position), position);
-            }
-        });
+        // Установка обработчика нажатия на изображение
+        holder.imageView.setOnClickListener(v -> listener.onItemClick(folderNamesList.get(position), position));
     }
 
+    // Возвращает количество элементов в адаптере
     @Override
     public int getItemCount() {
-        return names.size();
+        return folderNamesList.size();
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(String nameFolder, int position);
-    }
-
+    // Вложенный класс для хранения элементов View Holder'а
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView directoryName;
-        TextView countItem;
+        TextView folderName;
+        TextView folderCount;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.albumImagePreview);
-            countItem = itemView.findViewById(R.id.countImages);
-            directoryName = itemView.findViewById(R.id.albumDirectoryName);
+            folderCount = itemView.findViewById(R.id.countImages);
+            folderName = itemView.findViewById(R.id.albumDirectoryName);
         }
     }
-
 }

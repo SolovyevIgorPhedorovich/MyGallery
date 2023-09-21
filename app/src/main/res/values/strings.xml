@@ -13,10 +13,18 @@
 
     <string name="move_file_in">Переместить в</string>
     <string name="copy_file_in">Копировать в</string>
-    <string name="rename">Преименовать</string>
+    <string name="rename">Переименовать</string>
 
     <string name="hint">Название файла</string>
 
     <string name="OK">ОК</string>
     <string name="cancel">Отмена</string>
+
+    <string name="empty_favorites">Нет избранных файлов</string>
+    <string name="empty_cart">Корзина пуста</string>
+    <string name="empty_album">Файлы не найдены</string>
+
+    <string name="sort_album">Сортировка альбомов</string>
+    <string name="hide_album">Скрытые альбомы</string>
+    <string name="configured">Настройки</string>
 </resources>

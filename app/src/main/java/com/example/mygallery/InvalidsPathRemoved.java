@@ -10,11 +10,11 @@ import java.util.concurrent.CountDownLatch;
 
 public class InvalidsPathRemoved extends Thread {
     private List<String> invalidsPath;
-    private DatabaseManager databaseManager;
-    private CountDownLatch adapterLatch;
+    private final DatabaseManager databaseManager;
+    private final CountDownLatch adapterLatch;
 
     public InvalidsPathRemoved(Context context, CountDownLatch adapterLatch) {
-        invalidsPath = DataManager.getInstance(context).getInvalidsPathFile();
+        //invalidsPath = DataManager.getInstance(context).getInvalidsPathFile();
         databaseManager = DatabaseManager.getInstance(context);
         this.adapterLatch = adapterLatch;
     }

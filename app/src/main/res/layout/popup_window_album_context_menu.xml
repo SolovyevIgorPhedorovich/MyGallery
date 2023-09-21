@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/album_context_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <Button
+            android:id="@+id/sort_album"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_button_context_menu"
+            android:background="#00FFFFFF"
+            android:text="@string/sort_album"
+            android:textColor="@color/white"
+            android:textAlignment="viewStart"
+            android:textSize="@dimen/text_size_context_menu"
+            style="@style/Widget.Material3.Button.TextButton"/>
+
+    <View
+            android:layout_width="@dimen/width_dividing_line"
+            android:layout_height="@dimen/height_dividing_line"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/dividing_line"/>
+
+    <Button
+            android:id="@+id/hide_album"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_button_context_menu"
+            android:background="#00FFFFFF"
+            android:text="@string/hide_album"
+            android:textColor="@color/white"
+            android:textAlignment="viewStart"
+            android:textSize="@dimen/text_size_context_menu"
+            style="@style/Widget.Material3.Button.TextButton"/>
+
+    <View
+            android:layout_width="@dimen/width_dividing_line"
+            android:layout_height="@dimen/height_dividing_line"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/dividing_line"/>
+
+    <Button
+            android:id="@+id/configured"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/height_button_context_menu"
+            android:background="#00FFFFFF"
+            android:text="@string/configured"
+            android:textColor="@color/white"
+            android:textAlignment="viewStart"
+            android:textSize="@dimen/text_size_context_menu"
+            style="@style/Widget.Material3.Button.TextButton"/>
+
+
+</LinearLayout>

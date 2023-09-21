@@ -1,32 +1,30 @@
 package com.example.mygallery.activities;
 
-import android.os.Handler;
-import android.widget.*;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.os.Handler;
+import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import com.example.mygallery.fragment.ActionFileFragment;
-import com.example.mygallery.managers.DataManager;
-import com.example.mygallery.adapters.ImageViewPagerAdapter;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.widget.ViewPager2;
 import com.example.mygallery.R;
 import com.example.mygallery.ZoomOutPageTransformer;
+import com.example.mygallery.adapters.ImagePagerAdapter;
+import com.example.mygallery.fragment.ActionFileFragment;
+import com.example.mygallery.managers.DataManager;
 import com.example.mygallery.managers.DatabaseManager;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.managers.PopupWindowManager;
+import com.example.mygallery.popupWindow.PopupWindowContextMenuActionFile;
+import com.example.mygallery.popupWindow.PopupWindowRenameTo;
 
 import java.io.File;
 
@@ -43,7 +41,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     private TextView textView;
     private int idFolder = -1;
     private  boolean isMenuVisible = true;
-    private ImageViewPagerAdapter adapter;
+    private ImagePagerAdapter adapter;
     private FrameLayout menu, toolbar;
     private int initialPosition;
     private Intent intent;
@@ -59,14 +57,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         setContentView(R.layout.activity_image_view);
 
-        viewPager = findViewById(R.id.viewPager);
-        imageButtonBack = findViewById(R.id.buttonBack);
-        buttonRemoveFile = findViewById(R.id.buttonRemove);
-        buttonContextMenu = findViewById(R.id.buttonContextMenu);
-        buttonAddFavorites = findViewById(R.id.buttonAddFavorites);
-        textView = findViewById(R.id.itemNameTextView);
-        menu = findViewById(R.id.menuViewImage);
-        toolbar = findViewById(R.id.toolBar);
+        initializeViews();
         context = this;
 
         viewPager.requestLayout();
@@ -83,9 +74,21 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         setOnClickListenerButtons();
     }
 
+    private void initializeViews() {
+        // Инициализация всех View-компонентов
+        viewPager = findViewById(R.id.viewPager);
+        imageButtonBack = findViewById(R.id.buttonBack);
+        buttonRemoveFile = findViewById(R.id.buttonRemove);
+        buttonContextMenu = findViewById(R.id.buttonContextMenu);
+        buttonAddFavorites = findViewById(R.id.buttonAddFavorites);
+        textView = findViewById(R.id.itemNameTextView);
+        menu = findViewById(R.id.menuViewImage);
+        toolbar = findViewById(R.id.toolBar);
+    }
+
     //Установка адаптера для ViewPager
     private void setAdapter(int statusBarHeight){
-        adapter = new ImageViewPagerAdapter(this, statusBarHeight);
+        adapter = new ImagePagerAdapter(this, statusBarHeight);
         viewPager.setAdapter(adapter);
     }
 
@@ -94,49 +97,33 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         intent = getIntent();
         initialPosition = intent.getIntExtra("position", 0);
         viewPager.setCurrentItem(initialPosition, false);
-        setNameItem(dataManager.getPathsFiles().get(initialPosition).getName());
+        setNameItem(dataManager.getImageFilesList().get(initialPosition).getName());
     }
 
     public int getPosition(){
         DatabaseManager DBManger = DatabaseManager.getInstance(this);
         if (idFolder == -1){
-            idFolder = (int) DBManger.getIdFolder(dataManager.getPathsFiles().get(initialPosition).getParent()) - 1;
+            idFolder = (int) DBManger.getIdFolder(dataManager.getImageFilesList().get(initialPosition).getParent()) - 1;
         }
         return idFolder;
     }
 
     //Обработка нажатий
     private void setOnClickListenerButtons() {
-        imageButtonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
+        imageButtonBack.setOnClickListener(view -> onBackPressed());
+
+        buttonRemoveFile.setOnClickListener(view -> {
+            adapter.notifyItemRemoved(initialPosition);
+            fileManager.deleteFile(dataManager.getImageFilesList().get(initialPosition));
         });
 
-        buttonRemoveFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                adapter.notifyItemRemoved(initialPosition);
-                fileManager.deleteFile(dataManager.getPathsFiles().get(initialPosition));
-            }
+        buttonAddFavorites.setOnClickListener(view -> {
+            String path = dataManager.getImageFilesList().get(initialPosition).getAbsolutePath();
+            DatabaseManager db = new DatabaseManager(context);
+            db.addToFavorites(path);
         });
 
-        buttonAddFavorites.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String path = dataManager.getPathsFiles().get(initialPosition).getAbsolutePath();
-                DatabaseManager db = new DatabaseManager(context);
-                db.addFavorites(path);
-            }
-        });
-
-        buttonContextMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showContextMenuAction(view);
-            }
-        });
+        buttonContextMenu.setOnClickListener(this::showContextMenuAction);
     }
 
     public void moveFile(){
@@ -159,22 +146,19 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         fragmentTransaction.commit();
     }
 
-    public void creatView(){
-        View view = new View(this);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        ((ViewGroup) getWindow().getDecorView()).addView(view);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handler.removeCallbacks(runnable);
-                ((ViewGroup) getWindow().getDecorView()).removeView(view);
-                toggleMenu();
-            }
+    public void createView() {
+        View viewBackground = new View(this);
+        viewBackground.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ((ViewGroup) getWindow().getDecorView()).addView(viewBackground);
+        viewBackground.setOnClickListener(view -> {
+            handler.removeCallbacks(runnable);
+            ((ViewGroup) getWindow().getDecorView()).removeView(view);
+            toggleMenu();
         });
     }
 
     public void startSlaidShow(){
-        creatView();
+        createView();
         handler = new Handler();
         runnable = new Runnable() {
             @Override
@@ -194,22 +178,23 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     }
 
     public void rename(View view){
+        mPopupWindow = new PopupWindowRenameTo(this);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View menuView = inflater.inflate(R.layout.input_line_new_name, null);
         EditText inputText = menuView.findViewById(R.id.newName);
-        inputText.setText(dataManager.getPathsFiles().get(initialPosition).getName());
+        inputText.setText(dataManager.getImageFilesList().get(initialPosition).getName());
 
         //Установка содержимого
-        mPopupWindow.setContentViewPopupWindow(menuView);
+        mPopupWindow.setContent(menuView);
         mPopupWindow.setPosition(0,50);
-        mPopupWindow.showPopupWindow(view, menuView);
+        mPopupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
 
     }
 
     public void rename(String newName){
         if (!newName.isEmpty()){
 
-            File pathFile = dataManager.getPathsFiles().get(initialPosition);
+            File pathFile = dataManager.getImageFilesList().get(initialPosition);
             File newNamePathFile = new File(pathFile.getParent() + "/" + newName);
 
             if (newNamePathFile.compareTo(pathFile) != 0){
@@ -223,28 +208,28 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     }
 
     public void rotation(){
-        adapter.rotation(initialPosition);
+        adapter.rotateImage(initialPosition);
     }
 
     public void choose(){
-        String pathArtwork = dataManager.getPathsFiles().get(initialPosition).getAbsolutePath();
+        String pathArtwork = dataManager.getImageFilesList().get(initialPosition).getAbsolutePath();
         DatabaseManager DBManager = new DatabaseManager(context);
         int id = DBManager.updatePath(String.valueOf(textView.getText()), pathArtwork);
         DBManager.close();
-        dataManager.getCoversFolders().set(id-1, pathArtwork);
+        dataManager.getFolderCoversList().set(id - 1, pathArtwork);
     }
 
     private void showContextMenuAction(View view){
 
-        mPopupWindow = new PopupWindowManager(this);
+        mPopupWindow = new PopupWindowContextMenuActionFile(this);
 
         //Загрузка XML-макета
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View menuView = inflater.inflate(R.layout.context_menu_action_file, null);
 
-        mPopupWindow.setContentViewPopupWindow(menuView);
+        mPopupWindow.setContent(menuView);
         mPopupWindow.setPosition(toolbar.getWidth()/8, toolbar.getHeight()+30);
-        mPopupWindow.showPopupWindow(view, menuView);
+        mPopupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
     }
 
     //Обработка перелистывания pageViewer2
@@ -252,7 +237,7 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position){
-               setNameItem(dataManager.getPathsFiles().get(position).getName());
+                setNameItem(dataManager.getImageFilesList().get(position).getName());
                 if (initialPosition != position) {
                     adapter.notifyItemChanged(initialPosition); // вынести в отдельный поток с задржкой
                     initialPosition = position;
@@ -308,9 +293,9 @@ public class ImageViewActivity extends AppCompatActivity implements ActionFileFr
     public void onFolderSelected(File folderPath){
         if (typeAction == MOVE){
             adapter.notifyItemRemoved(initialPosition);
-            fileManager.moveFile(dataManager.getPathsFiles().get(initialPosition), folderPath);
+            fileManager.moveFile(dataManager.getImageFilesList().get(initialPosition), folderPath);
         } else if (typeAction == COPY) {
-            fileManager.copyFile(dataManager.getPathsFiles().get(initialPosition), folderPath);
+            fileManager.copyFile(dataManager.getImageFilesList().get(initialPosition), folderPath);
         }
     }
 }

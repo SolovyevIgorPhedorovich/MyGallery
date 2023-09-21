@@ -13,14 +13,14 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/closeFragment"
+                android:id="@+id/close_fragment"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="#00FFFFFF"
             app:srcCompat="@drawable/close_32"/>
 
         <TextView
-            android:id="@+id/typeAction"
+                android:id="@+id/type_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin" />

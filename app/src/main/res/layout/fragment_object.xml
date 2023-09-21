@@ -16,7 +16,7 @@
 
         <ImageView
             tools:ignore="ContentDescription"
-            android:id="@+id/albumImagePreview"
+            android:id="@+id/album_artwork"
             android:scaleType="centerCrop"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -31,14 +31,14 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/albumDirectoryName"
+                android:id="@+id/folder_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/countImages"
+                android:id="@+id/count_images"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp" />

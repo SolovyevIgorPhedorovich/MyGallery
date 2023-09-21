@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+                                                   tools:context=".activities.AlbumGridActivity">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
@@ -43,7 +43,7 @@
             app:srcCompat="@drawable/arrow_a_left_32" />
 
         <TextView
-            android:id="@+id/directoryNameTextView"
+                android:id="@+id/album_name_text_view"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_marginStart="45dp"
