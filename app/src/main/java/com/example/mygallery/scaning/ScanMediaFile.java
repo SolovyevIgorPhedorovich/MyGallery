@@ -1,0 +1,73 @@
+package com.example.mygallery.scaning;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+
+import com.example.mygallery.database.DatabaseFavorites;
+import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.models.Image;
+import com.example.mygallery.models.constructors.ImageFileConstructor;
+import com.example.mygallery.models.services.BaseService;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.util.*;
+
+public class ScanMediaFile implements Runnable {
+    private final Context context;
+    private final File path;
+    private final BaseService<Model> service;
+    DatabaseFavorites databaseManager;
+
+    public ScanMediaFile(Context context, BaseService<Model> service, File path) {
+        this.context = context;
+        this.path = path;
+        this.service = service;
+        this.databaseManager = new DatabaseFavorites(context);
+    }
+
+    @Override
+    public void run() {
+        scanOneDirectory();
+    }
+
+    private void scanOneDirectory() {
+        queryMediaStoreForImages();
+    }
+
+    private void queryMediaStoreForImages() {
+        List<Model> imageList = new ArrayList<>();
+        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        String[] projection = {MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
+        String selection = MediaStore.Images.Media.DATA + " LIKE ?";
+        String[] selectionArgs = new String[]{path.getAbsolutePath() + "%"};
+        String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
+
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder)) {
+            if (cursor != null) {
+                int index = 0;
+                int dataIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+                int sizeIndex = cursor.getColumnIndex(MediaStore.Images.Media.SIZE);
+                while (cursor.moveToNext()) {
+                    File path = new File(cursor.getString(dataIndex));
+                    int size = cursor.getInt(sizeIndex);
+                    String name = path.getName();
+                    imageList.add(setItemList(index, name, path, size));
+                    index++;
+                }
+            }
+        }
+        setService(imageList);
+    }
+
+    private Image setItemList(int id, String name, File path, int size) {
+        return ImageFileConstructor.initialized(id, name, path, size, databaseManager.checkFileFavorites(path));
+    }
+
+    private void setService(List<Model> imageList) {
+        service.setData(imageList);
+    }
+}
+

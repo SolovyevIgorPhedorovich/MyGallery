@@ -1,21 +1,17 @@
 package com.example.mygallery.managers;
 
 import android.content.Context;
-import android.graphics.Rect;
-import android.view.*;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.ImageViewActivity;
 
 public abstract class PopupWindowManager {
     protected final PopupWindow popupWindow;
     protected final Context context;
-    protected View bgView;
     protected int x, y;
 
     public PopupWindowManager(Context context) {
@@ -24,6 +20,7 @@ public abstract class PopupWindowManager {
         x = 0;
         y = 0;
         setDefaultConfiguration();
+        setAnimation();
     }
 
     // Установка конфигурации PopupWindow по умолчанию
@@ -50,10 +47,12 @@ public abstract class PopupWindowManager {
         popupWindow.setContentView(contentView);
     }
 
+
     // Показ PopupWindow с заданной позицией
     public void showPopupWindow(View anchorView, View viewMenu, int gravity) {
         popupWindow.showAtLocation(anchorView, gravity, x, y);
         setButtonListeners(viewMenu);
+        setSpecificConfiguration();
     }
 
     // Установка обработчиков для кнопок внутри PopupWindow
@@ -83,4 +82,5 @@ public abstract class PopupWindowManager {
 
     // Установка обработчика нажатия для кнопки
     protected abstract void setButtonClickListener(Button button, int buttonId);
+
 }

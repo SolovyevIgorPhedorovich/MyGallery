@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="popupWindowAnimation">
-        <item name="android:windowEnterAnimation">@anim/popup_scale_show</item>
-        <item name="android:windowExitAnimation">@anim/popup_scale_hide</item>
-    </style>
+	<style name="popupContextAnimation">
+		<item name="android:windowEnterAnimation">@anim/popup_scale_show</item>
+		<item name="android:windowExitAnimation">@anim/popup_scale_hide</item>
+	</style>
+
+	<style name="popupGlideAnimation">
+		<item name="android:windowEnterAnimation">@anim/popup_glide_show</item>
+		<item name="android:windowExitAnimation">@anim/popup_glide_hide</item>
+	</style>
+
 </resources>

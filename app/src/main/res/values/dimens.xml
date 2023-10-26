@@ -14,4 +14,6 @@
     <dimen name="height_button_context_menu">45dp</dimen>
     <dimen name="height_dividing_line">1dp</dimen>
     <dimen name="width_dividing_line">270dp</dimen>
+
+	<dimen name="size_select_image">100dp</dimen>
 </resources>

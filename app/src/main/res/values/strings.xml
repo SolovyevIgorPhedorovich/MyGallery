@@ -1,30 +1,70 @@
-<resources>
-    <string name="app_name">MyGallery</string>
-    
-    <string name="move_file">Переместить в альбом</string>
-    <string name="copy_file">Копировать в альбом</string>
-    <string name="add_note">Добавить заметку</string>
-    <string name="slide_show">Слайд-шоу</string>
-    <string name="print_or_export_in_pdf">Печать или экспорт в pdf</string>
-    <string name="rename_file">Переименовать</string>
-    <string name="set_as">Установить как</string>
-    <string name="rotation">Поворот</string>
-    <string name="choose_as_the_album_artwork">Выбрать в качестве обложки альбома</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+	<string name="app_name">MyGallery</string>
+	<string name="title_activity_image_view">ImageViewActivity2</string>
 
-    <string name="move_file_in">Переместить в</string>
-    <string name="copy_file_in">Копировать в</string>
-    <string name="rename">Переименовать</string>
+	<string name="move_file">Переместить в альбом</string>
+	<string name="copy_file">Копировать в альбом</string>
+	<string name="add_note">Добавить заметку</string>
+	<string name="slide_show">Слайд-шоу</string>
+	<string name="print_or_export_in_pdf">Печать или экспорт в pdf</string>
+	<string name="rename_file">Переименовать</string>
+	<string name="set_as">Установить как</string>
+	<string name="rotation">Поворот</string>
+	<string name="choose_as_the_album_artwork">Выбрать в качестве обложки альбома</string>
+	<string name="information">Сведения</string>
 
-    <string name="hint">Название файла</string>
+	<string name="move_file_in">Переместить в</string>
+	<string name="copy_file_in">Копировать в</string>
+	<string name="rename">Переименовать</string>
+	<string name="new_album">Новый альбом</string>
 
-    <string name="OK">ОК</string>
-    <string name="cancel">Отмена</string>
+	<string name="remove_image">Удалить фото?</string>
+	<string name="remove_vide">Удалить видео?</string>
 
-    <string name="empty_favorites">Нет избранных файлов</string>
-    <string name="empty_cart">Корзина пуста</string>
-    <string name="empty_album">Файлы не найдены</string>
+	<string name="hint">Название файла</string>
 
-    <string name="sort_album">Сортировка альбомов</string>
-    <string name="hide_album">Скрытые альбомы</string>
-    <string name="configured">Настройки</string>
+	<string name="OK">ОК</string>
+	<string name="DONE">ГОТОВО</string>
+	<string name="REMOVED">УДАЛИТЬ</string>
+	<string name="cancel">ОТМЕНА</string>
+
+	<string name="empty_favorites">Нет избранных файлов</string>
+	<string name="empty_cart">Корзина пуста</string>
+	<string name="empty_album">Файлы не найдены</string>
+
+	<string name="sort_album">Сортировка альбомов</string>
+	<string name="hide_album">Скрытые альбомы</string>
+	<string name="configured">Настройки</string>
+
+	<string name="albums">Альбомы</string>
+	<string name="all_photo">Все фото</string>
+
+	<string name="selected_info">Выберите элементы, которые необходимо добавить.</string>
+
+	<plurals name="selected_elements">
+		<item quantity="one">Выбрано %d элемент</item>
+		<item quantity="few">Выбрано %d элемента</item>
+		<item quantity="many">Выбрано %d элементов</item>
+		<item quantity="other">Выбрано %d элементов</item>
+	</plurals>
+
+	<plurals name="delete_elements">
+		<item quantity="one">Удалить %d элемент</item>
+		<item quantity="few">Удалить %d элемента</item>
+		<item quantity="many">Удалить %d элементов</item>
+		<item quantity="other">Удалить %d элементов</item>
+	</plurals>
+
+	<string name="moving">Перемещение</string>
+	<string name="coping">Копирование</string>
+	<string name="removing">Удаление</string>
+
+	<string name="count_file_progress_text">
+		<xliff:g id="progress"
+		         example="10">{}</xliff:g>/
+		<xliff:g id="max_file"
+		         example="100">{}
+		</xliff:g>
+	</string>
+
 </resources>
