@@ -4,5 +4,8 @@
 		      format="color"/>
 		<attr name="fullscreenTextColor"
 		      format="color"/>
+		<attr name="uiBackgroundColoer"
+		      format="color">
+		</attr>
 	</declare-styleable>
 </resources>

@@ -1,19 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="image_layout_margin">2dp</dimen>
-    <dimen name="image_preview_margin_horizontal">10dp</dimen>
+    <dimen name="layout_margin_2dp">2dp</dimen>
+    <dimen name="layout_margin_5dp">5dp</dimen>
+    <dimen name="layout_margin_10dp">10dp</dimen>
     <dimen name="image_preview_margin_vertical">3dp</dimen>
 
-    <dimen name="text_margin">16sp</dimen>
+    <dimen name="padding_top">5dp</dimen>
+    <dimen name="layout_size_0dp">0dp</dimen>
+    <dimen name="height_bottom_navigation_menu">70dp</dimen>
+    <dimen name="height_item_album_list">70dp</dimen>
+    <dimen name="layout_height_info_selected">35dp</dimen>
+
+    <dimen name="size_image_button">50dp</dimen>
+    <dimen name="size_image_in_list">60dp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="text_size_name_album">16sp</dimen>
+    <dimen name="text_size_count_file">14sp</dimen>
     <dimen name="text_size_context_menu">15sp</dimen>
+    <dimen name="text_size_button">14sp</dimen>
 
     <dimen name="text_header_popup_window">22sp</dimen>
     <dimen name="padding_top_header_text_popup_window">3dp</dimen>
     <dimen name="padding_horizontal_header_text_popup_window">15dp</dimen>
+    <dimen name="padding_horizontal_tool_menu">10dp</dimen>
 
     <dimen name="height_button_context_menu">45dp</dimen>
     <dimen name="height_dividing_line">1dp</dimen>
     <dimen name="width_dividing_line">270dp</dimen>
 
+    <dimen name="width_button_popup_window">180dp</dimen>
+    <dimen name="height_title_popup_menu">40dp</dimen>
+
+    <!-- Vertical border line -->
+    <dimen name="width_border_line_vertical">1dp</dimen>
+    <dimen name="layout_margin_vertical_border_line_vertical">12dp</dimen>
+
+    <dimen name="size_image_button_selecting_image">15dp</dimen>
+    <dimen name="margin_image_button_selecting_image">3dp</dimen>
+
 	<dimen name="size_select_image">100dp</dimen>
+    <dimen name="corner_radius">20dp</dimen>
+
+    <dimen name="min_height_edit_text">48dp</dimen>
+    <dimen name="ems">50</dimen>
 </resources>

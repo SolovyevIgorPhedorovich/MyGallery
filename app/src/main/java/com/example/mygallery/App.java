@@ -35,11 +35,11 @@ public class App extends Application {
             SharedPreferencesHelper.initializeSharedPreferences(appContext);
         }
 
-        initializedMode();
+        initializedModels();
         createTrashDir();
     }
 
-    private void initializedMode() {
+    private void initializedModels() {
         albums = new AlbumService();
         images = new ImageService();
         cart = new CartService();

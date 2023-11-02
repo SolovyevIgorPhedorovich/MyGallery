@@ -8,7 +8,7 @@
 	<TextView
 			android:id="@+id/popup_text"
 			android:layout_width="match_parent"
-			android:layout_height="40dp"
+			android:layout_height="@dimen/height_title_popup_menu"
 			android:text="@string/rename"
 			android:textSize="@dimen/text_header_popup_window"
 			android:paddingTop="@dimen/padding_top_header_text_popup_window"
@@ -24,7 +24,7 @@
 
 		<ProgressBar
 				style="?android:attr/progressBarStyleHorizontal"
-				android:layout_width="wrap_content"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:id="@+id/progress_bar"
 				android:layout_weight="1"/>
@@ -33,7 +33,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:id="@+id/count_file_progress"
-				android:layout_marginHorizontal="10dp"/>
+				android:layout_marginHorizontal="@dimen/layout_margin_10dp"/>
 	</LinearLayout>
 
 </LinearLayout>

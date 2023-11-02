@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
+import com.example.mygallery.databinding.ActivityAlbumBinding;
 import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 import com.example.mygallery.fragments.CartRecyclerViewFragment;
 import com.example.mygallery.fragments.FavoritesRecyclerViewFragment;
@@ -33,13 +34,15 @@ public class AlbumActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     FragmentManagerHelper fragmentManagerHelper;
     private SharedPreferencesHelper sharedPreferencesHelper;
+    private ActivityAlbumBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_album);
+        binding = ActivityAlbumBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        fragmentManagerHelper = new FragmentManagerHelper(getSupportFragmentManager(), R.id.fragmentContainer);
+        fragmentManagerHelper = new FragmentManagerHelper(getSupportFragmentManager(), binding.fragmentContainer.getId());
         sharedPreferencesHelper = new SharedPreferencesHelper(this, SharedPreferencesHelper.ALBUM_PREFERENCES);
 
         // Инициализация элементов интерфейса
@@ -49,9 +52,9 @@ public class AlbumActivity extends AppCompatActivity {
 
     // Метод для инициализации элементов интерфейса
     private void initializeViews() {
-        progressBar = findViewById(R.id.recyclerProgress);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        progressBar = binding.recyclerProgress;
+        Toolbar toolbar = binding.toolbar;
+        bottomNavigationView = binding.bottomNavigationView;
         bottomNavigationView.setSelectedItemId(R.id.action_albums);
 
         setSupportActionBar(toolbar);

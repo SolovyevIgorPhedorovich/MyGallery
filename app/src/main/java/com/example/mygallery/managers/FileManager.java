@@ -186,7 +186,7 @@ public class FileManager {
     }
 
     private PopupWindowProgress showProcess(int idText) {
-        return PopupWindowProgress.show(context, ((AlbumGridActivity) context).findViewById(R.id.fragmentContainer), idText, viewModel.totalCheckedCount());
+        return PopupWindowProgress.show(context, ((AlbumGridActivity) context).findViewById(R.id.fragment_container), idText, viewModel.totalCheckedCount());
     }
 
     private void reset() {

@@ -13,7 +13,7 @@ public class ImagePagerViewHolder extends RecyclerView.ViewHolder {
 
     public ImagePagerViewHolder(@NonNull @NotNull View itemView) {
         super(itemView);
-        imageView = itemView.findViewById(R.id.imageView);
+        imageView = itemView.findViewById(R.id.image_view);
         rotationAngle = 0f;
     }
 }

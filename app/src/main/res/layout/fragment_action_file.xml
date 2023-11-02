@@ -5,32 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+              android:background="#FFFFFF"
+              android:fitsSystemWindows="true"
+              tools:context=".fragments.ActionFileFragment">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+		    android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <ImageButton
-                android:id="@+id/close_fragment"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="#00FFFFFF"
+		        android:id="@+id/close_fragment"
+		        android:layout_width="@dimen/size_image_button"
+		        android:layout_height="@dimen/size_image_button"
+		        android:layout_marginStart="@dimen/layout_margin_2dp"
+		        android:background="@color/transparent"
+		        android:contentDescription="@string/button_back_description"
             app:srcCompat="@drawable/close_32"/>
 
         <TextView
-                android:id="@+id/type_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin" />
+		        android:id="@+id/type_action"
+		        android:layout_width="0dp"
+		        android:layout_height="match_parent"
+		        android:layout_weight="1"/>
 
         <ImageButton
-            android:id="@+id/buttonCreateAlbum"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="5dp"
-            android:background="#00FFFFFF"
+		        android:id="@+id/button_create_album"
+		        android:layout_width="@dimen/size_image_button"
+		        android:layout_height="@dimen/size_image_button"
+		        android:layout_marginEnd="@dimen/layout_margin_2dp"
+		        android:contentDescription="@string/button_created_album_description"
+		        android:background="@color/transparent"
             app:srcCompat="@drawable/plus_32" />
     </LinearLayout>
 
@@ -38,8 +43,6 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="LinearLayoutManager"
-        tools:context=".fragments.ActionFileFragment"/>
+        android:layout_marginHorizontal="@dimen/layout_margin_2dp"
+        app:layoutManager="LinearLayoutManager"/>
 </LinearLayout>

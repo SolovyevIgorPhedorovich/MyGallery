@@ -1,10 +1,8 @@
 package com.example.mygallery.navigator;
 
-import android.content.Context;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 
 public class FragmentManagerHelper {
     private final FragmentManager fragmentManager;
@@ -21,8 +19,7 @@ public class FragmentManagerHelper {
     }
 
     public boolean isCurrentFragmentInstanceOf(Class<? extends Fragment> fragmentClass) {
-        Fragment currentFragment = getCurrentFragment();
-        return fragmentClass.isInstance(currentFragment);
+        return fragmentClass.isInstance(getCurrentFragment());
     }
 
     public void switchToFragment(Class<? extends Fragment> fragmentClass) {

@@ -6,7 +6,9 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
+import com.example.mygallery.DiffUtilCallback;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.CreatedAlbumActivity;
 import com.example.mygallery.activities.ImageViewActivity;
@@ -33,6 +35,7 @@ public class ImageRecyclerViewFragment extends RecyclerViewFragment implements S
     private BaseViewModel<Model> viewModel;
     private ImageAdapter<Model> adapter;
     private View toolbar;
+    private DiffUtilCallback callback;
 
     public ImageRecyclerViewFragment(File albumPath) {
         this.albumPath = albumPath;
@@ -45,9 +48,9 @@ public class ImageRecyclerViewFragment extends RecyclerViewFragment implements S
     }
 
     @Override
-    protected void initializedViews(View view) {
-        super.initializedViews(view);
-        toolbar = view.findViewById(R.id.toolbar);
+    protected void initializedViews() {
+        super.initializedViews();
+        toolbar = binding.toolbar;
     }
 
     private void setConfigDragSelectTouchListener() {
@@ -80,9 +83,10 @@ public class ImageRecyclerViewFragment extends RecyclerViewFragment implements S
     protected void setObserve() {
         viewModel.data.observe(getViewLifecycleOwner(), o -> {
             if (adapter != null) {
-                Log.d("Update", "Данные обновлены");
+                callback = new DiffUtilCallback(adapter.getDataList(), o);
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
                 adapter.setDataList(o);
-                adapter.notifyDataSetChanged();
+                diffResult.dispatchUpdatesTo(adapter);
                 viewFragmentText(o.isEmpty());
             }
         });
@@ -99,9 +103,9 @@ public class ImageRecyclerViewFragment extends RecyclerViewFragment implements S
     @Override
     protected void configureRecyclerView() {
         createAdapter(); // Создание адаптера
-        recyclerView.addOnItemTouchListener(dragSelectTouchListener);
-
         setConfigDragSelectTouchListener();
+
+        recyclerView.addOnItemTouchListener(dragSelectTouchListener);
         recyclerView.setLayoutManager(new GridLayoutManager(fragmentContext, 4));
     }
 

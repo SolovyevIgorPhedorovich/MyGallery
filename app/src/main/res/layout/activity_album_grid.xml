@@ -7,57 +7,60 @@
                                                    tools:context=".activities.AlbumGridActivity">
 
     <FrameLayout
-        android:id="@+id/fragmentContainer"
+		    android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintTop_toTopOf="parent"
+		    android:layout_height="@dimen/layout_size_0dp"
+		    android:layout_marginTop="@dimen/layout_margin_2dp"
+		    app:layout_constraintTop_toBottomOf="@id/linear_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+		    app:layout_constraintStart_toStartOf="parent"
+		    app:layout_constraintBottom_toBottomOf="parent">
 
     </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
+	<LinearLayout
+			android:id="@+id/linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
+			android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/buttonSort"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="#00FFFFFF"
-            android:layout_marginStart="300dp"
-            app:srcCompat="@drawable/ui_filter_sort_a_default_32" />
-
-        <ImageButton
-		        android:id="@+id/button_back"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:background="#00FFFFFF"
+		<ImageButton
+				android:id="@+id/button_back"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_marginStart="@dimen/layout_margin_2dp"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_back_description"
             app:srcCompat="@drawable/arrow_a_left_32" />
 
-        <TextView
-                android:id="@+id/album_name_text_view"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="45dp"
+		<TextView
+				android:id="@+id/album_name_text_view"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
             android:gravity="center_vertical|start"
-            android:textSize="20sp" />
+				android:textSize="@dimen/text_size_title"/>
 
-        <ImageButton
-		        android:id="@+id/button_context_menu"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="355dp"
-            android:background="#00FFFFFF"
+		<ImageButton
+				android:id="@+id/button_sort"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_sort_description"
+				app:srcCompat="@drawable/ui_filter_sort_a_default_32"/>
+
+		<ImageButton
+				android:id="@+id/button_context_menu"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_marginEnd="@dimen/layout_margin_2dp"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_context_menu_description"
             app:srcCompat="@drawable/context_menu" />
 
-    </FrameLayout>
+	</LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

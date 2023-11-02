@@ -2,21 +2,22 @@
 <FrameLayout
 		xmlns:android="http://schemas.android.com/apk/res/android"
 		xmlns:app="http://schemas.android.com/apk/res-auto"
-		android:layout_width="100dp"
-		android:layout_height="100dp"
-		android:layout_margin="10dp">
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_margin="@dimen/layout_margin_5dp">
 
 	<ImageView
 			android:id="@+id/image_view"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"/>
+			android:layout_height="match_parent"
+			android:scaleType="centerCrop"/>
 
 	<ImageButton
 			android:id="@+id/button_delete_on_selected"
-			android:layout_width="10dp"
-			android:layout_height="10dp"
+			android:layout_width="@dimen/size_image_button_selecting_image"
+			android:layout_height="@dimen/size_image_button_selecting_image"
 			android:background="@drawable/collapse_bg"
 			android:layout_gravity="end"
-			android:layout_margin="3dp"
+			android:layout_margin="@dimen/margin_image_button_selecting_image"
 			app:srcCompat="@drawable/close_32"/>
 </FrameLayout>

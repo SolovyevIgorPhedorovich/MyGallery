@@ -9,4 +9,5 @@
 	<color name="black_overlay">#66000000</color>
 	<color name="transparent">#00000000</color>
 	<color name="background_ui_view">#E6000000</color>
+	<color name="red_removed">#E2CF3131</color>
 </resources>

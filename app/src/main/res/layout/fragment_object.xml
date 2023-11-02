@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="70dp">
+              android:layout_height="@dimen/height_item_album_list">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginVertical="2dp"
-        android:layout_marginStart="5dp"
-        app:cardCornerRadius="20dp"
+		    android:layout_width="@dimen/size_image_in_list"
+		    android:layout_height="@dimen/size_image_in_list"
+		    android:layout_marginHorizontal="@dimen/layout_margin_2dp"
+		    android:layout_gravity="center_vertical"
+		    app:cardCornerRadius="@dimen/corner_radius"
         app:cardElevation="0dp">
 
         <ImageView
@@ -26,22 +26,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:layout_marginStart="5dp"
+        android:layout_marginHorizontal="@dimen/layout_margin_2dp"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:paddingVertical="@dimen/padding_top">
 
         <TextView
-                android:id="@+id/folder_name"
+		        android:id="@+id/folder_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+		        android:textSize="@dimen/text_size_name_album"/>
 
         <TextView
-                android:id="@+id/count_images"
+		        android:id="@+id/count_images"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp" />
+		        android:textSize="@dimen/text_size_count_file"/>
     </LinearLayout>
 
 </LinearLayout>

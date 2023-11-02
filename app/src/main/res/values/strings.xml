@@ -1,6 +1,21 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">MyGallery</string>
-	<string name="title_activity_image_view">ImageViewActivity2</string>
+	<string name="title_activity_album">AlbumActivity</string>
+	<string name="title_activity_album_grid">AlbumGridActivity</string>
+	<string name="title_activity_image_view">ImageViewActivity</string>
+	<string name="title_activity_album_created">CreatedAlbumActivity</string>
+
+	<string name="button_back_description">Back</string>
+	<string name="button_sort_description">Sorted</string>
+	<string name="button_context_menu_description">Context menu</string>
+	<string name="button_info_description">Info</string>
+	<string name="button_share_description">Share</string>
+	<string name="button_favorite_description">Favorite</string>
+	<string name="button_edit_description">Edit</string>
+	<string name="button_remove_description">Remove</string>
+	<string name="button_created_album_description">Created album</string>
+	<string name="button_move_description">Move</string>
+	<string name="button_selected_all_description">Selected_all</string>
 
 	<string name="move_file">Переместить в альбом</string>
 	<string name="copy_file">Копировать в альбом</string>
@@ -38,6 +53,8 @@
 
 	<string name="albums">Альбомы</string>
 	<string name="all_photo">Все фото</string>
+	<string name="favorites">Избранное</string>
+	<string name="cart">Корзина</string>
 
 	<string name="selected_info">Выберите элементы, которые необходимо добавить.</string>
 
@@ -58,6 +75,8 @@
 	<string name="moving">Перемещение</string>
 	<string name="coping">Копирование</string>
 	<string name="removing">Удаление</string>
+
+	<string name="default_count_selected">0</string>
 
 	<string name="count_file_progress_text">
 		<xliff:g id="progress"

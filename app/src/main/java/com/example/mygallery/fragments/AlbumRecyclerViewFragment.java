@@ -2,7 +2,6 @@ package com.example.mygallery.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import com.example.mygallery.adapters.album.AlbumAdapterHelper;
 import com.example.mygallery.adapters.album.AlbumAdapter;
 import com.example.mygallery.adapters.album.FolderListAdapter;
 import com.example.mygallery.models.Album;
-import com.example.mygallery.navigator.ActivityNavigator;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
 import com.example.mygallery.viewmodel.AlbumViewModel;
@@ -84,7 +82,7 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) fragmentContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
-        int imageMargin = fragmentContext.getResources().getDimensionPixelSize(R.dimen.image_preview_margin_horizontal);
+        int imageMargin = fragmentContext.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp);
         return (screenWidth - (2 * imageMargin)) / 2;
     }
 

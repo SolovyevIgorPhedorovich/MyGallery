@@ -1,6 +1,5 @@
 package com.example.mygallery.viewmodel;
 
-import android.content.Context;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.models.services.BaseService;

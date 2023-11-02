@@ -5,14 +5,14 @@
     android:layout_gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/image_preview_margin_horizontal"
+             android:layout_marginHorizontal="@dimen/layout_margin_10dp"
     android:layout_marginVertical="@dimen/image_preview_margin_vertical">
 
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="@dimen/corner_radius"
         app:cardElevation="0dp">
 
         <ImageView
@@ -27,20 +27,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="bottom"
-        android:padding="10dp">
+        android:layout_gravity="bottom">
 
         <TextView
 		        android:id="@+id/folder_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="16sp"/>
+		        android:textSize="@dimen/text_size_name_album"/>
 
         <TextView
 		        android:id="@+id/count_images"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+		        android:textSize="@dimen/text_size_count_file"/>
     </LinearLayout>
 </FrameLayout>

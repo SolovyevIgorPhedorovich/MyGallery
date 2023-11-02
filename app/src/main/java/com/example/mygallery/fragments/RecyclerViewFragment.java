@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.ImageViewActivity;
+import com.example.mygallery.databinding.FragmentRecyclerViewBinding;
 import com.example.mygallery.navigator.ActivityNavigator;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +20,7 @@ public abstract class RecyclerViewFragment extends Fragment {
     protected RecyclerView recyclerView;
     protected TextView textView;
     protected SharedPreferencesHelper sharedPreferencesHelper;
+    protected FragmentRecyclerViewBinding binding;
 
     @Override
     public void onAttach(@NotNull Context context) {
@@ -26,9 +28,9 @@ public abstract class RecyclerViewFragment extends Fragment {
         fragmentContext = context;
     }
 
-    protected void initializedViews(View view) {
-        textView = view.findViewById(R.id.fragment_text);
-        recyclerView = view.findViewById(R.id.recycler_view_list);
+    protected void initializedViews() {
+        textView = binding.fragmentText;
+        recyclerView = binding.recyclerViewList;
     }
 
     @Override
@@ -38,12 +40,12 @@ public abstract class RecyclerViewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
-        initializedViews(view);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentRecyclerViewBinding.inflate(inflater, container, false);
+        initializedViews();
         configureRecyclerView(); // Конфигурирование RecyclerView
         setObserve();
-        return view;
+        return binding.getRoot();
     }
 
     protected void openActivity(int position, Class<?> openClass) {

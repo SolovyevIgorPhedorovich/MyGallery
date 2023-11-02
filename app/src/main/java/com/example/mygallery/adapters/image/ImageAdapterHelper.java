@@ -54,12 +54,16 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         this.dataList = new ArrayList<>(dataList);
     }
 
+    public List<T> getDataList() {
+        return dataList;
+    }
+
     // Загрузка изображения в ImageView с использованием Glide
     protected void setImage(File imagePath, ImageView imageView) {
         LoadImage.setImage(imagePath, imageView);
     }
 
-    protected void setSwitchMode(ImageViewHolder holder, int position) {
+    protected void setMode(ImageViewHolder holder, int position) {
         switch (mode) {
             case VIEWING:
                 holder.hideSelect();

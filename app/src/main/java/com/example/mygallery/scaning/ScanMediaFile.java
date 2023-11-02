@@ -10,7 +10,6 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.models.constructors.ImageFileConstructor;
 import com.example.mygallery.models.services.BaseService;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.*;
@@ -19,7 +18,7 @@ public class ScanMediaFile implements Runnable {
     private final Context context;
     private final File path;
     private final BaseService<Model> service;
-    DatabaseFavorites databaseManager;
+    private final DatabaseFavorites databaseManager;
 
     public ScanMediaFile(Context context, BaseService<Model> service, File path) {
         this.context = context;
@@ -41,21 +40,20 @@ public class ScanMediaFile implements Runnable {
         List<Model> imageList = new ArrayList<>();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
-        String selection = MediaStore.Images.Media.DATA + " LIKE ?";
+        String selection = MediaStore.Images.Media.DATA + " LIKE?";
         String[] selectionArgs = new String[]{path.getAbsolutePath() + "%"};
         String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
 
         try (Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder)) {
             if (cursor != null) {
-                int index = 0;
                 int dataIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
                 int sizeIndex = cursor.getColumnIndex(MediaStore.Images.Media.SIZE);
                 while (cursor.moveToNext()) {
                     File path = new File(cursor.getString(dataIndex));
                     int size = cursor.getInt(sizeIndex);
                     String name = path.getName();
-                    imageList.add(setItemList(index, name, path, size));
-                    index++;
+                    Image image = setItemList(imageList.size(), name, path, size);
+                    imageList.add(image);
                 }
             }
         }

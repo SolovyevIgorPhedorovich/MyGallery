@@ -8,22 +8,28 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.R;
+import com.example.mygallery.databinding.ActivityAddFileInNewAlbumBinding;
+import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 import com.example.mygallery.fragments.ChoiceImageListFragment;
 import com.example.mygallery.fragments.ImageRecyclerViewFragment;
+import com.example.mygallery.fragments.RecyclerViewFragment;
 import com.example.mygallery.viewmodel.ImageViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
 public class CreatedAlbumActivity extends AppCompatActivity {
-    private boolean isFragmentType = false;
+    private RecyclerViewFragment fragmentImage, fragmentAlbum;
     private TextView fragmentTextView;
     private ImageButton buttonViewType;
     private ImageViewModel images;
     private String pathAlbum;
+    private FragmentType currentFragment = FragmentType.IMAGE;
+    private ActivityAddFileInNewAlbumBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_file_in_new_album);
+        binding = ActivityAddFileInNewAlbumBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         initializeViews();
         initializedViewModels();
@@ -31,28 +37,33 @@ public class CreatedAlbumActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
-        fragmentTextView = findViewById(R.id.name_fragment);
-        buttonViewType = findViewById(R.id.button_swap);
+        fragmentTextView = binding.nameFragment;
+        buttonViewType = binding.buttonSwap;
 
         setListenerButton();
     }
 
-    private void initializedViewModels() {
-        images = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(ImageViewModel.class);
-    }
-
     private void setListenerButton() {
         buttonViewType.setOnClickListener(view -> {
-            if (!isFragmentType) {
-                fragmentTextView.setText(R.string.albums);
-                buttonViewType.setImageResource(R.drawable.baseline_all_photo_32);
-            } else {
-                fragmentTextView.setText(R.string.all_photo);
-                buttonViewType.setImageResource(R.drawable.baseline_photo_library_32);
+            switch (currentFragment) {
+                case IMAGE:
+                    fragmentTextView.setText(R.string.albums);
+                    buttonViewType.setImageResource(R.drawable.baseline_all_photo_32);
+                    currentFragment = FragmentType.ALBUM;
+                    break;
+                case ALBUM:
+                    fragmentTextView.setText(R.string.all_photo);
+                    buttonViewType.setImageResource(R.drawable.baseline_photo_library_32);
+                    currentFragment = FragmentType.IMAGE;
+                    break;
             }
-            isFragmentType = !isFragmentType;
+            toggleFragment();
         });
 
+    }
+
+    private void initializedViewModels() {
+        images = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(ImageViewModel.class);
     }
 
     private void setupUI() {
@@ -65,15 +76,33 @@ public class CreatedAlbumActivity extends AppCompatActivity {
 
         // Настройка RecyclerView
 
-        ImageRecyclerViewFragment fragmentImage = new ImageRecyclerViewFragment(Environment.getExternalStorageDirectory(), images);
+        fragmentImage = new ImageRecyclerViewFragment(Environment.getExternalStorageDirectory(), images);
+        fragmentAlbum = new AlbumRecyclerViewFragment();
         ChoiceImageListFragment fragmentChoice = new ChoiceImageListFragment(images, pathAlbum);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer, fragmentImage)
-                .add(R.id.choice_info_container, fragmentChoice)
+                .add(binding.fragmentContainer.getId(), fragmentImage)
+                .add(binding.choiceInfoContainer.getId(), fragmentChoice)
                 .commit();
 
         // Обработчик нажатия кнопки "Назад"
-        findViewById(R.id.button_close).setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
+        binding.buttonClose.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
     }
+
+    private void toggleFragment() {
+        switch (currentFragment) {
+            case ALBUM:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(binding.fragmentContainer.getId(), fragmentAlbum)
+                        .commit();
+                break;
+            case IMAGE:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(binding.fragmentContainer.getId(), fragmentImage)
+                        .commit();
+                break;
+        }
+    }
+
+    private enum FragmentType {ALBUM, IMAGE}
 
 }

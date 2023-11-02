@@ -5,18 +5,18 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.mygallery.R;
+import com.example.mygallery.databinding.ItemGalleryBinding;
 
 public class ImageViewHolder extends RecyclerView.ViewHolder {
     public ImageView imageView;
     public CheckBox checkBox;
     public ImageButton imageButton;
 
-    public ImageViewHolder(View itemView) {
-        super(itemView);
-        imageView = itemView.findViewById(R.id.imageView);
-        checkBox = itemView.findViewById(R.id.checkBox);
-        imageButton = itemView.findViewById(R.id.collapse_button);
+    public ImageViewHolder(ItemGalleryBinding binding) {
+        super(binding.getRoot());
+        imageView = binding.imageView;
+        checkBox = binding.checkBox;
+        imageButton = binding.collapseButton;
 
     }
 

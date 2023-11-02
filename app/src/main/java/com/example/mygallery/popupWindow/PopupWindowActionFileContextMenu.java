@@ -58,7 +58,7 @@ public class PopupWindowActionFileContextMenu extends PopupWindowManager {
     protected void setButtonClickListener(Button button, int buttonId) {
         button.setOnClickListener(view -> {
             popupWindow.dismiss();
-            if (buttonId == R.id.moveFile) {
+            if (buttonId == R.id.move_file) {
                 imageFileManager.moveFile();
             } else if (buttonId == R.id.copy_file) {
                 imageFileManager.copyFile();
