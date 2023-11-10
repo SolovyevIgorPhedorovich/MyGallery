@@ -44,5 +44,4 @@
     <dimen name="corner_radius">20dp</dimen>
 
     <dimen name="min_height_edit_text">48dp</dimen>
-    <dimen name="ems">50</dimen>
 </resources>

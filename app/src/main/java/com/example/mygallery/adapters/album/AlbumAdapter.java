@@ -1,5 +1,6 @@
 package com.example.mygallery.adapters.album;
 
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,11 @@ import java.util.List;
 
 public class AlbumAdapter extends AlbumAdapterHelper<Album> {
 
-    private final int imageWidth;
+    private final Point imageSize;
 
     public AlbumAdapter(List<Album> dataList, int imageWidth, OnItemClickListener listener) {
         super(dataList, listener);
-        this.imageWidth = imageWidth;
+        this.imageSize = new Point (imageWidth, (int) (imageWidth * 1.5));
     }
 
     // Создание нового View Holder'а
@@ -28,8 +29,8 @@ public class AlbumAdapter extends AlbumAdapterHelper<Album> {
     public AlbumViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_image_view, parent, false);
         ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
-        layoutParams.width = imageWidth;
-        layoutParams.height = (int) (imageWidth * 1.5);
+        layoutParams.width = imageSize.x;
+        layoutParams.height = imageSize.y;
         itemView.setLayoutParams(layoutParams);
         return new AlbumViewHolder(itemView);
     }
@@ -39,7 +40,7 @@ public class AlbumAdapter extends AlbumAdapterHelper<Album> {
     public void onBindViewHolder(@NonNull @NotNull AlbumViewHolder holder, int position) {
         Album album = dataList.get(position);
 
-        setImage(album.artwork, holder.folderImageView);
+        setImage(album.artwork, holder.folderImageView, imageSize);
 
         holder.fileCountTextView.setText(album.name);
         holder.folderNameTextView.setText(String.valueOf(album.count));

@@ -1,6 +1,7 @@
 package com.example.mygallery.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,11 +15,13 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 import com.example.mygallery.R;
 import com.example.mygallery.databinding.ActivityImageViewBinding;
+import com.example.mygallery.editor.ImageEditor;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
@@ -39,7 +42,8 @@ public class ImageViewActivity extends AppCompatActivity {
     private ImageButton imageButtonBack,
             buttonRemoveFile,
             buttonContextMenu,
-            buttonAddFavorites;
+            buttonAddFavorites,
+            buttonEdit;
     private TextView textView;
     private View menu, toolbar;
     private BaseViewModel<Model> viewModel;
@@ -138,6 +142,7 @@ public class ImageViewActivity extends AppCompatActivity {
         buttonRemoveFile = binding.buttonRemove;
         buttonContextMenu = binding.buttonContextMenu;
         buttonAddFavorites = binding.buttonAddFavorites;
+        buttonEdit = binding.buttonEdit;
         textView = binding.itemNameTextView;
         menu = binding.menuViewImage;
         toolbar = binding.toolBar;
@@ -156,6 +161,8 @@ public class ImageViewActivity extends AppCompatActivity {
     //Обработка нажатий
     private void setOnClickListenerButtons() {
         imageButtonBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
+        buttonEdit.setOnClickListener(v-> new ImageEditor(this, v, FileProvider.getUriForFile(this, "com.example.mygallery.fileprovider",viewModel.getItem(initialPosition).getPath())));
 
         buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.run(this, v, viewModel));
 

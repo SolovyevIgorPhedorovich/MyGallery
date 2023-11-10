@@ -18,10 +18,19 @@
 			android:supportsRtl="true"
 			android:theme="@style/Theme.MyGallery"
 			tools:targetApi="31">
+		<provider android:authorities="com.example.mygallery.fileprovider"
+		          android:name="androidx.core.content.FileProvider"
+		          android:exported="false"
+		          android:grantUriPermissions="true">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/file_paths"/>
+		</provider>
 		<activity
 				android:name=".activities.ImageViewActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
 				android:exported="false"
+				android:parentActivityName=".activities.AlbumGridActivity"
 				android:label="@string/title_activity_image_view"
 				android:theme="@style/Theme.MyGallery.Fullscreen"
 				android:windowSoftInputMode="adjustPan"/>
@@ -35,11 +44,11 @@
 		</activity>
 		<activity
 				android:name=".activities.AlbumGridActivity"
-				android:exported="true"
+				android:exported="false"
 				android:parentActivityName=".activities.AlbumActivity"/>
 		<activity
 				android:name=".activities.CreatedAlbumActivity"
-				android:exported="true"
+				android:exported="false"
 				android:parentActivityName=".activities.AlbumActivity"/>
 	</application>
 

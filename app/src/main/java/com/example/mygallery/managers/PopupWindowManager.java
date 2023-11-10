@@ -19,7 +19,6 @@ public abstract class PopupWindowManager {
         popupWindow = new PopupWindow(context);
         x = 0;
         y = 0;
-        setDefaultConfiguration();
         setAnimation();
     }
 
@@ -32,7 +31,8 @@ public abstract class PopupWindowManager {
     }
 
     // Установка содержимого PopupWindow и его конфигурации
-    protected abstract void setSpecificConfiguration();
+    protected abstract boolean setConfiguration();
+
 
     // Установка анимации для PopupWindow
     protected abstract void setAnimation();
@@ -45,14 +45,13 @@ public abstract class PopupWindowManager {
 
     public void setContent(View contentView) {
         popupWindow.setContentView(contentView);
+        if (!setConfiguration()) setDefaultConfiguration();
     }
-
 
     // Показ PopupWindow с заданной позицией
     public void showPopupWindow(View anchorView, View viewMenu, int gravity) {
         popupWindow.showAtLocation(anchorView, gravity, x, y);
         setButtonListeners(viewMenu);
-        setSpecificConfiguration();
     }
 
     // Установка обработчиков для кнопок внутри PopupWindow

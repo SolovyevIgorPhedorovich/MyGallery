@@ -43,8 +43,8 @@ public class PopupWindowSelectBarContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setSpecificConfiguration() {
-
+    protected boolean setConfiguration() {
+        return false;
     }
 
     @Override

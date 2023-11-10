@@ -1,5 +1,6 @@
 package com.example.mygallery.adapters.image;
 
+import android.graphics.Point;
 import android.util.SparseBooleanArray;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -59,8 +60,8 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
     }
 
     // Загрузка изображения в ImageView с использованием Glide
-    protected void setImage(File imagePath, ImageView imageView) {
-        LoadImage.setImage(imagePath, imageView);
+    protected void setImage(File imagePath, ImageView imageView, Point imageSize) {
+        LoadImage.setImage(imagePath, imageView, imageSize);
     }
 
     protected void setMode(ImageViewHolder holder, int position) {

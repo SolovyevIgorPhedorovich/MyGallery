@@ -16,8 +16,8 @@ public class PopupWindowAlbumContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setSpecificConfiguration() {
-
+    protected boolean setConfiguration() {
+        return false;
     }
 
     @Override

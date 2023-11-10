@@ -1,5 +1,6 @@
 package com.example.mygallery.adapters.album;
 
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +15,18 @@ import java.util.List;
 
 public class FolderListAdapter extends AlbumAdapterHelper<Album> {
     private int exceptionFolder;
+    private final Point imageSize;
 
     public FolderListAdapter(List<Album> dataList, OnItemClickListener listener) {
         super(dataList, listener);
+        this.imageSize = setImageSize();
     }
 
     public FolderListAdapter(List<Album> dataList, int exceptionFolder, OnItemClickListener listener) {
         super(dataList, listener);
         this.exceptionFolder = exceptionFolder;
         excludeFolder(exceptionFolder);
+        this.imageSize = setImageSize();
     }
 
     private void excludeFolder(int position) {
@@ -40,7 +44,7 @@ public class FolderListAdapter extends AlbumAdapterHelper<Album> {
     @Override
     public void onBindViewHolder(@NonNull @NotNull AlbumViewHolder holder, int position) {
         Album album = dataList.get(position);
-        setImage(album.artwork, holder.folderImageView);
+        setImage(album.artwork, holder.folderImageView, imageSize);
 
         holder.folderNameTextView.setText(album.name);
         holder.fileCountTextView.setText(String.valueOf(album.count));
@@ -52,6 +56,10 @@ public class FolderListAdapter extends AlbumAdapterHelper<Album> {
 
             listener.onItemClick(currentPosition);
         });
+    }
+
+    private Point setImageSize(){
+        return new Point(R.dimen.size_image_in_list, R.dimen.size_image_in_list);
     }
 
 }

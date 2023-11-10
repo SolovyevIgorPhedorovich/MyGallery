@@ -12,7 +12,7 @@ import java.io.File;
 public class CreateAlbumManager {
 
     public static void createAlbum(Context context, View view) {
-        PopupWindowInputNameContextMenu.show(context, view, generateUniqueFolderName());
+        PopupWindowInputNameContextMenu.show(context, view, generateUniqueFolderName(), null);
     }
 
 

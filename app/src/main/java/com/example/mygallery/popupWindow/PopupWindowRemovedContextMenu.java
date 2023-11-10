@@ -4,8 +4,10 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.managers.PopupWindowManager;
@@ -49,13 +51,17 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setSpecificConfiguration() {
-
+    protected boolean setConfiguration() {
+        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2* context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));
+        return true;
     }
 
     @Override
     protected void setAnimation() {
-
+        popupWindow.setAnimationStyle(R.style.popupGlideAnimation);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.example.mygallery.adapters.imagepager.ImagePagerAdapter;
 import com.example.mygallery.database.DatabaseAlbum;
 import com.example.mygallery.fragments.ActionFileFragment;
 import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.navigator.FragmentManager;
 import com.example.mygallery.popupWindow.PopupWindowInputNameContextMenu;
@@ -69,13 +70,13 @@ public class ImageFileManager {
     }
 
     public void rename(View view) {
-        PopupWindowInputNameContextMenu.show(context, view, image.name);
+        PopupWindowInputNameContextMenu.show(context, view, image.name, this::rename);
     }
 
     public void rename(String newName) {
         if (!newName.isEmpty()) {
 
-            com.example.mygallery.managers.FileManager fileManager = new com.example.mygallery.managers.FileManager(context, viewModel);
+            FileManager fileManager = new FileManager(context, viewModel);
 
             fileManager.renameFile(image, newName);
         }
@@ -92,5 +93,9 @@ public class ImageFileManager {
     public void choose() {
         DatabaseAlbum DBManager = new DatabaseAlbum(context);
         DBManager.updateArtwork(image.path.getParent(), image.path.getAbsolutePath());
+    }
+
+    public interface NewName{
+        void setNewName(String newName);
     }
 }

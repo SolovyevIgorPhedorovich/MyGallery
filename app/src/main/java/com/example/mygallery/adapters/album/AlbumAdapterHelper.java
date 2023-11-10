@@ -1,5 +1,6 @@
 package com.example.mygallery.adapters.album;
 
+import android.graphics.Point;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
@@ -28,8 +29,8 @@ public abstract class AlbumAdapterHelper<T> extends RecyclerView.Adapter<AlbumVi
     }
 
     // Загрузка изображения в ImageView с использованием Glide
-    protected void setImage(File imagePath, ImageView imageView) {
-        LoadImage.setImage(imagePath, imageView);
+    protected void setImage(File imagePath, ImageView imageView, Point imageSize) {
+        LoadImage.setImage(imagePath, imageView, imageSize);
     }
 
     @NonNull

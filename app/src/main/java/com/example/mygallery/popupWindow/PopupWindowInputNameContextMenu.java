@@ -8,49 +8,61 @@ import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.ImageViewActivity;
+import com.example.mygallery.activities.imageViewActivity.ImageFileManager;
+import com.example.mygallery.databinding.PopupWindowNewNameBinding;
 import com.example.mygallery.managers.CreateAlbumManager;
 import com.example.mygallery.managers.PopupWindowManager;
 
 public class PopupWindowInputNameContextMenu extends PopupWindowManager {
-    private final boolean isLayoutListenerCallde = false;
     private EditText editText;
+    private final PopupWindowNewNameBinding binding;
 
-    public PopupWindowInputNameContextMenu(Context context) {
+    private final ImageFileManager.NewName listener;
+
+    public PopupWindowInputNameContextMenu(Context context, ImageFileManager.NewName listener) {
         super(context);
+        this.binding = PopupWindowNewNameBinding.inflate(LayoutInflater.from(context));
+        this.listener = listener;
+        initializedViews();
     }
 
-    public static void show(Context context, View view, String name) {
-        PopupWindowInputNameContextMenu mPopupWindow = new PopupWindowInputNameContextMenu(context);
-        initialized(context, mPopupWindow, view, name);
+    private void initializedViews(){
+        editText = binding.inputName;
     }
 
-    private static void initialized(Context context, PopupWindowInputNameContextMenu mPopupWindow, View view, String name) {
-        //Загрузка XML-макета
-        LayoutInflater inflater = LayoutInflater.from(context);
+    public static void show(Context context, View view, String name, ImageFileManager.NewName listener) {
+        PopupWindowInputNameContextMenu mPopupWindow = new PopupWindowInputNameContextMenu(context, listener);
+        initialized(mPopupWindow, view, name);
+    }
 
-        assert inflater != null;
-        View menuView = inflater.inflate(R.layout.popup_window_new_name, null);
+    private static void initialized(PopupWindowInputNameContextMenu mPopupWindow, View view, String name) {
 
-        EditText inputText = menuView.findViewById(R.id.input_name);
-        inputText.setText(name);
+        View menuView = mPopupWindow.binding.getRoot();
+
+        mPopupWindow.editText.setText(name);
 
         //Установка содержимого
         mPopupWindow.setContent(menuView);
         mPopupWindow.setPosition(0, 50);
-        mPopupWindow.setDismissListener();
         mPopupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
     }
 
     @Override
-    protected void setSpecificConfiguration() {
+    protected boolean setConfiguration() {
+        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2* context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));
         popupWindow.setOutsideTouchable(false);
-        editText = popupWindow.getContentView().findViewById(R.id.input_name);
+
         // Установка флага, чтобы окно реагировало на изменение размера при открытии клавиатуры
         popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         setLayoutListener();
         setFocusEditText();
+        return true;
     }
 
     @Override
@@ -63,11 +75,11 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
         button.setOnClickListener(view -> {
             popupWindow.dismiss();
             if (buttonId == R.id.OK) {
-                EditText name = popupWindow.getContentView().findViewById(R.id.input_name);
+                String newName = editText.getText().toString();
                 if (context instanceof ImageViewActivity) {
-                    //((ImageViewActivity) context).rename(name.getText().toString());
+                    listener.setNewName(newName);
                 } else
-                    CreateAlbumManager.create(context, name.getText().toString());
+                    CreateAlbumManager.create(context, newName);
             }
         });
     }
@@ -79,8 +91,6 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(() ->
                 {
-
-                    Log.d("KeyboaerOpen", "KeyboardOpen");
                     Rect r = new Rect();
                     rootView.getWindowVisibleDisplayFrame(r);
 
@@ -104,11 +114,5 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
             InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
         });
-    }
-
-    private void setDismissListener() {
-        if (context instanceof ImageViewActivity) {
-
-        }
     }
 }

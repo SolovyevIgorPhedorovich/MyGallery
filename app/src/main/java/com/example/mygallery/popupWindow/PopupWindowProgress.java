@@ -58,13 +58,14 @@ public class PopupWindowProgress extends PopupWindowManager {
     }
 
     @Override
-    protected void setSpecificConfiguration() {
+    protected boolean setConfiguration() {
         // Add any specific configuration here
+        return false;
     }
 
     @Override
     protected void setAnimation() {
-        // Add any animation here
+        popupWindow.setAnimationStyle(R.style.popupGlideAnimation);
     }
 
     @Override

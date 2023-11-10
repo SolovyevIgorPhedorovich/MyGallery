@@ -11,14 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.databinding.FragmentRecyclerViewBinding;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.navigator.ActivityNavigator;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
+import com.example.mygallery.viewmodel.BaseViewModel;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class RecyclerViewFragment extends Fragment {
     protected Context fragmentContext = getActivity();
     protected RecyclerView recyclerView;
     protected TextView textView;
+    protected BaseViewModel<Model> viewModel;
     protected SharedPreferencesHelper sharedPreferencesHelper;
     protected FragmentRecyclerViewBinding binding;
 

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
+import com.example.mygallery.activities.AlbumActivity;
 import com.example.mygallery.activities.AlbumGridActivity;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
@@ -106,7 +107,8 @@ public class SelectBarFragment extends Fragment {
     private void setButtonClickListener(int buttonId, ImageButton button) {
         button.setOnClickListener(view -> {
             if (buttonId == R.id.button_share) {
-
+                //TODO: add method share
+                return;
             } else if (buttonId == R.id.button_move) {
                 com.example.mygallery.navigator.FragmentManager.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, viewModel.getItem(0));
             } else if (buttonId == R.id.button_selected_all) {
@@ -133,8 +135,15 @@ public class SelectBarFragment extends Fragment {
     }
 
     private void closeFragment(View view) {
-        FragmentManager fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
-        fragmentManager.popBackStack();
+        FragmentManager fragmentManager;
+        if(context instanceof AlbumActivity){
+            fragmentManager = ((AlbumActivity) context).getSupportFragmentManager();
+            fragmentManager.popBackStack();
+        }
+        else if (context instanceof AlbumGridActivity){
+            fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
+            fragmentManager.popBackStack();
+        }
     }
 
     public interface OnFragmentInteraction {

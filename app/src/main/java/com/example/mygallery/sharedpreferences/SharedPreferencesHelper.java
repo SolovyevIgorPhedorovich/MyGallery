@@ -3,6 +3,7 @@ package com.example.mygallery.sharedpreferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
+import com.example.mygallery.sharedpreferences.values.SettingPreferences;
 
 public class SharedPreferencesHelper {
 
@@ -21,6 +22,12 @@ public class SharedPreferencesHelper {
         SharedPreferences.Editor editor = albumPreferences.edit();
         editor.putString(AlbumPreferences.DISPLAY_TYPE_KEY, AlbumPreferences.DISPLAY_TYPE_GRID_VALUES);
         editor.putString(AlbumPreferences.SORT_ALBUMS_KEY, AlbumPreferences.SORT_ALBUMS_SORT_VALUES);
+        editor.apply();
+
+        SharedPreferences settingPreferences = context.getSharedPreferences(SETTING_PREFERENCES, Context.MODE_PRIVATE);
+        editor = settingPreferences.edit();
+        editor.putString(SettingPreferences.DEFAULT_APP_EDIT_IMAGE_KEY, null);
+        editor.putString(SettingPreferences.DEFAULT_APP_EDIT_VIDEO_KEY, null);
         editor.apply();
 
     }

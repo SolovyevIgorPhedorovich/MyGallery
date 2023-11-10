@@ -2,6 +2,7 @@ package com.example.mygallery.adapters.image;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -20,7 +21,7 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     private static final int COLUM = 4;
 
     protected final Context context;
-    private final int imageSize;
+    private final Point imageSize;
 
     public ImageAdapter(Context context, List<T> dataList, OnItemClickListener listener, OnItemClickListener selectClickListener, OnItemClickListener longClickListener) {
         super(dataList, listener, selectClickListener, longClickListener);
@@ -35,8 +36,8 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     public ImageViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         ItemGalleryBinding binding = ItemGalleryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         ViewGroup.LayoutParams layoutParams = binding.getRoot().getLayoutParams();
-        layoutParams.width = imageSize;
-        layoutParams.height = imageSize;
+        layoutParams.width = imageSize.x;
+        layoutParams.height = imageSize.y;
         binding.getRoot().setLayoutParams(layoutParams);
         return new ImageViewHolder(binding);
     }
@@ -45,13 +46,14 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         setMode(holder, position);
         setCheckedState(holder, position);
-        setImage(((Model) dataList.get(position)).getPath(), holder.imageView);
+        setImage(((Model) dataList.get(position)).getPath(), holder.imageView, imageSize);
     }
 
     // Метод для вычисления размера изображения в сетке
-    private int calculateImageSize() {
+    private Point calculateImageSize() {
         Display display;
         DisplayMetrics displayMetrics = new DisplayMetrics();
+        Point imageSize = new Point();
         int screenWidth;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             display = context.getDisplay();
@@ -64,7 +66,9 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
             screenWidth = displayMetrics.widthPixels;
         }
         int margin = context.getResources().getDimensionPixelSize(R.dimen.layout_margin_2dp);
+        int widthImage = (screenWidth - ((1 + COLUM) * margin)) / COLUM;
+        imageSize.set(widthImage, widthImage);
         // Вычисление ширины для отображения изображения в сетке
-        return (screenWidth - ((1 + COLUM) * margin)) / COLUM;
+        return imageSize;
     }
 }

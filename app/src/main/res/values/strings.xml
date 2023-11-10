@@ -78,6 +78,8 @@
 
 	<string name="default_count_selected">0</string>
 
+	<string name="fill_in_the_selection">Запомнить выбор</string>
+
 	<string name="count_file_progress_text">
 		<xliff:g id="progress"
 		         example="10">{}</xliff:g>/

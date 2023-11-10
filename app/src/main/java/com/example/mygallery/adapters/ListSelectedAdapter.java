@@ -1,6 +1,7 @@
 package com.example.mygallery.adapters;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +38,12 @@ public class ListSelectedAdapter extends RecyclerView.Adapter<ListSelectedAdapte
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_holder_list_selected, parent, false);
-        return new ListSelectedAdapter.ImageViewHolder(itemView);
+        return new ImageViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ImageViewHolder holder, int position) {
-        LoadImage.setImage(imageList.get(position).getPath(), holder.imageView);
+        LoadImage.setImage(imageList.get(position).getPath(), holder.imageView, new Point(SIZE, SIZE));
 
         holder.imageButton.setOnClickListener(v -> listener.onItemClick(position));
     }
@@ -52,7 +53,7 @@ public class ListSelectedAdapter extends RecyclerView.Adapter<ListSelectedAdapte
         return imageList.size();
     }
 
-    class ImageViewHolder extends RecyclerView.ViewHolder {
+    static class ImageViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
         ImageButton imageButton;

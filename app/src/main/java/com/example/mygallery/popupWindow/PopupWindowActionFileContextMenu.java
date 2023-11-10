@@ -4,7 +4,9 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.imageViewActivity.ImageFileManager;
 import com.example.mygallery.adapters.imagepager.ImagePagerAdapter;
@@ -45,8 +47,13 @@ public class PopupWindowActionFileContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setSpecificConfiguration() {
+    protected boolean setConfiguration() {
+        popupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));
         popupWindow.setOutsideTouchable(true);
+        return true;
     }
 
     @Override
