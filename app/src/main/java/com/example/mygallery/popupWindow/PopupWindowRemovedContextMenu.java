@@ -34,7 +34,7 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
 
     public static void run(Context context, View view, BaseViewModel<Model> viewModel) {
         PopupWindowManager mPopupWindow = new PopupWindowRemovedContextMenu(context, viewModel);
-        initialized(context, mPopupWindow, view, viewModel.getSelectedItems().size());
+        initialized(context, mPopupWindow, view, viewModel.totalCheckedCount());
     }
 
     private static void initialized(Context context, PopupWindowManager mPopupWindow, View view, int countSelect) {

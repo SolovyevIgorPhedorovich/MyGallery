@@ -72,7 +72,7 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
         float imageHeight = imageView.getDrawable().getIntrinsicHeight();
         float rotationAngle = imageView.getRotation();
 
-        if (imageWidth > screenWidth && imageHeight <= imageHeight) {
+        if (imageWidth > screenWidth && imageHeight <= screenHeight) {
             imageHeight -= imageWidth - screenWidth;
             imageWidth = screenWidth;
         } else if (imageHeight > screenHeight && imageWidth <= screenWidth) {

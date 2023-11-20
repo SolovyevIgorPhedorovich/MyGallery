@@ -108,7 +108,6 @@ public class SelectBarFragment extends Fragment {
         button.setOnClickListener(view -> {
             if (buttonId == R.id.button_share) {
                 //TODO: add method share
-                return;
             } else if (buttonId == R.id.button_move) {
                 com.example.mygallery.navigator.FragmentManager.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, viewModel.getItem(0));
             } else if (buttonId == R.id.button_selected_all) {

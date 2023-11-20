@@ -59,9 +59,9 @@ public class PopupWindowSelectBarContextMenu extends PopupWindowManager {
             if (buttonId == R.id.copy_file) {
                 FragmentManager.openActionFragment(context, ActionFileFragment.Action.COPY, viewModel, file);
             } else if (buttonId == R.id.print) {
-                //fileManager.print();
+                //TODO: открытие активности настройки печати
             } else if (buttonId == R.id.information) {
-                //
+                //TODO: отображение подробной информации о файле
             }
         });
     }

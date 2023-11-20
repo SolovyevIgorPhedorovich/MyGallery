@@ -8,4 +8,8 @@ public interface Model {
     File getPath();
 
     String getName();
+
+    void setId(int id);
+
+    void setPath(File path);
 }

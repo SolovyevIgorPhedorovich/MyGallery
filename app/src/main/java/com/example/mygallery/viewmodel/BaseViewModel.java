@@ -1,11 +1,11 @@
 package com.example.mygallery.viewmodel;
 
-import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.mygallery.interfaces.model.DataListener;
 import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.models.Album;
 import com.example.mygallery.models.services.BaseService;
 import com.example.mygallery.multichoice.MultiChoice;
 import com.example.mygallery.multichoice.MultiChoiceState;
@@ -84,8 +84,12 @@ public class BaseViewModel<T> extends ViewModel {
         service.updateData(id, item);
     }
 
-    public void updateDatabase() {
-        service.updateDatabase();
+    public void updateDatabase(Album data) {
+        service.updateDatabase(data);
+    }
+
+    public void updateDatabase(List<Album> data) {
+        service.updateDatabase(data);
     }
 
     public List<File> getPathList() {
@@ -114,7 +118,7 @@ public class BaseViewModel<T> extends ViewModel {
         return multiChoice.listener();
     }
 
-    public HashSet<T> getSelectedItems() {
+    public List<T> getSelectedItems() {
         return multiChoice.getSelectedItems();
     }
 
@@ -130,8 +134,8 @@ public class BaseViewModel<T> extends ViewModel {
         multiChoice.clearAll();
     }
 
-    public boolean isChecked(T item) {
-        return multiChoice.isChecked(item);
+    public boolean isChecked(int position) {
+        return multiChoice.isChecked(getList().get(position));
     }
 
     public int totalCheckedCount() {

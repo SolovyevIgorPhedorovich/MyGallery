@@ -6,13 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.databinding.ActivityAlbumGridBinding;
 import com.example.mygallery.fragments.ImageRecyclerViewFragment;
-import com.example.mygallery.models.Album;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.AlbumViewModel;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
 public class AlbumGridActivity extends AppCompatActivity {
-    private BaseViewModel<Album> viewModel;
+    private BaseViewModel<Model> viewModel;
     private int position;
     private ActivityAlbumGridBinding binding;
 

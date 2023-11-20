@@ -4,11 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 import com.example.mygallery.database.DatabaseAlbum;
 import com.example.mygallery.models.Album;
-import com.example.mygallery.models.services.BaseService;
-import com.example.mygallery.viewmodel.BaseViewModel;
+import com.example.mygallery.models.constructors.AlbumConstructor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,23 +15,18 @@ import java.util.List;
 import java.util.Map;
 
 public class ScanMemoryRunnable implements Runnable {
-    private final List<String> names, pathAlbums, pathArtworks;
+    private final List<Album> data;
     private final Context context;
-    private final List<Integer> counts;
-    private DatabaseAlbum databaseManager;
-    private BaseService<Album> albums;
+    private final DatabaseAlbum databaseManager;
 
     public ScanMemoryRunnable(Context context) {
         this.context = context;
-        this.names = new ArrayList<>();
-        this.pathAlbums = new ArrayList<>();
-        this.pathArtworks = new ArrayList<>();
-        this.counts = new ArrayList<>();
+        this.data = new ArrayList<>();
+        this.databaseManager = new DatabaseAlbum((context));
     }
 
     @Override
     public void run() {
-        databaseManager = new DatabaseAlbum(context);
         scanDirectoriesForFoldersWithImages();
         addFilesToDatabase();
     }
@@ -52,23 +45,34 @@ public class ScanMemoryRunnable implements Runnable {
                 while (cursor.moveToNext()) {
                     int dataIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA); // Индекс столбца с путем к изображению
                     int folderIndex = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME); // Индекс столбца с именем папки
+
                     String nameFolder = cursor.getString(folderIndex); // Имя текущей папки
                     String imagePath = cursor.getString(dataIndex); // Путь к текущему изображению
-                    String pathFolder = new File(imagePath).getParent(); // Путь к текущей папке
+                    String folderPath = new File(imagePath).getParent(); // Путь к текущей папке
+
                     if (!isImageInUnwantedFolder(imagePath)) { // Проверка, что изображение не находится в нежелательной папке
-                        folderFileCountMap.put(pathFolder, folderFileCountMap.getOrDefault(pathFolder, 0) + 1); // Увеличение счетчика файлов в папке
-                        if (folderFileCountMap.get(pathFolder) == 1) { // Если это первое изображение в папке
-                            pathAlbums.add(pathFolder); // Добавление пути папки в список
-                            names.add(nameFolder); // Добавление имени папки в список
-                            pathArtworks.add(imagePath); // Добавление пути изображения в список обложек папок
+                        int count = getCountFile(folderFileCountMap.getOrDefault(folderPath, 0));
+
+                        folderFileCountMap.put(folderPath, count); // Обновляем счетчика файлов в папке
+                        if (count == 1) { // Если это первое изображение в папке
+                            data.add(AlbumConstructor.initialized(data.size(), nameFolder, new File(folderPath), 0, new File(imagePath)));
                         }
                     }
                 }
-                counts.addAll(folderFileCountMap.values()); // Добавление количества файлов в каждой папке в список
+
+                int i = 0;
+                for (int count : folderFileCountMap.values()) {
+                    data.get(i).count = count;
+                    i++;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace(); // Обработка возможных ошибок и вывод информации о них
         }
+    }
+
+    private int getCountFile(Integer count) {
+        return (count != null) ? count + 1 : 1;
     }
 
     // Метод для проверки, находится ли изображение в нежелательной папке
@@ -78,8 +82,6 @@ public class ScanMemoryRunnable implements Runnable {
 
     // Метод для добавления данных в базу данных
     private void addFilesToDatabase() {
-        Log.d("addFileDataBase", "Start");
-        databaseManager.insertOrUpdateData(names, counts, pathAlbums, pathArtworks);
-        databaseManager.close();
+        databaseManager.insertOrUpdateData(data);
     }
 }

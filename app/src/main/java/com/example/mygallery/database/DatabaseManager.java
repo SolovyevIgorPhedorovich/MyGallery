@@ -75,18 +75,18 @@ public class DatabaseManager extends SQLiteOpenHelper {
 
     // Копирование файла базы данных из ресурсов
     private void copyDataBaseFile() throws IOException {
-        InputStream input = context.getAssets().open(DB_NAME);
-        OutputStream output = Files.newOutputStream(Paths.get(getDataBasePath()));
-        byte[] buffer = new byte[1024];
-        int length;
+        try (InputStream input = context.getAssets().open(DB_NAME);
+             OutputStream output = Files.newOutputStream(Paths.get(getDataBasePath()))) {
 
-        while ((length = input.read(buffer)) > 0) {
-            output.write(buffer, 0, length);
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+
+            output.flush();
         }
-
-        output.flush();
-        output.close();
-        input.close();
     }
 
     // Закрытие базы данных

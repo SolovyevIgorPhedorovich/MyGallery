@@ -22,5 +22,15 @@
 	       parent="MyButtonStyle">
 		<item name="android:textColor">@color/red_removed</item>
 	</style>
+	<style name="Widget.Theme.MyGallery.ActionBar.Fullscreen"
+	       parent="Widget.AppCompat.ActionBar">
+		<item name="android:background">@color/black_overlay</item>
+	</style>
+
+	<style name="Widget.Theme.MyGallery.ButtonBar.Fullscreen"
+	       parent="">
+		<item name="android:background">@color/black_overlay</item>
+		<item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+	</style>
 
 </resources>

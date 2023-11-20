@@ -1,6 +1,5 @@
 package com.example.mygallery.models.services;
 
-import android.content.Context;
 import com.example.mygallery.database.DatabaseCart;
 import com.example.mygallery.database.DatabaseFavorites;
 import com.example.mygallery.interfaces.model.Model;

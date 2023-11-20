@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.adapters.viewholder.ImageViewHolder;
+import com.example.mygallery.interfaces.OnCheckedIsChoice;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.viewimage.LoadImage;
 import org.jetbrains.annotations.NotNull;
@@ -20,14 +21,16 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
     protected final OnItemClickListener listener;
     protected final OnItemClickListener selectClickListener;
     protected final OnItemClickListener longClickListener;
+    protected final OnCheckedIsChoice checked;
     protected Mode mode;
     protected List<T> dataList;
     protected SparseBooleanArray selectedItems;
 
-    public ImageAdapterHelper(List<T> dataList, OnItemClickListener listener, OnItemClickListener selectClickListener, OnItemClickListener longClickListener) {
+    public ImageAdapterHelper(List<T> dataList, OnItemClickListener listener, OnItemClickListener selectClickListener, OnItemClickListener longClickListener, OnCheckedIsChoice checked) {
         this.listener = listener;
         this.longClickListener = longClickListener;
         this.selectClickListener = selectClickListener;
+        this.checked = checked;
         setDataList(dataList);
     }
 
@@ -82,15 +85,7 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         if (selectedItems != null)
             holder.checkBox.setChecked(selectedItems.get(position, false)); // Установите состояние CheckBox из модели данных
 
-        holder.itemView.setOnClickListener(v -> {
-            boolean selectState = !holder.checkBox.isChecked();
-            if (selectState)
-                selectedItems.put(position, true);
-            else
-                selectedItems.delete(position);
-            setCheckedState(holder, position);
-            selectClickListener.onItemClick(position);
-        });
+        holder.itemView.setOnClickListener(v -> selectClickListener.onItemClick(position));
 
         holder.itemView.setOnLongClickListener(v -> {
             longClickListener.onItemClick(position);
@@ -126,6 +121,44 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
                 selectedItems.clear();
 
             notifyDataSetChanged();
+        }
+    }
+
+    public void updateSelectedItems(List<T> selectedItemList) {
+        int oldSize = selectedItems.size();
+        int newSize = selectedItemList.size();
+
+        if (newSize < oldSize) {
+            for (int a = 0, i = oldSize - 1; a <= i; a++, i--) {
+                int position1 = selectedItems.keyAt(a);
+                int position2 = selectedItems.keyAt(i);
+
+                if (!selectedItemList.contains(dataList.get(position1))) {
+                    notifyItemChanged(position1);
+                    break;
+                } else if (!selectedItemList.contains(dataList.get(position2))) {
+                    notifyItemChanged(position2);
+                    break;
+                }
+
+            }
+        } else if (newSize > oldSize) {
+            for (int i = 0; i < getItemCount(); i++) {
+                if (dataList.get(i).equals(selectedItemList.get(newSize - 1))) {
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    protected void updateSelectedItems(int position) {
+        boolean currentValue = selectedItems.get(position, false);
+        boolean actualityValue = checked.onChecked(position);
+        if (actualityValue && !currentValue) {
+            selectedItems.put(position, true);
+        } else if (!actualityValue && currentValue) {
+            selectedItems.delete(position);
         }
     }
 

@@ -1,6 +1,11 @@
 package com.example.mygallery.models;
 
+import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.Objects;
 
 
 public class Image implements Model {
@@ -8,11 +13,10 @@ public class Image implements Model {
 
     public String name;
 
-    public java.io.File path;
+    public File path;
 
     public int size;
     public boolean isFavorite;
-
 
     @Override
     public int getId() {
@@ -29,4 +33,39 @@ public class Image implements Model {
         return path;
     }
 
+    @Override
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public void setPath(File path) {
+        this.path = path;
+    }
+
+    @Override
+    public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Image other = (Image) obj;
+
+        return Objects.equals(this.path, other.path);
+    }
+
+    @NotNull
+    public Image clone() {
+        Image image = new Image();
+        image.id = this.id;
+        image.name = this.name;
+        image.path = this.path;
+        image.size = this.size;
+        image.isFavorite = this.isFavorite;
+        return image;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(path);
+    }
 }

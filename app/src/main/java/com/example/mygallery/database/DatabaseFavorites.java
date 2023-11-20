@@ -19,30 +19,36 @@ public class DatabaseFavorites extends DatabaseManager {
     // Получение списка избранных файлов
     public List<Model> getFavorites() {
         List<Model> pathFavorites = new ArrayList<>();
-        if (openOrInitializeDatabase()) {
-            Cursor cursor = mDataBase.rawQuery("SELECT id, path FROM favorites", null);
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                    File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
-                    String name = path.getName();
-                    pathFavorites.add(FavoriteConstructor.initialized(id, name, path, 0));
+        try {
+            if (openOrInitializeDatabase()) {
+                Cursor cursor = mDataBase.rawQuery("SELECT id, path FROM favorites", null);
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                        File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
+                        String name = path.getName();
+                        pathFavorites.add(FavoriteConstructor.initialized(id, name, path, 0));
+                    }
+                    cursor.close();
                 }
-                cursor.close();
             }
+        } finally {
+            close();
         }
-        close();
         return pathFavorites;
     }
 
     public boolean checkFileFavorites(File path) {
-        if (openOrInitializeDatabase()) {
-            Cursor cursor = mDataBase.rawQuery("SELECT path FROM favorites WHERE path=?", new String[]{path.getAbsolutePath()});
+        try {
+            if (openOrInitializeDatabase()) {
+                Cursor cursor = mDataBase.rawQuery("SELECT path FROM favorites WHERE path=?", new String[]{path.getAbsolutePath()});
 
-            if (cursor != null) {
-                cursor.close();
-                return true;
+                if (cursor != null) {
+                    cursor.close();
+                    return true;
+                }
             }
+        } finally {
             close();
         }
         return false;
@@ -50,10 +56,13 @@ public class DatabaseFavorites extends DatabaseManager {
 
     // Добавление файла в избранное
     public void addToFavorites(Image image) {
-        if (openOrInitializeDatabase()) {
-            ContentValues values = new ContentValues();
-            values.put("path", image.path.getAbsolutePath());
-            mDataBase.insert("favorites", null, values);
+        try {
+            if (openOrInitializeDatabase()) {
+                ContentValues values = new ContentValues();
+                values.put("path", image.path.getAbsolutePath());
+                mDataBase.insert("favorites", null, values);
+            }
+        } finally {
             close();
         }
     }

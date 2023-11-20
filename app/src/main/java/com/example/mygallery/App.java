@@ -3,7 +3,6 @@ package com.example.mygallery;
 import android.app.Application;
 import android.content.Context;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.Album;
 import com.example.mygallery.models.services.*;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 
@@ -11,7 +10,7 @@ import java.io.File;
 
 public class App extends Application {
     private static App instance;
-    public BaseService<Album> albums;
+    public BaseService<Model> albums;
     public BaseService<Model> images;
     public BaseService<Model> cart;
     public BaseService<Model> favorites;

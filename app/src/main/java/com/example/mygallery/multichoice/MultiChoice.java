@@ -2,26 +2,20 @@ package com.example.mygallery.multichoice;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import com.example.mygallery.interfaces.model.Model;
 
 import java.util.*;
 
 public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T> {
 
-    private final HashSet<T> selectedItems = new HashSet<>();
+    private final HashSet<T> selectedItems = new LinkedHashSet<>();
     private final MutableLiveData<MultiChoiceState<T>> liveData = new MutableLiveData<>();
     private boolean isAllSelected = false;
     private List<T> items = Collections.emptyList();
 
     @Override
     public void setItemLiveData(LiveData<List<T>> liveData) {
-        liveData.observeForever(new androidx.lifecycle.Observer<List<T>>() {
-            @Override
-            public void onChanged(List<T> newItems) {
-                items = newItems;
-                removedDeletedFile(newItems);
-                notifyUpdates();
-            }
-        });
+        liveData.observeForever(newItems -> items = newItems);
     }
 
     @Override
@@ -29,8 +23,9 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
         return liveData;
     }
 
-    public HashSet<T> getSelectedItems() {
-        return selectedItems;
+    @Override
+    public List<T> getSelectedItems() {
+        return new ArrayList<>(selectedItems);
     }
 
     @Override
@@ -84,15 +79,6 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
                 return true;
 
         return false;
-    }
-
-    private void removedDeletedFile(List<T> files) {
-        List<T> selectedItemsCopy = new ArrayList<>(selectedItems);
-
-        selectedItemsCopy.removeAll(new HashSet<>(files));
-
-        selectedItems.clear();
-        selectedItems.addAll(selectedItemsCopy);
     }
 
     @Override

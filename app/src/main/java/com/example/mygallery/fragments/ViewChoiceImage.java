@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.AlbumGridActivity;
+import com.example.mygallery.activities.CreatedAlbumActivity;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewPager.ConfigurationViewPager;
@@ -63,8 +64,14 @@ public class ViewChoiceImage extends Fragment {
     }
 
     private void closeFragment(View view) {
-        FragmentManager fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
-        fragmentManager.popBackStack();
+        FragmentManager fragmentManager;
+        if (context instanceof CreatedAlbumActivity) {
+            fragmentManager = ((CreatedAlbumActivity) context).getSupportFragmentManager();
+            fragmentManager.popBackStack();
+        } else if (context instanceof AlbumGridActivity) {
+            fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
+            fragmentManager.popBackStack();
+        }
     }
 
     private void setCurrentPosition(int position) {

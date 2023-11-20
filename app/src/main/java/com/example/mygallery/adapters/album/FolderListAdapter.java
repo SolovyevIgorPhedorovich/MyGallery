@@ -8,21 +8,22 @@ import androidx.annotation.NonNull;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.AlbumViewHolder;
 import com.example.mygallery.interfaces.OnItemClickListener;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Album;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class FolderListAdapter extends AlbumAdapterHelper<Album> {
+public class FolderListAdapter extends AlbumAdapterHelper<Model> {
     private int exceptionFolder;
     private final Point imageSize;
 
-    public FolderListAdapter(List<Album> dataList, OnItemClickListener listener) {
+    public FolderListAdapter(List<Model> dataList, OnItemClickListener listener) {
         super(dataList, listener);
         this.imageSize = setImageSize();
     }
 
-    public FolderListAdapter(List<Album> dataList, int exceptionFolder, OnItemClickListener listener) {
+    public FolderListAdapter(List<Model> dataList, int exceptionFolder, OnItemClickListener listener) {
         super(dataList, listener);
         this.exceptionFolder = exceptionFolder;
         excludeFolder(exceptionFolder);
@@ -43,7 +44,7 @@ public class FolderListAdapter extends AlbumAdapterHelper<Album> {
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull AlbumViewHolder holder, int position) {
-        Album album = dataList.get(position);
+        Album album = (Album) dataList.get(position);
         setImage(album.artwork, holder.folderImageView, imageSize);
 
         holder.folderNameTextView.setText(album.name);

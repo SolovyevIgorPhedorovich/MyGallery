@@ -1,7 +1,6 @@
 package com.example.mygallery.fragments;
 
 import android.view.View;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.mygallery.DiffUtilCallback;
 import com.example.mygallery.activities.CreatedAlbumActivity;
@@ -16,11 +15,10 @@ import com.example.mygallery.navigator.FragmentManager;
 import java.util.List;
 
 public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment.OnFragmentInteraction {
-
+    private static final int spanCount = 4;
     private DragSelect dragSelect;
     private ImageAdapter<Model> adapter;
     private View toolbar;
-    private DiffUtilCallback callback;
 
     @Override
     protected void initializedViews() {
@@ -43,7 +41,7 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
         dragSelect.setConfigDragSelectTouchListener();
 
         recyclerView.addOnItemTouchListener(dragSelect.getDragSelectTouchListener());
-        recyclerView.setLayoutManager(new GridLayoutManager(fragmentContext, 4));
+        recyclerView.setLayoutManager(new GridLayoutManager(fragmentContext, spanCount));
     }
 
     @Override
@@ -64,14 +62,9 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
             return;
         }
 
-        if (callback == null) {
-            callback = new DiffUtilCallback(adapter.getDataList(), data);
-        }
-
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getDataList(), data);
         adapter.setDataList(data);
-        diffResult.dispatchUpdatesTo(adapter);
-
+        callback.start(adapter);
         viewFragmentText(data.isEmpty());
     }
 
@@ -84,14 +77,16 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
             adapter.selectedAll();
         else if (data.totalCheckedCount() == 0 && !data.isAllSelected())
             adapter.clearAll();
+        else
+            adapter.updateSelectedItems(data.getSelectedItems());
     }
 
     // Helper method to create the adapter
     private void createAdapter() {
         if (fragmentContext instanceof CreatedAlbumActivity) {
-            adapter = new FileChoiceAdapter(fragmentContext, viewModel.getList(), this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection);
+            adapter = new FileChoiceAdapter(fragmentContext, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection, this::isChecked);
         } else {
-            adapter = new ImageAdapter<>(fragmentContext, viewModel.getList(), this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this));
+            adapter = new ImageAdapter<>(fragmentContext, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this), this::isChecked);
         }
         recyclerView.setAdapter(adapter);
         dragSelect.setAdapter(adapter);
@@ -107,5 +102,9 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
                 FragmentManager.openSelectedViewFragment(fragmentContext, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
                 break;
         }
+    }
+
+    private boolean isChecked(int position) {
+        return viewModel.isChecked(position);
     }
 }

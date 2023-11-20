@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.text.TextUtils;
-import android.util.Log;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Album;
 import com.example.mygallery.models.constructors.AlbumConstructor;
@@ -21,7 +20,7 @@ public class DatabaseAlbum extends DatabaseManager {
     }
 
     // Получение ID папки по её имени
-    public long getAlbumId(String findData) {
+    private long getAlbumId(String findData) {
         long folderId = -1;
         if (openOrInitializeDatabase()) {
             Cursor cursor = mDataBase.rawQuery("SELECT id FROM folders WHERE name = ?", new String[]{findData});
@@ -34,44 +33,52 @@ public class DatabaseAlbum extends DatabaseManager {
     }
 
     // Вставка данных о папке в базу данных
-    public long insertData(String nameFolder, int countFiles, String path) {
-        long id = -1;
+    public void insertData(Album data) {
         if (openOrInitializeDatabase()) {
-            ContentValues values = new ContentValues();
-            values.put("name", nameFolder);
-            values.put("count_files", countFiles);
-            values.put("path", path);
-            id = mDataBase.insert("folders", null, values);
+            startInsert(data);
         }
-        return id;
+    }
+
+    private void startInsert(Album data) {
+        ContentValues valuesFolders = new ContentValues();
+        ContentValues valuesArtwork = new ContentValues();
+
+        valuesFolders.put("name", data.name);
+        valuesFolders.put("count_files", data.count);
+        valuesFolders.put("path", String.valueOf(data.path));
+        valuesArtwork.put("path", String.valueOf(data.artwork));
+
+        insertOrUpdateDataFolders(valuesFolders, valuesArtwork);
+    }
+
+    public void insertData(List<Album> dataList) {
+        if (openOrInitializeDatabase()) {
+            mDataBase.beginTransaction();
+            try {
+                for (Album data : dataList) {
+                    startInsert(data);
+                }
+                mDataBase.setTransactionSuccessful();
+            } finally {
+                mDataBase.endTransaction();
+            }
+            close();
+        }
     }
 
     // Вставка данных о нескольких папках в базу данных
-    public void insertOrUpdateData(List<String> names, List<Integer> counts, List<String> paths, List<String> artworks) {
+    public void insertOrUpdateData(List<Album> dataList) {
         if (openOrInitializeDatabase()) {
             mDataBase.beginTransaction();
             try {
                 // Получите список всех папок из базы данных
                 List<String> existingFolders = getExistingFolders();
 
-                for (int i = 0; i < names.size(); i++) {
-                    String name = names.get(i);
-                    int count = counts.get(i);
-                    String pathFolder = paths.get(i);
-                    String pathCovers = artworks.get(i);
-
-                    ContentValues valuesFolders = new ContentValues();
-                    ContentValues valuesArtwork = new ContentValues();
-
-                    valuesFolders.put("name", name);
-                    valuesFolders.put("count_files", count);
-                    valuesFolders.put("path", pathFolder);
-                    valuesArtwork.put("path", pathCovers);
-
-                    insertOrUpdateDataFolders(valuesFolders, valuesArtwork, pathFolder);
+                for (Album data : dataList) {
+                    startInsert(data);
 
                     // Удалите информацию о папке из списка существующих
-                    existingFolders.remove(pathFolder);
+                    existingFolders.remove(String.valueOf(data.path));
                 }
 
                 // Удалите информацию о папках, которые есть в базе данных, но отсутствуют в списке сканирования
@@ -80,44 +87,43 @@ public class DatabaseAlbum extends DatabaseManager {
                 mDataBase.setTransactionSuccessful();
             } finally {
                 mDataBase.endTransaction();
-                Log.d("Updata DB", "База данных обновлена");
             }
+            close();
         }
     }
 
-    private void insertOrUpdateDataFolders(ContentValues valuesFolders, ContentValues valuesArtwork, String pathFolder) {
-        if (openOrInitializeDatabase()) {
-            mDataBase.beginTransaction();
-            try {
-                long id = 0;
-                // Попытка обновления записи с заданным "path". Если записи с таким "path" нет, она будет вставлена.
-                id = mDataBase.update("folders", valuesFolders, "path = ?", new String[]{pathFolder});
+    private void insertOrUpdateDataFolders(ContentValues valuesFolders, ContentValues valuesArtwork) {
+        // Попытка обновления записи с заданным "path". Если записи с таким "path" нет, она будет вставлена.
+        String path = valuesFolders.getAsString("path");
+        long id = mDataBase.update("folders", valuesFolders, "path = ?", new String[]{path});
 
-                if (id == 0) {
-                    // Записи с таким "path" не существует, поэтому создадим новую запись.
-                    id = mDataBase.insert("folders", null, valuesFolders);
-                    valuesArtwork.put("id_folder", id);
-                    // Вставка информации об обложках (artworks)
-                    mDataBase.insert("artwork", null, valuesArtwork);
-                }
+        if (id == 0) {
+            // Записи с таким "path" не существует, поэтому создадим новую запись.
+            insertDataFolders(valuesFolders, valuesArtwork);
+        } else {
+            updateArtwork(getAlbumId(path), valuesArtwork);
+        }
+    }
 
+    private void insertDataFolders(ContentValues valuesFolders, ContentValues valuesArtwork) {
+        try {
+            long id = mDataBase.insert("folders", null, valuesFolders);
+            valuesArtwork.put("id_folder", id);
+            // Вставка информации об обложках (artworks)
+            mDataBase.insert("artwork", null, valuesArtwork);
+        } catch (SQLiteConstraintException e) {
+            String errorMessage = e.getMessage();
 
-                mDataBase.setTransactionSuccessful();
-            } catch (SQLiteConstraintException e) {
-                String errorMessage = e.getMessage();
-
-                // Обработка ошибки, например, изменение имени папки и повторная вставка
-                if (errorMessage != null && errorMessage.contains("UNIQUE constraint")) {
-                    renameNameDataFolder(valuesFolders, valuesArtwork, pathFolder);
-                }
-            } finally {
-                mDataBase.endTransaction();
+            // Обработка ошибки, например, изменение имени папки и повторная вставка
+            if (errorMessage != null && errorMessage.contains("UNIQUE constraint")) {
+                renameNameDataFolder(valuesFolders, valuesArtwork);
             }
         }
+
     }
 
     // Переименование папки в случае конфликта имени
-    private void renameNameDataFolder(ContentValues valuesFolders, ContentValues valuesArtwork, String pathFolder) {
+    private void renameNameDataFolder(ContentValues valuesFolders, ContentValues valuesArtwork) {
         String name = valuesFolders.getAsString("name");
         Cursor cursor = mDataBase.query("folders", null, "name LIKE ?", new String[]{name + "%"}, null, null, null);
 
@@ -127,7 +133,7 @@ public class DatabaseAlbum extends DatabaseManager {
             valuesFolders.put("name", newName);
 
             // Повторно пытаемся вставить данные
-            insertOrUpdateDataFolders(valuesFolders, valuesArtwork, pathFolder);
+            insertDataFolders(valuesFolders, valuesArtwork);
             cursor.close();
         }
     }
@@ -166,39 +172,48 @@ public class DatabaseAlbum extends DatabaseManager {
     }
 
     // Получение информации о папках
-    public List<Album> getDataAlbum() {
-        List<Album> list = new ArrayList<>();
+    public List<Model> getDataAlbum() {
+        List<Model> list = new ArrayList<>();
+        try {
+            if (openOrInitializeDatabase()) {
+                Cursor cursor = mDataBase.rawQuery("SELECT id, name, count_files, path FROM folders GROUP BY id", null);
 
-        if (openOrInitializeDatabase()) {
-            Cursor cursor = mDataBase.rawQuery("SELECT id, name, count_files, path FROM folders GROUP BY id", null);
+                if (cursor != null) {
 
-            if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+                        String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                        int count = cursor.getInt(cursor.getColumnIndexOrThrow("count_files"));
+                        File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
+                        File artwork = getArtworkAlbumPaths(id);
 
-                while (cursor.moveToNext()) {
-                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                    int count = cursor.getInt(cursor.getColumnIndexOrThrow("count_files"));
-                    File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
-                    File artwork = getArtworkAlbumPaths(id);
-
-                    list.add(AlbumConstructor.initialized(id, name, path, count, artwork));
+                        list.add(AlbumConstructor.initialized(id, name, path, count, artwork));
+                    }
+                    cursor.close();
                 }
-                cursor.close();
             }
+        } finally {
             close();
         }
         return list;
     }
 
+    private void updateArtwork(long id, ContentValues values) {
+        if (values.getAsString("path") != null) {
+            mDataBase.update("artwork", values, "id_folder=?", new String[]{String.valueOf(id)});
+        }
+    }
+
     // Обновление обложки
-    public int updateArtwork(String name, String newPath) {
-        long id = -1;
-        if (openOrInitializeDatabase()) {
-            ContentValues values = new ContentValues();
-            values.put("path", newPath);
-            id = mDataBase.update("artwork", values, "folder_id = ?", new String[]{String.valueOf(getAlbumId(name))});
+    public void updateArtwork(String name, String newPath) {
+        try {
+            if (openOrInitializeDatabase()) {
+                ContentValues values = new ContentValues();
+                values.put("path", newPath);
+                updateArtwork(getAlbumId(name), values);
+            }
+        } finally {
             close();
         }
-        return (int) id;
     }
 }

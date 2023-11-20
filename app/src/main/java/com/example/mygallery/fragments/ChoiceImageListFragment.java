@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.mygallery.DiffUtilCallback;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.ListSelectedAdapter;
 import com.example.mygallery.managers.FileManager;
@@ -64,8 +65,11 @@ public class ChoiceImageListFragment extends Fragment {
 
     private void setObserve() {
         images.listener().observe(getViewLifecycleOwner(), imageMultiChoiceState -> {
+            DiffUtilCallback callback = new DiffUtilCallback(adapter.getList(), images.getSelectedItems());
+
             adapter.setList(images.getSelectedItems());
-            adapter.notifyDataSetChanged();
+            callback.start(adapter);
+
             int count = imageMultiChoiceState.totalCheckedCount();
             countChoiceFile.setText(String.valueOf(count));
             viewFragmentText(count == 0);
@@ -88,7 +92,7 @@ public class ChoiceImageListFragment extends Fragment {
     }
 
     private void setAdapter() {
-        adapter = new ListSelectedAdapter(context, images.getSelectedItems(), p -> images.toggleSelection(images.getItem(p)));
+        adapter = new ListSelectedAdapter(context, images.getSelectedItems(), images::toggleSelection);
         recyclerView.setAdapter(adapter);
     }
 }

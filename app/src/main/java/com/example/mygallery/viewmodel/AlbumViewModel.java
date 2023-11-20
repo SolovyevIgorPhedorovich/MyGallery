@@ -1,15 +1,14 @@
 package com.example.mygallery.viewmodel;
 
+
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.Album;
+import com.example.mygallery.models.services.AlbumService;
 import com.example.mygallery.models.services.BaseService;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-public class AlbumViewModel extends BaseViewModel<Album> {
-    public AlbumViewModel(BaseService<Album> service) {
+public class AlbumViewModel extends BaseViewModel<Model> {
+    public AlbumViewModel(BaseService<Model> service) {
         super(service);
     }
 
@@ -24,13 +23,11 @@ public class AlbumViewModel extends BaseViewModel<Album> {
         return position;
     }
 
-    @Override
-    public void updateDatabase() {
-        super.updateDatabase();
-        getData();
+    public void findAlbums() {
+        ((AlbumService) service).findAlbums();
     }
 
     private boolean isImage(File pathImage, int position) {
-        return getList().get(position).path.getAbsolutePath().equals(pathImage.getParent());
+        return getList().get(position).getPath().getAbsolutePath().equals(pathImage.getParent());
     }
 }

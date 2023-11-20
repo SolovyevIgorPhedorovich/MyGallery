@@ -17,6 +17,7 @@ import com.example.mygallery.databinding.ActivityAlbumBinding;
 import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 import com.example.mygallery.fragments.CartRecyclerViewFragment;
 import com.example.mygallery.fragments.FavoritesRecyclerViewFragment;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.CreateAlbumManager;
 import com.example.mygallery.navigator.FragmentManagerHelper;
 import com.example.mygallery.popupWindow.PopupWindowAlbumContextMenu;
@@ -24,12 +25,11 @@ import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class AlbumActivity extends AppCompatActivity {
+public class AlbumActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
 
     // Флаг для определения первого запуска
-    private final boolean isFirstStart = false;
     private ProgressBar progressBar;
     private BottomNavigationView bottomNavigationView;
     FragmentManagerHelper fragmentManagerHelper;
@@ -47,6 +47,8 @@ public class AlbumActivity extends AppCompatActivity {
 
         // Инициализация элементов интерфейса
         initializeViews();
+        setListenerBottomNavigationView();
+
         requestStoragePermission();
     }
 
@@ -55,6 +57,7 @@ public class AlbumActivity extends AppCompatActivity {
         progressBar = binding.recyclerProgress;
         Toolbar toolbar = binding.toolbar;
         bottomNavigationView = binding.bottomNavigationView;
+
         bottomNavigationView.setSelectedItemId(R.id.action_albums);
 
         setSupportActionBar(toolbar);
@@ -63,8 +66,6 @@ public class AlbumActivity extends AppCompatActivity {
     // Метод для запроса разрешений на доступ к хранилищу
     private void requestStoragePermission() {
         if (hasStoragePermissions()) {
-            setListenerBottomNavigationView();
-
             fragmentManagerHelper.switchToFragment(AlbumRecyclerViewFragment.class);
         } else {
             requestStoragePermissions();
@@ -88,9 +89,7 @@ public class AlbumActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-            } else {
-                // Разрешения не получены, предпринимаем необходимые действия
+                requestStoragePermission();
             }
         }
     }
@@ -99,7 +98,6 @@ public class AlbumActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!isFirstStart) progressBar.setVisibility(View.GONE);
     }
 
     // Установка слушателя для нижней навигационной панели
@@ -161,5 +159,10 @@ public class AlbumActivity extends AppCompatActivity {
             AlbumRecyclerViewFragment fragment = (AlbumRecyclerViewFragment) fragmentManagerHelper.getCurrentFragment();
             fragment.updateTypeDisplay();
         }
+    }
+
+    @Override
+    public void onPermissionsGranted() {
+        progressBar.setVisibility(View.GONE);
     }
 }

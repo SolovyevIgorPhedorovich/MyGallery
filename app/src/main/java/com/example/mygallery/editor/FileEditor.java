@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.view.View;
-import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.SettingPreferences;
 
@@ -77,7 +76,7 @@ public class FileEditor {
 
     private void startApp(String packageName){
         editIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        editIntent.setPackage(packageName);
+        editIntent.setPackage(packageName); //TODO: добавить обработку, ситуации если приложение по умолчанию было удалено с устройства
         context.startActivity(editIntent);
     }
 }

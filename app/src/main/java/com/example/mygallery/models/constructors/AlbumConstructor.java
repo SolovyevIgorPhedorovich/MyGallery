@@ -15,15 +15,14 @@ public class AlbumConstructor {
         album.path = path;
         album.count = count;
         album.artwork = artwork;
-        returnAlbum();
     }
 
     public static Album initialized(int id, String name, File path, int count, File artwork) {
         AlbumConstructor albumConstructor = new AlbumConstructor(id, name, path, count, artwork);
-        return albumConstructor.returnAlbum();
+        return albumConstructor.getAlbum();
     }
 
-    private Album returnAlbum() {
+    private Album getAlbum() {
         return album;
     }
 

@@ -8,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.mygallery.R;
-import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.databinding.FragmentRecyclerViewBinding;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.navigator.ActivityNavigator;
@@ -76,5 +74,4 @@ public abstract class RecyclerViewFragment extends Fragment {
     }
 
     protected abstract void viewFragmentText(Boolean isEmpty);
-
 }
