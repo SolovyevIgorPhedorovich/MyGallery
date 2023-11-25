@@ -5,14 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.mygallery.interfaces.model.DataListener;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.Album;
 import com.example.mygallery.models.services.BaseService;
 import com.example.mygallery.multichoice.MultiChoice;
 import com.example.mygallery.multichoice.MultiChoiceState;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class BaseViewModel<T> extends ViewModel {
@@ -65,9 +63,12 @@ public class BaseViewModel<T> extends ViewModel {
     }
 
     public void removeItem(int position) {
-        service.removeItem(position);
+        if (totalCheckedCount() == 0) {
+            service.removeItem(position);
+        } else {
+            service.removeItem(getSelectedItems());
+        }
     }
-
     public boolean isEmpty() {
         return service.isEmpty();
     }
@@ -84,12 +85,8 @@ public class BaseViewModel<T> extends ViewModel {
         service.updateData(id, item);
     }
 
-    public void updateDatabase(Album data) {
-        service.updateDatabase(data);
-    }
-
-    public void updateDatabase(List<Album> data) {
-        service.updateDatabase(data);
+    public void updateDatabase(String curPath, String destPath) {
+        service.updateDatabase(curPath, destPath, totalCheckedCount() != 0 ? totalCheckedCount() : 1);
     }
 
     public List<File> getPathList() {

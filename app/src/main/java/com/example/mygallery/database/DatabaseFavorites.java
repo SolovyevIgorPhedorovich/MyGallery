@@ -3,11 +3,12 @@ package com.example.mygallery.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.Image;
 import com.example.mygallery.models.constructors.FavoriteConstructor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,11 @@ public class DatabaseFavorites extends DatabaseManager {
                         int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
                         File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
                         String name = path.getName();
-                        pathFavorites.add(FavoriteConstructor.initialized(id, name, path, 0));
+                        try {
+                            pathFavorites.add(FavoriteConstructor.initialized(id, name, path, 0));
+                        } catch (FileNotFoundException e) {
+                            mDataBase.delete("favorites", "path=?", new String[]{String.valueOf(path)});
+                        }
                     }
                     cursor.close();
                 }
@@ -54,14 +59,41 @@ public class DatabaseFavorites extends DatabaseManager {
         return false;
     }
 
+    public void removedFromFavorites(File path) {
+        try {
+            if (openOrInitializeDatabase()) {
+                mDataBase.delete("favorites", "path=?", new String[]{String.valueOf(path)});
+            }
+        } finally {
+            close();
+        }
+    }
+
+    public void removedFromFavorites(List<Model> imageList) {
+        try {
+            if (openOrInitializeDatabase()) {
+                mDataBase.beginTransaction();
+                for (Model image : imageList) {
+                    mDataBase.delete("favorites", "path=?", new String[]{String.valueOf(image.getPath())});
+                }
+                mDataBase.setTransactionSuccessful();
+            }
+        } finally {
+            mDataBase.endTransaction();
+            close();
+        }
+    }
+
     // Добавление файла в избранное
-    public void addToFavorites(Image image) {
+    public void addToFavorites(Model image) {
         try {
             if (openOrInitializeDatabase()) {
                 ContentValues values = new ContentValues();
-                values.put("path", image.path.getAbsolutePath());
+                values.put("path", image.getPath().getAbsolutePath());
                 mDataBase.insert("favorites", null, values);
             }
+        } catch (SQLiteConstraintException e) {
+            removedFromFavorites(image.getPath());
         } finally {
             close();
         }

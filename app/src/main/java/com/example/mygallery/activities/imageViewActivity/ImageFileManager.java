@@ -13,7 +13,7 @@ import com.example.mygallery.fragments.ActionFileFragment;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.models.Image;
-import com.example.mygallery.navigator.FragmentManager;
+import com.example.mygallery.navigator.FragmentNavigator;
 import com.example.mygallery.popupWindow.PopupWindowInputNameContextMenu;
 import com.example.mygallery.viewPager.ConfigurationViewPager;
 import com.example.mygallery.viewmodel.BaseViewModel;
@@ -33,11 +33,11 @@ public class ImageFileManager {
     }
 
     public void moveFile() {
-        FragmentManager.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, image);
+        FragmentNavigator.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, image);
     }
 
     public void copyFile() {
-        FragmentManager.openActionFragment(context, ActionFileFragment.Action.COPY, viewModel, image);
+        FragmentNavigator.openActionFragment(context, ActionFileFragment.Action.COPY, viewModel, image);
     }
 
     public void createView() {

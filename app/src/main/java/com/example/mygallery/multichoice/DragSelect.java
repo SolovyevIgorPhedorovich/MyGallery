@@ -9,7 +9,7 @@ import com.example.mygallery.adapters.image.ImageAdapter;
 import com.example.mygallery.adapters.viewholder.ImageViewHolder;
 import com.example.mygallery.dragselection.DragSelectionProcessor;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.navigator.FragmentManager;
+import com.example.mygallery.navigator.FragmentNavigator;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import com.michaelflisar.dragselectrecyclerview.DragSelectTouchListener;
 
@@ -49,7 +49,7 @@ public class DragSelect {
 
     public void startSelected(int position, Fragment fragment) {
         if (!isStartedFragment) {
-            FragmentManager.openSelectBarFragment(fragment, context, viewModel); // открываем фрагмент с выбором элемента
+            FragmentNavigator.openSelectBarFragment(fragment, context, viewModel); // открываем фрагмент с выбором элемента
             toolbar.setOnClickListener(v -> {});
             isStartedFragment = true; // устанавливаем флаг, что фрагмент запущен
         }

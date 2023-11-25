@@ -20,10 +20,10 @@ public class DatabaseAlbum extends DatabaseManager {
     }
 
     // Получение ID папки по её имени
-    private long getAlbumId(String findData) {
+    private long getAlbumId(String name) {
         long folderId = -1;
         if (openOrInitializeDatabase()) {
-            Cursor cursor = mDataBase.rawQuery("SELECT id FROM folders WHERE name = ?", new String[]{findData});
+            Cursor cursor = mDataBase.rawQuery("SELECT id FROM folders WHERE name = ?", new String[]{name});
             if (cursor.moveToFirst()) {
                 folderId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
             }
@@ -32,13 +32,19 @@ public class DatabaseAlbum extends DatabaseManager {
         return folderId;
     }
 
-    // Вставка данных о папке в базу данных
-    public void insertData(Album data) {
+    private int getCount(String path) {
+        int count = 0;
         if (openOrInitializeDatabase()) {
-            startInsert(data);
+            Cursor cursor = mDataBase.rawQuery("SELECT count_files FROM folders WHERE path = ?", new String[]{path});
+            if (cursor.moveToFirst()) {
+                count = cursor.getInt(cursor.getColumnIndexOrThrow("count_files"));
+            }
+            cursor.close();
         }
+        return count;
     }
 
+    // Вставка данных о папке в базу данных
     private void startInsert(Album data) {
         ContentValues valuesFolders = new ContentValues();
         ContentValues valuesArtwork = new ContentValues();
@@ -51,13 +57,22 @@ public class DatabaseAlbum extends DatabaseManager {
         insertOrUpdateDataFolders(valuesFolders, valuesArtwork);
     }
 
-    public void insertData(List<Album> dataList) {
+    public void updateData(String curPath, String destPath, int count) {
         if (openOrInitializeDatabase()) {
             mDataBase.beginTransaction();
             try {
-                for (Album data : dataList) {
-                    startInsert(data);
+
+                ContentValues dest = new ContentValues();
+
+                if (curPath != null) {
+                    ContentValues cur = new ContentValues();
+                    cur.put("count_files", getCount(curPath) - count);
+                    mDataBase.update("folders", cur, "path=?", new String[]{curPath});
                 }
+
+                dest.put("count_files", getCount(destPath) + count);
+                mDataBase.update("folders", dest, "path=?", new String[]{destPath});
+
                 mDataBase.setTransactionSuccessful();
             } finally {
                 mDataBase.endTransaction();
@@ -101,7 +116,7 @@ public class DatabaseAlbum extends DatabaseManager {
             // Записи с таким "path" не существует, поэтому создадим новую запись.
             insertDataFolders(valuesFolders, valuesArtwork);
         } else {
-            updateArtwork(getAlbumId(path), valuesArtwork);
+            updateArtwork(getAlbumId(valuesFolders.getAsString("name")), valuesArtwork);
         }
     }
 

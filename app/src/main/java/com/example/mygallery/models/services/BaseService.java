@@ -8,12 +8,12 @@ import com.example.mygallery.database.DatabaseAlbum;
 import com.example.mygallery.interfaces.model.DataListener;
 import com.example.mygallery.interfaces.model.DataManager;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.Album;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
@@ -63,6 +63,20 @@ public abstract class BaseService<T> implements DataManager<T> {
     }
 
     @Override
+    public void removeItem(List<T> selectItemList) {
+        int min = list.size();
+        int i = 0;
+        for (T item : selectItemList) {
+            int id = ((Model) item).getId();
+            list.remove(id - i);
+            ++i;
+            min = Math.min(id, min);
+        }
+        updateId(min);
+        notifyChanges();
+    }
+
+    @Override
     public void clear() {
         list.clear();
         notifyChanges();
@@ -77,17 +91,21 @@ public abstract class BaseService<T> implements DataManager<T> {
 
     public void updateData(int id, T newItem) {
         list.set(id, newItem);
-        sortListById();
+        //sortListById(); //TODO: заменить на сортировку по параметру из SharedPreferences
         notifyChanges();
     }
 
     private void updateId(int id) {
-        Executors.newSingleThreadExecutor().submit(() -> {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        executor.submit(() -> {
             for (int i = id; i < list.size(); i++) {
                 ((Model) list.get(i)).setId(++i);
             }
             notifyChanges();
         });
+
+        executor.shutdown();
     }
 
     public void addListener(DataListener<T> listener) {
@@ -104,27 +122,18 @@ public abstract class BaseService<T> implements DataManager<T> {
             listener.onDataChanged(list);
     }
 
-    private Runnable startUpdateDatabase(Album data) {
-        return () -> {
-            databaseManager.insertData(data);
-            databaseManager.close();
-        };
+    private Runnable startUpdateDatabase(String curPath, String destPath, int count) {
+        return () -> databaseManager.updateData(curPath, destPath, count);
     }
 
-    private Runnable startUpdateDatabase(List<Album> dataList) {
-        return () -> databaseManager.insertData(dataList);
-    }
-
-    public void updateDatabase(List<Album> dataList) {
-        handler.post(startUpdateDatabase(dataList));
-    }
-
-    public void updateDatabase(Album data) {
-        handler.post(startUpdateDatabase(data));
+    public void updateDatabase(String curPath, String destPath, int count) {
+        handler.post(startUpdateDatabase(curPath, destPath, count));
     }
 
     private void sortListById() {
-        Executors.newSingleThreadExecutor().submit(() -> {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        executor.submit(() -> {
             list.sort((item1, item2) -> {
                 int id1 = ((Model) item1).getId();
                 int id2 = ((Model) item2).getId();
@@ -132,6 +141,7 @@ public abstract class BaseService<T> implements DataManager<T> {
             });
             notifyChanges();
         });
-    }
 
+        executor.shutdown();
+    }
 }

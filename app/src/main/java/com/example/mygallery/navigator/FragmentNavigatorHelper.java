@@ -4,12 +4,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-public class FragmentManagerHelper {
+public class FragmentNavigatorHelper {
     private final FragmentManager fragmentManager;
     private final int containerId;
     private Fragment currentFragment;
 
-    public FragmentManagerHelper(FragmentManager fragmentManager, int containerId) {
+    public FragmentNavigatorHelper(FragmentManager fragmentManager, int containerId) {
         this.fragmentManager = fragmentManager;
         this.containerId = containerId;
     }

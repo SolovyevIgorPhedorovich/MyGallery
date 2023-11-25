@@ -7,11 +7,12 @@
 
     <item
             android:id="@+id/action_albums"
-            android:icon="@drawable/album_image_32"
+            android:icon="@drawable/album_selected_32_regular"
             android:title="@string/albums"/>
 
     <item
             android:id="@+id/action_cart"
             android:icon="@drawable/trash_can_32"
             android:title="@string/cart"/>
+
 </menu>

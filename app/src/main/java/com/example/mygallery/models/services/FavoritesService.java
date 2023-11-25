@@ -8,21 +8,22 @@ import java.util.concurrent.Executors;
 
 public class FavoritesService extends BaseService<Model> {
 
-    DatabaseFavorites databaseFavorites;
+    private final DatabaseFavorites databaseFavorites;
+
+    public FavoritesService() {
+        databaseFavorites = new DatabaseFavorites(context);
+    }
 
     @Override
     public void getData() {
-        this.databaseFavorites = new DatabaseFavorites(context);
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        executor.submit(new LoadFavoriteData());
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> setData(databaseFavorites.getFavorites()));
         executor.shutdown();
     }
 
-    class LoadFavoriteData implements Runnable {
-
-        @Override
-        public void run() {
-            setData(databaseFavorites.getFavorites());
-        }
+    public void updateDatabase(int position) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> databaseFavorites.addToFavorites(list.get(position)));
+        executor.shutdown();
     }
 }

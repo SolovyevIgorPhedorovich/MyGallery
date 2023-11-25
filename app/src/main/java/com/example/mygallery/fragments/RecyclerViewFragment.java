@@ -16,7 +16,7 @@ import com.example.mygallery.viewmodel.BaseViewModel;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class RecyclerViewFragment extends Fragment {
-    protected Context fragmentContext = getActivity();
+    protected Context context;
     protected RecyclerView recyclerView;
     protected TextView textView;
     protected BaseViewModel<Model> viewModel;
@@ -26,7 +26,7 @@ public abstract class RecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
-        fragmentContext = context;
+        this.context = context;
     }
 
     protected void initializedViews() {
@@ -37,7 +37,7 @@ public abstract class RecyclerViewFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        fragmentContext = null; // Очищаем ссылку на контекст при отсоединении фрагмента
+        context = null; // Очищаем ссылку на контекст при отсоединении фрагмента
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class RecyclerViewFragment extends Fragment {
     }
 
     protected void openActivity(int position, Class<?> openClass) {
-        ActivityNavigator navigator = new ActivityNavigator(fragmentContext);
+        ActivityNavigator navigator = new ActivityNavigator(context);
         Bundle extras = new Bundle();
         extras.putInt("position", position);
         navigator.navigateToActivityWithExtras(openClass, extras);

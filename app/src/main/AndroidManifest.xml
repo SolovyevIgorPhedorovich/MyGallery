@@ -26,12 +26,6 @@
 			android:supportsRtl="true"
 			android:theme="@style/Theme.MyGallery"
 			tools:targetApi="31">
-		<activity
-				android:name=".FullscreenActivity"
-				android:configChanges="orientation|keyboardHidden|screenSize"
-				android:exported="false"
-				android:label="@string/title_activity_fullscreen"
-				android:theme="@style/Theme.MyGallery.Fullscreen"/>
 
 		<provider
 				android:name="androidx.core.content.FileProvider"
@@ -47,8 +41,21 @@
 				android:name=".activities.ImageViewActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
 				android:exported="false"
-				android:label="@string/title_activity_image_view"
-				android:parentActivityName=".activities.AlbumGridActivity"
+				android:parentActivityName=".activities.AlbumActivity"
+				android:theme="@style/Theme.MyGallery.Fullscreen"
+				android:windowSoftInputMode="adjustPan"/>
+		<activity
+				android:name=".activities.CartViewActivity"
+				android:configChanges="orientation|keyboardHidden|screenSize"
+				android:exported="false"
+				android:parentActivityName=".activities.AlbumActivity"
+				android:theme="@style/Theme.MyGallery.Fullscreen"
+				android:windowSoftInputMode="adjustPan"/>
+		<activity
+				android:name=".activities.FavoritesViewActivity"
+				android:configChanges="orientation|keyboardHidden|screenSize"
+				android:exported="false"
+				android:parentActivityName=".activities.AlbumActivity"
 				android:theme="@style/Theme.MyGallery.Fullscreen"
 				android:windowSoftInputMode="adjustPan"/>
 		<activity

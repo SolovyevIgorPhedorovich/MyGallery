@@ -50,4 +50,9 @@ public class AlbumGridActivity extends AppCompatActivity {
         // Обработчик нажатия кнопки "Назад"
         binding.buttonBack.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

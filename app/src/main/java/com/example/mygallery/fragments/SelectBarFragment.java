@@ -13,7 +13,9 @@ import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.AlbumActivity;
 import com.example.mygallery.activities.AlbumGridActivity;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.navigator.FragmentNavigator;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowSelectBarContextMenu;
 import com.example.mygallery.viewmodel.BaseViewModel;
@@ -30,7 +32,7 @@ public class SelectBarFragment extends Fragment {
     private View toolbar;
     private int countSelected;
     private boolean isAllSelected;
-    private OnFragmentInteraction listener;
+    private OnFragmentInteractionListener listener;
     private Context context;
 
     public SelectBarFragment(BaseViewModel<Model> viewModel, Fragment parentFragment) {
@@ -38,13 +40,13 @@ public class SelectBarFragment extends Fragment {
         this.buttonToolbar = new HashMap<>();
         this.countSelected = 0;
         this.isAllSelected = false;
-        this.listener = (OnFragmentInteraction) parentFragment;
+        this.listener = (OnFragmentInteractionListener) parentFragment;
     }
 
     private void initializeViews(View view) {
         buttonBack = view.findViewById(R.id.button_back);
         textView = view.findViewById(R.id.select_info);
-        toolbar = view.findViewById(R.id.tool_bar);
+        toolbar = view.findViewById(R.id.toolbar);
     }
 
 
@@ -58,7 +60,7 @@ public class SelectBarFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         if (listener != null) {
-            listener.onFragmentClosed();
+            listener.onPermissionsGranted();
             listener = null;
         }
     }
@@ -70,7 +72,7 @@ public class SelectBarFragment extends Fragment {
         setButtonToolbar();
         setObserve();
 
-        buttonBack.setOnClickListener(this::closeFragment);
+        buttonBack.setOnClickListener(v -> closeFragment());
         return view;
     }
 
@@ -99,8 +101,15 @@ public class SelectBarFragment extends Fragment {
 
     private void setClickableButton(boolean isEmpty) {
         for (Map.Entry<Integer, ImageButton> entry : buttonToolbar.entrySet()) {
-            if (entry.getKey() != R.id.button_selected_all)
-                entry.getValue().setClickable(!isEmpty);
+            if (entry.getKey() != R.id.button_selected_all) {
+                ImageButton button = entry.getValue();
+                button.setClickable(!isEmpty);
+                if (!isEmpty) {
+                    button.setAlpha(1.0f);
+                } else {
+                    button.setAlpha(0.5f);
+                }
+            }
         }
     }
 
@@ -109,16 +118,16 @@ public class SelectBarFragment extends Fragment {
             if (buttonId == R.id.button_share) {
                 //TODO: add method share
             } else if (buttonId == R.id.button_move) {
-                com.example.mygallery.navigator.FragmentManager.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, viewModel.getItem(0));
+                FragmentNavigator.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, viewModel.getItem(0), this::closeFragment);
             } else if (buttonId == R.id.button_selected_all) {
                 if (!isAllSelected)
                     viewModel.selectAll();
                 else
                     viewModel.clearAll();
             } else if (buttonId == R.id.button_remove) {
-                PopupWindowRemovedContextMenu.run(context, view, viewModel);
+                PopupWindowRemovedContextMenu.run(context, view, viewModel, this::closeFragment);
             } else if (buttonId == R.id.button_context_menu) {
-                PopupWindowSelectBarContextMenu.show(context, view, viewModel, viewModel.getItem(0));
+                PopupWindowSelectBarContextMenu.show(context, view, viewModel, viewModel.getItem(0), this::closeFragment);
             }
         });
     }
@@ -133,7 +142,7 @@ public class SelectBarFragment extends Fragment {
 
     }
 
-    private void closeFragment(View view) {
+    private void closeFragment() {
         FragmentManager fragmentManager;
         if(context instanceof AlbumActivity){
             fragmentManager = ((AlbumActivity) context).getSupportFragmentManager();
@@ -143,9 +152,5 @@ public class SelectBarFragment extends Fragment {
             fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
             fragmentManager.popBackStack();
         }
-    }
-
-    public interface OnFragmentInteraction {
-        void onFragmentClosed();
     }
 }

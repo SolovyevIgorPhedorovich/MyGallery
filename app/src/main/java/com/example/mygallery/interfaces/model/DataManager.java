@@ -13,6 +13,7 @@ public interface DataManager<T> {
 
     void removeItem(int position);
 
+    void removeItem(List<T> positionList);
     void clear();
 
     boolean isEmpty();

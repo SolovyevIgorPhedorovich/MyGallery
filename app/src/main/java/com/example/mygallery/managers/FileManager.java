@@ -2,37 +2,46 @@ package com.example.mygallery.managers;
 
 import android.content.Context;
 import android.media.MediaScannerConnection;
-import android.os.Handler;
-import android.os.Looper;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.AlbumGridActivity;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.*;
-import com.example.mygallery.models.constructors.AlbumConstructor;
+import com.example.mygallery.models.Cart;
+import com.example.mygallery.models.Favorite;
+import com.example.mygallery.models.Image;
+import com.example.mygallery.models.Video;
 import com.example.mygallery.popupWindow.PopupWindowProgress;
 import com.example.mygallery.viewmodel.BaseViewModel;
+import com.example.mygallery.viewmodel.CartViewModel;
+import com.example.mygallery.viewmodel.ImageViewModel;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileManager {
-    private static String cartPath;
+    private static File cartPath;
     private final BaseViewModel<Model> viewModel;
     private final Context context;
-    private int position;
-    private boolean isGroupFile = false;
-    private final Handler handler;
-    private final List<Album> listenerChangeList;
+    private final List<String> updatePaths;
+    private int position = -1;
+    private boolean isMoveToCart = false;
+    private OnFragmentInteractionListener listener;
 
     public FileManager(Context context, BaseViewModel<Model> viewModel) {
-        cartPath = context.getApplicationInfo().dataDir + "/Корзина/";
+        cartPath = new File(context.getFilesDir(), "Корзина");
         this.context = context;
         this.viewModel = viewModel;
-        this.handler = new Handler(Looper.getMainLooper());
-        this.listenerChangeList = new ArrayList<>();
+        this.updatePaths = new ArrayList<>();
+    }
+
+    public FileManager(Context context, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
+        this(context, viewModel);
+        this.listener = listener;
     }
 
     public void setPosition(int position) {
@@ -40,10 +49,15 @@ public class FileManager {
     }
 
     public void moveFile(File destPath) {
+        Model currentModel = viewModel.getItem(position != -1 ? position : 0);
         if (viewModel.totalCheckedCount() != 0)
             moveFilesTo(destPath);
         else if (position != -1)
             moveFileTo(viewModel.getItem(position), destPath);
+
+        updateViewModel();
+        updateMediaStoreWithNewFiles();
+        updateDatabaseWithNewData(currentModel.getPath().getParent(), String.valueOf(destPath));
         reset();
     }
 
@@ -52,18 +66,29 @@ public class FileManager {
             copyFilesTo(destPath);
         else if (position != -1)
             copyFileTo(viewModel.getItem(position), destPath);
+        updateMediaStoreWithNewFiles();
+        updateDatabaseWithNewData(null, String.valueOf(destPath));
         reset();
     }
 
     public void removedFile() {
-        if (viewModel.totalCheckedCount() != 0)
-            removedFilesFrom();
-        else if (position != -1)
-            removedFileFrom(viewModel.getItem(position));
+        if (viewModel instanceof CartViewModel) {
+            if (viewModel.totalCheckedCount() != 0) {
+                removedFilesFrom();
+            } else if (position != -1) {
+                Model model = viewModel.getItem(position);
+                removedFileFrom(model.getPath());
+            }
+            updateCartDatabase();
+            updateViewModel();
+        } else {
+            isMoveToCart = true;
+            moveFile(cartPath);
+        }
         reset();
     }
 
-    private Model getNewImage(Model oldFile, File newPath) {
+    private Model getNewModel(Model oldFile, File newPath) {
         Model newFile = null;
         if (oldFile instanceof Image) {
             newFile = ((Image) oldFile).clone();
@@ -81,41 +106,23 @@ public class FileManager {
 
     public void renameFile(Model oldFile, String newName) {
         File newPath = new File(viewModel.getPath(position).getParent() + "/" + newName);
-        this.renameFileTo(oldFile, getNewImage(oldFile, newPath));
-    }
 
-    private void setInfoChangeAlbum(File oldFile, File newFile) {
-        int countChangeFile = viewModel.totalCheckedCount() != 0 ? viewModel.totalCheckedCount() : 1;
-
-        if (oldFile != null) {
-            Album initAlbum = AlbumConstructor.initialized(-1, oldFile.getName(), oldFile, -countChangeFile, null);
-            listenerChangeList.add(initAlbum);
-        }
-        if (newFile != null) {
-            Album destAlbum = AlbumConstructor.initialized(-1, newFile.getName(), newFile, countChangeFile, null);
-            listenerChangeList.add(destAlbum);
-        }
+        renameFileTo(oldFile, newPath);
+        updateViewModel(oldFile, getNewModel(oldFile, newPath));
+        updateMediaStoreWithNewFiles();
     }
 
     // Перемещение файла
     private void moveFileTo(Model oldFile, File destPath) {
         destPath = new File(destPath, oldFile.getName());
-        renameFileTo(oldFile, getNewImage(oldFile, destPath));
-        if (!isGroupFile) {
-            setInfoChangeAlbum(oldFile.getPath().getParentFile(), destPath.getParentFile());
-            updateDatabaseWithNewData();
-        }
+        renameFileTo(oldFile, destPath);
     }
 
     private void moveFilesTo(File destPath) {
         int i = 1;
-        isGroupFile = true;
         PopupWindowProgress mPopupWindow = showProcess(R.string.moving);
         for (Model file : viewModel.getSelectedItems()) {
             mPopupWindow.updateProgress(i);
-            if (i == viewModel.totalCheckedCount())
-                isGroupFile = false;
-
             moveFileTo(file, destPath);
             i++;
         }
@@ -126,11 +133,7 @@ public class FileManager {
         destPath = new File(destPath, file.getName());
         try {
             FileUtils.copyFile(file.getPath(), destPath);
-            if (!isGroupFile) {
-                updateMediaStoreWithNewFiles(new String[]{String.valueOf(destPath.getParent())});
-                setInfoChangeAlbum(null, destPath.getParentFile());
-                updateDatabaseWithNewData();
-            }
+            updatePaths.add(String.valueOf(destPath));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -138,80 +141,91 @@ public class FileManager {
 
     private void copyFilesTo(File destPath) {
         int i = 1;
-        isGroupFile = true;
         PopupWindowProgress mPopupWindow = showProcess(R.string.coping);
         for (Model file : viewModel.getSelectedItems()) {
             mPopupWindow.updateProgress(i);
-            if (i == viewModel.totalCheckedCount())
-                isGroupFile = false;
-
             copyFileTo(file, destPath);
             i++;
         }
     }
 
     // Удаление файла
-    private void removedFileFrom(Model file) {
-        File trashPath = new File(cartPath);
-        if (!file.getPath().equals(trashPath)) {
-            renameFileTo(file, getNewImage(file, trashPath));
-        } else {
-            try {
-                FileUtils.delete(file.getPath());
-                if (!isGroupFile) {
-                    updateMediaStoreWithNewFiles(new String[]{String.valueOf(file.getPath())});
-                    setInfoChangeAlbum(file.getPath().getParentFile(), null);
-                    updateDatabaseWithNewData();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void removedFilesFrom() {
-        int i = 1;
-        isGroupFile = true;
-        PopupWindowProgress mPopupWindow = showProcess(R.string.removing);
-        for (Model file : viewModel.getSelectedItems()) {
-            mPopupWindow.updateProgress(i);
-            if (i == viewModel.totalCheckedCount()) {
-                isGroupFile = false;
-            }
-            removedFileFrom(file);
-            i++;
-        }
-    }
-
-    // Переименование файла
-    private void renameFileTo(Model oldFile, Model newFile) {
+    private void removedFileFrom(File pathFile) {
         try {
-            FileUtils.copyFile(oldFile.getPath(), newFile.getPath());
-            FileUtils.delete(oldFile.getPath());
-            updateViewModel(oldFile, newFile);
-            if (!isGroupFile)
-                updateMediaStoreWithNewFiles(new String[]{String.valueOf(oldFile.getPath()), String.valueOf(newFile.getPath().getParent())});
+            FileUtils.delete(pathFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void updateDatabaseWithNewData() {
-        viewModel.updateDatabase(listenerChangeList);
-        listenerChangeList.clear();
+    private void removedFilesFrom() {
+        int i = 1;
+        PopupWindowProgress mPopupWindow = showProcess(R.string.removing);
+        for (Model file : viewModel.getSelectedItems()) {
+            mPopupWindow.updateProgress(i);
+            removedFileFrom(file.getPath());
+            i++;
+        }
     }
 
-    private void updateMediaStoreWithNewFiles(String[] pathList) {
-        Runnable runnable = () -> MediaScannerConnection.scanFile(context, pathList, null, null);
-        handler.post(runnable);
+    // Переименование файла
+    private void renameFileTo(Model oldFile, File newPath) {
+        try {
+            FileUtils.copyFile(oldFile.getPath(), newPath);
+            FileUtils.delete(oldFile.getPath());
+
+            updatePaths.add(String.valueOf(oldFile.getPath()));
+            updatePaths.add(String.valueOf(newPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateDatabaseWithNewData(String curPath, String destPath) {
+        viewModel.updateDatabase(curPath, destPath);
+    }
+
+    private void updateCartDatabase() {
+        ((CartViewModel) viewModel).updateDatabase(position);
+    }
+
+    private String getMIME(String path) {
+        String mimeType = null;
+        try {
+            URL url = new URL("file://" + path);
+            URLConnection connection = url.openConnection();
+            mimeType = connection.getContentType();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return mimeType;
+    }
+
+    private String[] getMIMEtypes() {
+        String[] mimeType = new String[updatePaths.size()];
+        for (int i = 0; i < updatePaths.size(); i++) {
+            mimeType[i] = getMIME(updatePaths.get(i));
+        }
+        return mimeType;
+    }
+
+    private void updateMediaStoreWithNewFiles() {
+        new Thread(() -> {
+            String[] pathList = updatePaths.toArray(new String[0]);
+            String[] mimeList = getMIMEtypes();
+            MediaScannerConnection.scanFile(context, pathList, mimeList, (s, uri) -> updatePaths.clear());
+        }).start();
     }
 
     private void updateViewModel(Model oldFile, Model newFile) {
-        if (oldFile.equals(newFile)) {
-            viewModel.updateData(oldFile.getId(), newFile);
-        } else {
-            viewModel.removeItem(oldFile.getId());
+        viewModel.updateData(oldFile.getId(), newFile);
+    }
+
+    private void updateViewModel() {
+        if (isMoveToCart) {
+            ((ImageViewModel) viewModel).moveToCart(position);
         }
+        viewModel.removeItem(position);
     }
 
     private PopupWindowProgress showProcess(int idText) {
@@ -219,6 +233,10 @@ public class FileManager {
     }
 
     private void reset() {
+        isMoveToCart = true;
         this.position = -1;
+        if (listener != null) {
+            listener.onPermissionsGranted();
+        }
     }
 }

@@ -58,8 +58,8 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
                 adapter.onSetDataList(o);
                 callback.start(adapter);
                 viewFragmentText(o.isEmpty());
-                if (fragmentContext instanceof OnFragmentInteractionListener) {
-                    ((OnFragmentInteractionListener) fragmentContext).onPermissionsGranted();
+                if (context instanceof OnFragmentInteractionListener) {
+                    ((OnFragmentInteractionListener) context).onPermissionsGranted();
                 }
             }
         });
@@ -74,7 +74,7 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
             spanCount = 1;
             createAlbumAdapter(setListAdapter());
         }
-        recyclerView.setLayoutManager(new GridLayoutManager(fragmentContext, spanCount));
+        recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
     }
 
     // Создание адаптера для альбомов
@@ -84,18 +84,18 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
     }
 
     private AlbumAdapterHelper<Model> setListAdapter() {
-        if (fragmentContext instanceof AlbumSelected) {
-            return new FolderListAdapter(viewModel.getList(), listener);
+        if (context instanceof AlbumSelected) {
+            return new FolderListAdapter(context, viewModel.getList(), listener);
         } else {
-            return new FolderListAdapter(viewModel.getList(), p -> openActivity(p, AlbumGridActivity.class));
+            return new FolderListAdapter(context, viewModel.getList(), p -> openActivity(p, AlbumGridActivity.class));
         }
     }
 
     private AlbumAdapterHelper<Model> setGridAdapter() {
-        if (fragmentContext instanceof AlbumSelected) {
-            return new AlbumAdapter(fragmentContext, viewModel.getList(), spanCount, listener);
+        if (context instanceof AlbumSelected) {
+            return new AlbumAdapter(context, viewModel.getList(), spanCount, listener);
         } else {
-            return new AlbumAdapter(fragmentContext, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class));
+            return new AlbumAdapter(context, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class));
         }
     }
 

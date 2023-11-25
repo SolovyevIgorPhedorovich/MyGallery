@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.managers.PopupWindowManager;
 import com.example.mygallery.interfaces.model.Model;
@@ -22,6 +23,11 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
         this.fileManager = new FileManager(context, viewModel);
     }
 
+    private PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
+        super(context);
+        this.fileManager = new FileManager(context, viewModel, listener);
+    }
+
     public PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, int position) {
         this(context, viewModel);
         fileManager.setPosition(position);
@@ -32,8 +38,8 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
         initialized(context, mPopupWindow, view, 1);
     }
 
-    public static void run(Context context, View view, BaseViewModel<Model> viewModel) {
-        PopupWindowManager mPopupWindow = new PopupWindowRemovedContextMenu(context, viewModel);
+    public static void run(Context context, View view, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
+        PopupWindowManager mPopupWindow = new PopupWindowRemovedContextMenu(context, viewModel, listener);
         initialized(context, mPopupWindow, view, viewModel.totalCheckedCount());
     }
 
@@ -46,7 +52,7 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
         ((TextView) menuView.findViewById(R.id.popup_text)).setText(context.getResources().getQuantityString(R.plurals.delete_elements, countSelect, countSelect));
 
         mPopupWindow.setContent(menuView);
-        mPopupWindow.setPosition(view.getWidth() / 8, view.getHeight() + 30);
+        mPopupWindow.setPosition(0, view.getHeight() + 30);
         mPopupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
     }
 

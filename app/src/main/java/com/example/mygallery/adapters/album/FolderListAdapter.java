@@ -1,5 +1,6 @@
 package com.example.mygallery.adapters.album;
 
+import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,19 +16,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class FolderListAdapter extends AlbumAdapterHelper<Model> {
-    private int exceptionFolder;
+    private int exceptionFolder = -1;
     private final Point imageSize;
 
-    public FolderListAdapter(List<Model> dataList, OnItemClickListener listener) {
+    public FolderListAdapter(Context context, List<Model> dataList, OnItemClickListener listener) {
         super(dataList, listener);
-        this.imageSize = setImageSize();
+        this.imageSize = setImageSize(context);
     }
 
-    public FolderListAdapter(List<Model> dataList, int exceptionFolder, OnItemClickListener listener) {
-        super(dataList, listener);
+    public FolderListAdapter(Context context, List<Model> dataList, int exceptionFolder, OnItemClickListener listener) {
+        this(context, dataList, listener);
         this.exceptionFolder = exceptionFolder;
         excludeFolder(exceptionFolder);
-        this.imageSize = setImageSize();
     }
 
     private void excludeFolder(int position) {
@@ -52,15 +52,16 @@ public class FolderListAdapter extends AlbumAdapterHelper<Model> {
 
         holder.itemView.setOnClickListener(v -> {
             int currentPosition = position;
-            if (position >= exceptionFolder)
-                currentPosition = currentPosition - 1;
+            if (exceptionFolder != -1 && position >= exceptionFolder)
+                currentPosition = currentPosition + 1;
 
             listener.onItemClick(currentPosition);
         });
     }
 
-    private Point setImageSize(){
-        return new Point(R.dimen.size_image_in_list, R.dimen.size_image_in_list);
+    private Point setImageSize(Context context) {
+        int imageSize = context.getResources().getDimensionPixelSize(R.dimen.size_image_in_list);
+        return new Point(imageSize, imageSize);
     }
 
 }

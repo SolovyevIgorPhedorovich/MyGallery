@@ -26,6 +26,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginHorizontal="10dp"
 				android:layout_gravity="end|center"
+				android:alpha="0.5"
 				android:text="@string/DONE"
 				android:textSize="@dimen/text_size_button"
 				android:clickable="false"/>

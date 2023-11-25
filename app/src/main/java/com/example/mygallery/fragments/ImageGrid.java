@@ -3,18 +3,24 @@ package com.example.mygallery.fragments;
 import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.mygallery.DiffUtilCallback;
+import com.example.mygallery.activities.CartViewActivity;
 import com.example.mygallery.activities.CreatedAlbumActivity;
+import com.example.mygallery.activities.FavoritesViewActivity;
 import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.adapters.FileChoiceAdapter;
 import com.example.mygallery.adapters.image.ImageAdapter;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.multichoice.DragSelect;
 import com.example.mygallery.multichoice.MultiChoiceState;
-import com.example.mygallery.navigator.FragmentManager;
+import com.example.mygallery.navigator.FragmentNavigator;
+import com.example.mygallery.viewmodel.CartViewModel;
+import com.example.mygallery.viewmodel.FavoritesViewModel;
+import com.example.mygallery.viewmodel.ImageViewModel;
 
 import java.util.List;
 
-public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment.OnFragmentInteraction {
+public class ImageGrid extends RecyclerViewFragment implements OnFragmentInteractionListener {
     private static final int spanCount = 4;
     private DragSelect dragSelect;
     private ImageAdapter<Model> adapter;
@@ -34,14 +40,14 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
 
     @Override
     protected void configureRecyclerView() {
-        this.dragSelect = new DragSelect(fragmentContext, toolbar, recyclerView);
+        this.dragSelect = new DragSelect(context, toolbar, recyclerView);
         dragSelect.setViewModel(viewModel);
 
         createAdapter();
         dragSelect.setConfigDragSelectTouchListener();
 
         recyclerView.addOnItemTouchListener(dragSelect.getDragSelectTouchListener());
-        recyclerView.setLayoutManager(new GridLayoutManager(fragmentContext, spanCount));
+        recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
     }
 
     @Override
@@ -49,7 +55,7 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
     }
 
     @Override
-    public void onFragmentClosed() {
+    public void onPermissionsGranted() {
         dragSelect.toggle();
         toolbar.setOnClickListener(null);
         viewModel.clearAll();
@@ -83,10 +89,10 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
 
     // Helper method to create the adapter
     private void createAdapter() {
-        if (fragmentContext instanceof CreatedAlbumActivity) {
-            adapter = new FileChoiceAdapter(fragmentContext, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection, this::isChecked);
+        if (context instanceof CreatedAlbumActivity) {
+            adapter = new FileChoiceAdapter(context, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection, this::isChecked);
         } else {
-            adapter = new ImageAdapter<>(fragmentContext, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this), this::isChecked);
+            adapter = new ImageAdapter<>(context, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this), this::isChecked);
         }
         recyclerView.setAdapter(adapter);
         dragSelect.setAdapter(adapter);
@@ -96,10 +102,16 @@ public class ImageGrid extends RecyclerViewFragment implements SelectBarFragment
     private void openViewing(int position) {
         switch (adapter.getMode()) {
             case VIEWING:
-                openActivity(position, ImageViewActivity.class);
+                if (viewModel instanceof ImageViewModel) {
+                    openActivity(position, ImageViewActivity.class);
+                } else if (viewModel instanceof CartViewModel) {
+                    openActivity(position, CartViewActivity.class);
+                } else if (viewModel instanceof FavoritesViewModel) {
+                    openActivity(position, FavoritesViewActivity.class);
+                }
                 break;
             case SELECTED:
-                FragmentManager.openSelectedViewFragment(fragmentContext, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
+                FragmentNavigator.openSelectedViewFragment(context, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
                 break;
         }
     }

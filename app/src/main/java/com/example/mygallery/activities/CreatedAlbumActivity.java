@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,14 +13,14 @@ import com.example.mygallery.databinding.ActivityAddFileInNewAlbumBinding;
 import com.example.mygallery.fragments.ChoiceImageListFragment;
 import com.example.mygallery.fragments.ImageRecyclerViewFragment;
 import com.example.mygallery.fragments.RecyclerViewFragment;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.navigator.ActivityNavigator;
 import com.example.mygallery.viewmodel.ImageViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
 import java.io.File;
 
-public class CreatedAlbumActivity extends AppCompatActivity {
-    private ImageButton buttonViewType;
+public class CreatedAlbumActivity extends AppCompatActivity implements OnFragmentInteractionListener {
     private ImageViewModel images;
     private String pathAlbum;
     private ActivityAddFileInNewAlbumBinding binding;
@@ -50,9 +48,7 @@ public class CreatedAlbumActivity extends AppCompatActivity {
     }
 
     private void setListenerButton() {
-        binding.buttonSwap.setOnClickListener(view -> {
-            openSelectedAlbumFragment();
-        });
+        binding.buttonSwap.setOnClickListener(view -> openSelectedAlbumFragment());
 
     }
 
@@ -103,4 +99,8 @@ public class CreatedAlbumActivity extends AppCompatActivity {
         images.scanMediaAlbum(pathAlum);
     }
 
+    @Override
+    public void onPermissionsGranted() {
+        getOnBackPressedDispatcher().onBackPressed();
+    }
 }

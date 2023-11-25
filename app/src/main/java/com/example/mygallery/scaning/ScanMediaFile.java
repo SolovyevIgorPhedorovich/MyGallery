@@ -54,6 +54,9 @@ public class ScanMediaFile implements Runnable {
                     String name = path.getName();
                     Image image = setItemList(imageList.size(), name, path, size);
                     imageList.add(image);
+                    if (imageList.size() % 50 == 0) {
+                        setService(imageList);
+                    }
                 }
             }
         }

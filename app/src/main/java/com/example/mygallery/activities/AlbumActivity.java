@@ -19,7 +19,7 @@ import com.example.mygallery.fragments.CartRecyclerViewFragment;
 import com.example.mygallery.fragments.FavoritesRecyclerViewFragment;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.CreateAlbumManager;
-import com.example.mygallery.navigator.FragmentManagerHelper;
+import com.example.mygallery.navigator.FragmentNavigatorHelper;
 import com.example.mygallery.popupWindow.PopupWindowAlbumContextMenu;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
@@ -32,24 +32,23 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
     // Флаг для определения первого запуска
     private ProgressBar progressBar;
     private BottomNavigationView bottomNavigationView;
-    FragmentManagerHelper fragmentManagerHelper;
+    FragmentNavigatorHelper fragmentNavigatorHelper;
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityAlbumBinding binding;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = ActivityAlbumBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        fragmentManagerHelper = new FragmentManagerHelper(getSupportFragmentManager(), binding.fragmentContainer.getId());
-        sharedPreferencesHelper = new SharedPreferencesHelper(this, SharedPreferencesHelper.ALBUM_PREFERENCES);
-
-        // Инициализация элементов интерфейса
-        initializeViews();
-        setListenerBottomNavigationView();
-
-        requestStoragePermission();
+    private static int getImage(int menuId, boolean isSelected) {
+        int image = -1;
+        if (menuId == R.id.action_favorites) {
+            image = isSelected ? R.drawable.favorite_selected_32_regular :
+                    R.drawable.favorites_32_regular;
+        } else if (menuId == R.id.action_albums) {
+            image = isSelected ? R.drawable.album_selected_32_regular :
+                    R.drawable.album_image_32;
+        } else if (menuId == R.id.action_cart) {
+            image = isSelected ? R.drawable.trash_can_select_32_regular :
+                    R.drawable.trash_can_32;
+        }
+        return image;
     }
 
     // Метод для инициализации элементов интерфейса
@@ -63,13 +62,20 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
         setSupportActionBar(toolbar);
     }
 
-    // Метод для запроса разрешений на доступ к хранилищу
-    private void requestStoragePermission() {
-        if (hasStoragePermissions()) {
-            fragmentManagerHelper.switchToFragment(AlbumRecyclerViewFragment.class);
-        } else {
-            requestStoragePermissions();
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityAlbumBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        fragmentNavigatorHelper = new FragmentNavigatorHelper(getSupportFragmentManager(), binding.fragmentContainer.getId());
+        sharedPreferencesHelper = new SharedPreferencesHelper(this, SharedPreferencesHelper.ALBUM_PREFERENCES);
+
+        // Инициализация элементов интерфейса
+        initializeViews();
+        setListenerBottomNavigationView();
+
+        requestStoragePermission();
     }
 
     // Метод для проверки наличия разрешений
@@ -100,25 +106,48 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
         super.onResume();
     }
 
+    // Метод для запроса разрешений на доступ к хранилищу
+    private void requestStoragePermission() {
+        if (hasStoragePermissions()) {
+            fragmentNavigatorHelper.switchToFragment(AlbumRecyclerViewFragment.class);
+        } else {
+            requestStoragePermissions();
+        }
+    }
+
     // Установка слушателя для нижней навигационной панели
     private void setListenerBottomNavigationView(){
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            updateBottomNavigationVisuals(id);
             if (id == R.id.action_albums) {
                 // Отобразить фрагмент с альбомами
-                fragmentManagerHelper.switchToFragment(AlbumRecyclerViewFragment.class);
+                fragmentNavigatorHelper.switchToFragment(AlbumRecyclerViewFragment.class);
                 return true;
             } else if (id == R.id.action_favorites) {
                 // Отобразить фрагмент с избранными
-                fragmentManagerHelper.switchToFragment(FavoritesRecyclerViewFragment.class);
+                fragmentNavigatorHelper.switchToFragment(FavoritesRecyclerViewFragment.class);
                 return true;
             } else if (id == R.id.action_cart) {
                 // Отобразить фрагмент с корзиной
-                fragmentManagerHelper.switchToFragment(CartRecyclerViewFragment.class);
+                fragmentNavigatorHelper.switchToFragment(CartRecyclerViewFragment.class);
                 return true;
             }
             return false;
         });
+    }
+
+    private void updateBottomNavigationVisuals(int selectedItemId) {
+        Menu menu = bottomNavigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem menuItem = menu.getItem(i);
+            boolean isSelected = menuItem.getItemId() == selectedItemId;
+            menuItem.setChecked(isSelected);
+
+            int image = getImage(menuItem.getItemId(), isSelected);
+
+            menuItem.setIcon(image);
+        }
     }
 
 
@@ -155,8 +184,8 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
     }
 
     private void updateFragment() {
-        if (fragmentManagerHelper.isCurrentFragmentInstanceOf(AlbumRecyclerViewFragment.class)) {
-            AlbumRecyclerViewFragment fragment = (AlbumRecyclerViewFragment) fragmentManagerHelper.getCurrentFragment();
+        if (fragmentNavigatorHelper.isCurrentFragmentInstanceOf(AlbumRecyclerViewFragment.class)) {
+            AlbumRecyclerViewFragment fragment = (AlbumRecyclerViewFragment) fragmentNavigatorHelper.getCurrentFragment();
             fragment.updateTypeDisplay();
         }
     }

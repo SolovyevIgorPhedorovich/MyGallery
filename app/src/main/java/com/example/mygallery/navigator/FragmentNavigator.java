@@ -8,11 +8,12 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.mygallery.fragments.ActionFileFragment;
 import com.example.mygallery.fragments.SelectBarFragment;
 import com.example.mygallery.fragments.ViewChoiceImage;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.BaseViewModel;
 
-public class FragmentManager {
+public class FragmentNavigator {
 
     private static FragmentTransaction getFragmentTransaction(Context context) {
         if (context instanceof FragmentActivity) {
@@ -27,6 +28,15 @@ public class FragmentManager {
 
         fragmentTransaction
                 .add(android.R.id.content, new ActionFileFragment(typeAction, viewModel, file))
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public static void openActionFragment(Context context, ActionFileFragment.Action typeAction, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
+        FragmentTransaction fragmentTransaction = getFragmentTransaction(context);
+
+        fragmentTransaction
+                .add(android.R.id.content, new ActionFileFragment(typeAction, viewModel, file, listener))
                 .addToBackStack(null)
                 .commit();
     }

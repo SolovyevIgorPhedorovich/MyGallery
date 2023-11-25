@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.adapters.album.FolderListAdapter;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.AlbumViewModel;
@@ -36,11 +37,17 @@ public class ActionFileFragment extends Fragment {
     private TextView textView;
     private RecyclerView recyclerView;
     private AlbumViewModel albumViewModel;
+    private OnFragmentInteractionListener listener;
     // Конструктор класса
     public ActionFileFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file) {
         this.typeAction = typeAction;
         this.file = file;
         this.viewModel = viewModel;
+    }
+
+    public ActionFileFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
+        this(typeAction, viewModel, file);
+        this.listener = listener;
     }
 
     @Override
@@ -103,7 +110,7 @@ public class ActionFileFragment extends Fragment {
     private void createRecyclerViewAdapter() {
         Context context = view.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        FolderListAdapter adapter = new FolderListAdapter(albumViewModel.getList(), albumViewModel.getPathListByPathImage(file.getPath()), this::actionFile);
+        FolderListAdapter adapter = new FolderListAdapter(context, albumViewModel.getList(), albumViewModel.getPathListByPathImage(file.getPath()), this::actionFile);
         recyclerView.setAdapter(adapter);
     }
 
@@ -114,7 +121,7 @@ public class ActionFileFragment extends Fragment {
     }
 
     private void actionFile(int position) {
-        FileManager fileManager = new FileManager(context, viewModel);
+        FileManager fileManager = new FileManager(context, viewModel, listener);
         File destPath = albumViewModel.getPath(position);
         fileManager.setPosition(position);
 

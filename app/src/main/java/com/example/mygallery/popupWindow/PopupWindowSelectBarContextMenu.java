@@ -7,16 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import com.example.mygallery.R;
 import com.example.mygallery.fragments.ActionFileFragment;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.PopupWindowManager;
-import com.example.mygallery.models.Image;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.navigator.FragmentManager;
+import com.example.mygallery.navigator.FragmentNavigator;
 import com.example.mygallery.viewmodel.BaseViewModel;
 
 public class PopupWindowSelectBarContextMenu extends PopupWindowManager {
 
     private final Model file;
     private final BaseViewModel<Model> viewModel;
+    private OnFragmentInteractionListener listener;
 
 
     public PopupWindowSelectBarContextMenu(Context context, BaseViewModel<Model> viewModel, Model file) {
@@ -25,8 +26,18 @@ public class PopupWindowSelectBarContextMenu extends PopupWindowManager {
         this.viewModel = viewModel;
     }
 
+    public PopupWindowSelectBarContextMenu(Context context, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
+        this(context, viewModel, file);
+        this.listener = listener;
+    }
+
     public static void show(Context context, View view, BaseViewModel<Model> viewModel, Model file) {
         PopupWindowManager mPopupWindow = new PopupWindowSelectBarContextMenu(context, viewModel, file);
+        initialized(context, mPopupWindow, view);
+    }
+
+    public static void show(Context context, View view, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
+        PopupWindowManager mPopupWindow = new PopupWindowSelectBarContextMenu(context, viewModel, file, listener);
         initialized(context, mPopupWindow, view);
     }
 
@@ -57,7 +68,7 @@ public class PopupWindowSelectBarContextMenu extends PopupWindowManager {
         button.setOnClickListener(view -> {
             popupWindow.dismiss();
             if (buttonId == R.id.copy_file) {
-                FragmentManager.openActionFragment(context, ActionFileFragment.Action.COPY, viewModel, file);
+                FragmentNavigator.openActionFragment(context, ActionFileFragment.Action.COPY, viewModel, file, listener);
             } else if (buttonId == R.id.print) {
                 //TODO: открытие активности настройки печати
             } else if (buttonId == R.id.information) {

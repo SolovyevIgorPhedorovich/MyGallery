@@ -35,10 +35,15 @@ public class ImageRecyclerViewFragment extends ImageGrid {
     @Override
     public void onStart() {
         super.onStart();
-        if (!viewModel.isEmpty() && fragmentContext instanceof CreatedAlbumActivity) return;
+        if (!viewModel.isEmpty() && context instanceof CreatedAlbumActivity) return;
         if (viewModel instanceof ImageViewModel){
             ((ImageViewModel) viewModel).scanMediaAlbum(albumPath);
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        viewModel.clear();
+    }
 }

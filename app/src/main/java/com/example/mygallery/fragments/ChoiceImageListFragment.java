@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.DiffUtilCallback;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.ListSelectedAdapter;
+import com.example.mygallery.interfaces.OnFragmentInteractionListener;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.viewmodel.ImageViewModel;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +48,8 @@ public class ChoiceImageListFragment extends Fragment {
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
         this.context = context;
-        this.fileManager = new FileManager(context, images);
+        OnFragmentInteractionListener listener = (OnFragmentInteractionListener) context;
+        this.fileManager = new FileManager(context, images, listener);
     }
 
     @Override
@@ -65,7 +68,7 @@ public class ChoiceImageListFragment extends Fragment {
 
     private void setObserve() {
         images.listener().observe(getViewLifecycleOwner(), imageMultiChoiceState -> {
-            DiffUtilCallback callback = new DiffUtilCallback(adapter.getList(), images.getSelectedItems());
+            DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getList(), images.getSelectedItems());
 
             adapter.setList(images.getSelectedItems());
             callback.start(adapter);
@@ -85,9 +88,11 @@ public class ChoiceImageListFragment extends Fragment {
         if (isEmpty) {
             fragmentTextView.setVisibility(View.VISIBLE);
             buttonDone.setClickable(false);
+            buttonDone.setAlpha(0.5f);
         } else {
             fragmentTextView.setVisibility(View.GONE);
             buttonDone.setClickable(true);
+            buttonDone.setAlpha(1.0f);
         }
     }
 

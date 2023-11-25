@@ -15,7 +15,7 @@ public class DatabaseCart extends DatabaseManager {
 
     public DatabaseCart(Context context) {
         super(context);
-        CURRENT_PATH = context.getApplicationInfo().dataDir + "/Корзина";
+        CURRENT_PATH = context.getFilesDir() + "/Корзина/";
     }
 
     public List<Model> getCartFile() {
@@ -41,18 +41,66 @@ public class DatabaseCart extends DatabaseManager {
         return pathFavorites;
     }
 
-    // Добавление файла в корзину
-    public void addToFCart(File initial_path) {
+    public void removeFile(List<Model> initialPathList) {
         try {
             if (openOrInitializeDatabase()) {
-                ContentValues values = new ContentValues();
-                values.put("current_path", CURRENT_PATH);
-                values.put("initial_path", initial_path.getAbsolutePath());
-                values.put("deletion_date", System.currentTimeMillis());
-                mDataBase.insert("cart", null, values);
+                mDataBase.beginTransaction();
+                for (Model initialPath : initialPathList) {
+                    remove(initialPath.getPath());
+                }
+                mDataBase.setTransactionSuccessful();
+            }
+        } finally {
+            mDataBase.endTransaction();
+            close();
+        }
+    }
+
+    public void removeFile(File initialPath) {
+        try {
+            if (openOrInitializeDatabase()) {
+                remove(initialPath);
             }
         } finally {
             close();
         }
+    }
+
+    private void remove(File initialPath) {
+        mDataBase.delete("cart", "path=?", new String[]{String.valueOf(initialPath)});
+    }
+
+    // Добавление файла в корзину
+    public void addToCart(File initialPath) {
+        try {
+            if (openOrInitializeDatabase()) {
+                add(initialPath);
+            }
+        } finally {
+            close();
+        }
+    }
+
+    public void addToCart(List<Model> initialPathList) {
+        try {
+            if (openOrInitializeDatabase()) {
+                mDataBase.beginTransaction();
+                for (Model initialPath : initialPathList) {
+                    add(initialPath.getPath());
+                }
+                mDataBase.setTransactionSuccessful();
+            }
+        } finally {
+            mDataBase.endTransaction();
+            close();
+        }
+    }
+
+    private void add(File initialPath) {
+        ContentValues values = new ContentValues();
+        values.put("current_path", CURRENT_PATH + initialPath.getName());
+        values.put("initial_path", initialPath.getAbsolutePath());
+        values.put("deletion_date", System.currentTimeMillis());
+        mDataBase.insert("cart", null, values);
     }
 }
