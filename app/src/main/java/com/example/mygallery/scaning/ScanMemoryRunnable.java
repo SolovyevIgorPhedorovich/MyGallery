@@ -55,7 +55,7 @@ public class ScanMemoryRunnable implements Runnable {
 
                         folderFileCountMap.put(folderPath, count); // Обновляем счетчика файлов в папке
                         if (count == 1) { // Если это первое изображение в папке
-                            data.add(AlbumConstructor.initialized(data.size(), nameFolder, new File(folderPath), 0, new File(imagePath)));
+                            data.add(AlbumConstructor.initialized(data.size() + 1, nameFolder, new File(folderPath), 0, new File(imagePath)));
                         }
                     }
                 }

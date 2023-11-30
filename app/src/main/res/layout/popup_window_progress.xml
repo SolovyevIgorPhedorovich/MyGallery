@@ -10,7 +10,6 @@
 			android:layout_width="match_parent"
 			android:layout_height="@dimen/height_title_popup_menu"
 			android:text="@string/rename"
-			android:textSize="@dimen/text_header_popup_window"
 			android:paddingTop="@dimen/padding_top_header_text_popup_window"
 			android:paddingHorizontal="@dimen/padding_horizontal_header_text_popup_window"
 			android:textStyle="bold"

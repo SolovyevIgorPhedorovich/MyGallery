@@ -68,7 +68,7 @@ public abstract class BaseService<T> implements DataManager<T> {
         int i = 0;
         for (T item : selectItemList) {
             int id = ((Model) item).getId();
-            list.remove(id - i);
+            list.remove(id - i - 1);
             ++i;
             min = Math.min(id, min);
         }

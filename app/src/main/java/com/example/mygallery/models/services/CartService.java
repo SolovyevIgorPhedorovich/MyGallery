@@ -3,6 +3,7 @@ package com.example.mygallery.models.services;
 import com.example.mygallery.database.DatabaseCart;
 import com.example.mygallery.interfaces.model.Model;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,8 +24,9 @@ public class CartService extends BaseService<Model> {
     }
 
     public void updateDatabase(int position) {
+        File path = new File(list.get(position).getPath().getPath());
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> databaseCart.removeFile(list.get(position).getPath()));
+        executor.submit(() -> databaseCart.removeFile(path));
         executor.shutdown();
     }
 

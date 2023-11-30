@@ -36,7 +36,7 @@ public class ImageRecyclerViewFragment extends ImageGrid {
     public void onStart() {
         super.onStart();
         if (!viewModel.isEmpty() && context instanceof CreatedAlbumActivity) return;
-        if (viewModel instanceof ImageViewModel){
+        if (viewModel instanceof ImageViewModel && viewModel.isEmpty()) {
             ((ImageViewModel) viewModel).scanMediaAlbum(albumPath);
         }
     }

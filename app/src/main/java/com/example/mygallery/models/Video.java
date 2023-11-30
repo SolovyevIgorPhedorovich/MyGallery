@@ -5,6 +5,7 @@ import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -43,6 +44,16 @@ public class Video implements Model {
     @Override
     public void setPath(File path) {
         this.path = path;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public String getDate() {
+        return null;
     }
 
     @Override

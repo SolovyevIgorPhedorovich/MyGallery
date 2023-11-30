@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+
+	<TextView
+			android:layout_width="match_parent"
+			android:layout_height="@dimen/height_title_popup_menu"
+			android:text="@string/duplicate_file_warning"
+			android:textSize="@dimen/text_size_title"
+			android:gravity="center_vertical"/>
+
+	<TextView
+			android:id="@+id/duplicate_name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/file_already_exists"
+			android:textSize="@dimen/text_size"
+			android:layout_marginTop="@dimen/text_margin"/>
+
+	<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/replace"
+			android:textSize="@dimen/text_size"
+			android:layout_marginBottom="@dimen/text_margin"/>
+
+	<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/original_file_location"
+			android:textSize="@dimen/text_size"/>
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginVertical="@dimen/layout_margin_2dp">
+
+		<ImageView
+				android:id="@+id/original_image"
+				android:layout_width="@dimen/size_image_in_list"
+				android:layout_height="@dimen/size_image_in_list"
+				android:layout_margin="@dimen/layout_margin_2dp"/>
+
+		<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:gravity="center_vertical"
+				android:orientation="vertical">
+
+			<TextView
+					android:id="@+id/original_file_size"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/size"
+					android:textSize="@dimen/text_size"/>
+
+			<TextView
+					android:id="@+id/original_date_modified"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/modified"
+					android:textSize="@dimen/text_size"/>
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<TextView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/target_file_location"
+			android:textSize="@dimen/text_size"/>
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginVertical="@dimen/layout_margin_2dp">
+
+		<ImageView
+				android:id="@+id/target_image"
+				android:layout_width="@dimen/size_image_in_list"
+				android:layout_height="@dimen/size_image_in_list"
+				android:layout_margin="@dimen/layout_margin_2dp"/>
+
+		<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:gravity="center_vertical"
+				android:orientation="vertical">
+
+			<TextView
+					android:id="@+id/target_file_size"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/size"
+					android:textSize="@dimen/text_size"/>
+
+			<TextView
+					android:id="@+id/target_date_modified"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="@string/modified"
+					android:textSize="@dimen/text_size"/>
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_gravity="center_horizontal">
+
+		<Button
+				android:id="@+id/replace_button"
+				android:layout_width="@dimen/width_button_popup_window"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/REPLACE"
+				style="@style/MyButtonStyle"/>
+		<View
+				android:layout_width="@dimen/width_border_line_vertical"
+				android:layout_height="match_parent"
+				android:layout_marginVertical="@dimen/layout_margin_vertical_border_line_vertical"
+				android:background="@color/black"/>
+
+		<Button
+				android:id="@+id/cancel_button"
+				android:layout_width="@dimen/width_button_popup_window"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/cancel"
+				style="@style/MyButtonStyle"/>
+
+	</LinearLayout>
+
+</LinearLayout>

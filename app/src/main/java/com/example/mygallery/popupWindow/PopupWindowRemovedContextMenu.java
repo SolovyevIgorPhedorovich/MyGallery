@@ -18,18 +18,14 @@ import com.example.mygallery.viewmodel.BaseViewModel;
 public class PopupWindowRemovedContextMenu extends PopupWindowManager {
     private final FileManager fileManager;
 
-    private PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel) {
-        super(context);
-        this.fileManager = new FileManager(context, viewModel);
-    }
-
     private PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
         super(context);
         this.fileManager = new FileManager(context, viewModel, listener);
     }
 
     public PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, int position) {
-        this(context, viewModel);
+        super(context);
+        this.fileManager = new FileManager(context, viewModel);
         fileManager.setPosition(position);
     }
 

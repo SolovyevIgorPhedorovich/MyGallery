@@ -67,7 +67,7 @@ public class DatabaseCart extends DatabaseManager {
     }
 
     private void remove(File initialPath) {
-        mDataBase.delete("cart", "path=?", new String[]{String.valueOf(initialPath)});
+        mDataBase.delete("cart", "current_path=?", new String[]{String.valueOf(initialPath)});
     }
 
     // Добавление файла в корзину
@@ -96,9 +96,14 @@ public class DatabaseCart extends DatabaseManager {
         }
     }
 
+    private String getFormat(String oldName) {
+        String[] parts = oldName.split("\\.");
+        return "." + parts[parts.length - 1];
+    }
+
     private void add(File initialPath) {
         ContentValues values = new ContentValues();
-        values.put("current_path", CURRENT_PATH + initialPath.getName());
+        values.put("current_path", CURRENT_PATH + initialPath.hashCode() + getFormat(initialPath.getName()));
         values.put("initial_path", initialPath.getAbsolutePath());
         values.put("deletion_date", System.currentTimeMillis());
         mDataBase.insert("cart", null, values);

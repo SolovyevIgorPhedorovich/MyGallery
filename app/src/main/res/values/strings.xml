@@ -36,11 +36,23 @@
 	<string name="remove_image">Удалить фото?</string>
 	<string name="remove_vide">Удалить видео?</string>
 
+	<string name="duplicate_file_warning">Найден повторяющийся файл</string>
+	<string name="file_already_exists">Файл с именем %s уже существует.</string>
+	<string name="replace">Заменить?</string>
+	<string name="original_file_location">Файл в исходном месте сохранения:</string>
+	<string name="target_file_location">Файл в целевом месте сохранения:</string>
+	<string name="apply_all">Применить ко всем</string>
+
+	<string name="size">Размер: %s</string>
+	<string name="modified">Изменено: %s</string>
+
 	<string name="hint">Название файла</string>
 
 	<string name="OK">ОК</string>
 	<string name="DONE">ГОТОВО</string>
 	<string name="REMOVED">УДАЛИТЬ</string>
+	<string name="REPLACE">ЗАМЕНИТЬ</string>
+	<string name="SKIP">Пропустить</string>
 	<string name="cancel">ОТМЕНА</string>
 
 	<string name="empty_favorites">Нет избранных файлов</string>

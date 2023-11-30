@@ -52,7 +52,7 @@ public class ScanMediaFile implements Runnable {
                     File path = new File(cursor.getString(dataIndex));
                     int size = cursor.getInt(sizeIndex);
                     String name = path.getName();
-                    Image image = setItemList(imageList.size(), name, path, size);
+                    Image image = setItemList(imageList.size() + 1, name, path, size);
                     imageList.add(image);
                     if (imageList.size() % 50 == 0) {
                         setService(imageList);

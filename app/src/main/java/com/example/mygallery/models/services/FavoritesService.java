@@ -1,18 +1,13 @@
 package com.example.mygallery.models.services;
 
-import com.example.mygallery.database.DatabaseFavorites;
 import com.example.mygallery.interfaces.model.Model;
 
+import java.io.File;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class FavoritesService extends BaseService<Model> {
-
-    private final DatabaseFavorites databaseFavorites;
-
-    public FavoritesService() {
-        databaseFavorites = new DatabaseFavorites(context);
-    }
+public class FavoritesService extends ImageService {
 
     @Override
     public void getData() {
@@ -25,5 +20,25 @@ public class FavoritesService extends BaseService<Model> {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> databaseFavorites.addToFavorites(list.get(position)));
         executor.shutdown();
+    }
+
+    @Override
+    public void moveToCart(int position) {
+        super.moveToCart(position);
+    }
+
+    @Override
+    public void moveToCart(List<Model> pathList) {
+        super.moveToCart(pathList);
+    }
+
+    @Override
+    public void updateFavorites(int position, File newPath) {
+        super.updateFavorites(position, newPath);
+    }
+
+    @Override
+    public void updateFavorites(List<Model> pathList, List<File> newPathList) {
+        super.updateFavorites(pathList, newPathList);
     }
 }

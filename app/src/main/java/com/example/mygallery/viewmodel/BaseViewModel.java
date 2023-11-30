@@ -85,8 +85,8 @@ public class BaseViewModel<T> extends ViewModel {
         service.updateData(id, item);
     }
 
-    public void updateDatabase(String curPath, String destPath) {
-        service.updateDatabase(curPath, destPath, totalCheckedCount() != 0 ? totalCheckedCount() : 1);
+    public void updateDatabase(String curPath, String destPath, int countDuplicateReplace) {
+        service.updateDatabase(curPath, destPath, (totalCheckedCount() != 0 ? totalCheckedCount() : 1) - countDuplicateReplace);
     }
 
     public List<File> getPathList() {

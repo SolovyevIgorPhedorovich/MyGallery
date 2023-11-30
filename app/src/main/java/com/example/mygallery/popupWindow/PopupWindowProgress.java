@@ -4,9 +4,11 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
 import com.example.mygallery.managers.PopupWindowManager;
 
@@ -49,7 +51,8 @@ public class PopupWindowProgress extends PopupWindowManager {
         progressBar = popupWindow.getContentView().findViewById(R.id.progress_bar);
     }
 
-    public void updateProgress(int progress) {
+    public void updateProgress() {
+        int progress = progressBar.getProgress() + 1;
         textProgress.setText(context.getString(R.string.count_file_progress_text).replace("{}", String.valueOf(progress)).replace("{}", String.valueOf(MAX_FILE)));
         progressBar.setProgress(progress);
         if (progress == MAX_FILE) {
@@ -59,8 +62,11 @@ public class PopupWindowProgress extends PopupWindowManager {
 
     @Override
     protected boolean setConfiguration() {
-        // Add any specific configuration here
-        return false;
+        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2 * context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
+        popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setFocusable(true);
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));
+        return true;
     }
 
     @Override

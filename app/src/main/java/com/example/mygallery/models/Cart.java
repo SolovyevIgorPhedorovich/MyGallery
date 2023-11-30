@@ -5,6 +5,7 @@ import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Objects;
 
 public class Cart implements Model {
@@ -42,6 +43,16 @@ public class Cart implements Model {
     @Override
     public void setPath(File path) {
         this.current_path = path;
+    }
+
+    @Override
+    public int getSize() {
+        return 0;
+    }
+
+    @Override
+    public String getDate() {
+        return null;
     }
 
     @Override

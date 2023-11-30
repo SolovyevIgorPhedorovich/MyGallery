@@ -13,7 +13,8 @@
 
     <dimen name="size_image_button">50dp</dimen>
     <dimen name="size_image_in_list">60dp</dimen>
-    <dimen name="text_size_title">20sp</dimen>
+	<dimen name="text_size_title">24sp</dimen>
+	<dimen name="text_size">18sp</dimen>
 
     <dimen name="text_margin">16dp</dimen>
     <dimen name="text_size_name_album">16sp</dimen>

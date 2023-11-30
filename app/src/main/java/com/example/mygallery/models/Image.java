@@ -1,10 +1,13 @@
 package com.example.mygallery.models;
 
+import android.icu.text.SimpleDateFormat;
 import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -14,6 +17,8 @@ public class Image implements Model {
     public String name;
 
     public File path;
+
+    public long date;
 
     public int size;
     public boolean isFavorite;
@@ -41,6 +46,18 @@ public class Image implements Model {
     @Override
     public void setPath(File path) {
         this.path = path;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public String getDate() {
+        Date creationDate = new Date(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+        return dateFormat.format(creationDate);
     }
 
     @Override

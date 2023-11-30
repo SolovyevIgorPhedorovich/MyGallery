@@ -6,6 +6,7 @@ import com.example.mygallery.models.services.ImageService;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ImageViewModel extends BaseViewModel<Model> {
     public ImageViewModel(BaseService<Model> service) {
@@ -21,6 +22,14 @@ public class ImageViewModel extends BaseViewModel<Model> {
             ((ImageService) service).moveToCart(position);
         } else {
             ((ImageService) service).moveToCart(new ArrayList<>(getSelectedItems()));
+        }
+    }
+
+    public void updateFavorites(int position, List<File> newPathList) {
+        if (totalCheckedCount() == 0) {
+            ((ImageService) service).updateFavorites(position, newPathList.get(0));
+        } else {
+            ((ImageService) service).updateFavorites(new ArrayList<>(getSelectedItems()), newPathList);
         }
     }
 

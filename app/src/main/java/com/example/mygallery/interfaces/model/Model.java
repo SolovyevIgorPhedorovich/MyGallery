@@ -9,6 +9,10 @@ public interface Model {
 
     String getName();
 
+    int getSize();
+
+    String getDate();
+
     void setId(int id);
 
     void setPath(File path);

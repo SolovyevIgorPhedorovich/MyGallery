@@ -98,4 +98,33 @@ public class DatabaseFavorites extends DatabaseManager {
             close();
         }
     }
+
+    public void updatePath(File oldPath, File newPath) {
+        try {
+            if (openOrInitializeDatabase()) {
+                ContentValues values = new ContentValues();
+                values.put("path", newPath.getAbsolutePath());
+                mDataBase.update("favorites", values, "path=?", new String[]{oldPath.getAbsolutePath()});
+            }
+        } finally {
+            close();
+        }
+    }
+
+    public void updatePath(List<Model> oldImageList, List<File> newImageList) {
+        try {
+            if (openOrInitializeDatabase()) {
+                ContentValues values = new ContentValues();
+                mDataBase.beginTransaction();
+                for (int i = 0, a = 1; i < oldImageList.size(); i++, a += 2) {
+                    values.put("path", newImageList.get(a).getAbsolutePath());
+                    mDataBase.update("favorites", values, "path=?", new String[]{oldImageList.get(i).getPath().getAbsolutePath()});
+                }
+                mDataBase.setTransactionSuccessful();
+            }
+        } finally {
+            mDataBase.endTransaction();
+            close();
+        }
+    }
 }

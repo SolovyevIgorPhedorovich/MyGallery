@@ -43,6 +43,16 @@ public class Favorite implements Model {
     }
 
     @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public String getDate() {
+        return null;
+    }
+
+    @Override
     public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;

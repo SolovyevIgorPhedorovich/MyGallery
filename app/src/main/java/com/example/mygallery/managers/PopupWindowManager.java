@@ -1,5 +1,6 @@
 package com.example.mygallery.managers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public abstract class PopupWindowManager {
 
     // Показ PopupWindow с заданной позицией
     public void showPopupWindow(View anchorView, View viewMenu, int gravity) {
+        if (anchorView == null) anchorView = ((Activity) context).findViewById(android.R.id.content);
         popupWindow.showAtLocation(anchorView, gravity, x, y);
         setButtonListeners(viewMenu);
     }
