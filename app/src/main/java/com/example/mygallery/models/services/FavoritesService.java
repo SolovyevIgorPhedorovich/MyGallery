@@ -17,9 +17,7 @@ public class FavoritesService extends ImageService {
     }
 
     public void updateDatabase(int position) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> databaseFavorites.addToFavorites(list.get(position)));
-        executor.shutdown();
+        super.setFavorites(list.get(position));
     }
 
     @Override

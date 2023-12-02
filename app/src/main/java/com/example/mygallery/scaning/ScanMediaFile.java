@@ -12,6 +12,7 @@ import com.example.mygallery.models.constructors.ImageFileConstructor;
 import com.example.mygallery.models.services.BaseService;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class ScanMediaFile implements Runnable {
@@ -40,8 +41,8 @@ public class ScanMediaFile implements Runnable {
         List<Model> imageList = new ArrayList<>();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
-        String selection = MediaStore.Images.Media.DATA + " LIKE?";
-        String[] selectionArgs = new String[]{path.getAbsolutePath() + "%"};
+        String selection = MediaStore.Images.Media.DATA + " LIKE ? AND " + MediaStore.Images.Media.DATA + " NOT LIKE ?";
+        String[] selectionArgs = new String[]{path.getAbsolutePath() + "/%", path.getAbsolutePath() + "/%/%"};
         String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
 
         try (Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder)) {
@@ -59,11 +60,13 @@ public class ScanMediaFile implements Runnable {
                     }
                 }
             }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
         setService(imageList);
     }
 
-    private Image setItemList(int id, String name, File path, int size) {
+    private Image setItemList(int id, String name, File path, int size) throws FileNotFoundException {
         return ImageFileConstructor.initialized(id, name, path, size, databaseManager.checkFileFavorites(path));
     }
 

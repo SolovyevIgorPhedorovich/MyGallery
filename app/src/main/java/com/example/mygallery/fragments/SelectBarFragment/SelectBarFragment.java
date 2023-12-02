@@ -1,4 +1,4 @@
-package com.example.mygallery.fragments;
+package com.example.mygallery.fragments.SelectBarFragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
 import com.example.mygallery.activities.AlbumActivity;
 import com.example.mygallery.activities.AlbumGridActivity;
+import com.example.mygallery.fragments.ActionFileFragment;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.navigator.FragmentNavigator;
@@ -25,15 +26,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SelectBarFragment extends Fragment {
-    private final BaseViewModel<Model> viewModel;
+    protected final BaseViewModel<Model> viewModel;
     private final Map<Integer, ImageButton> buttonToolbar;
     private ImageButton buttonBack;
     private TextView textView;
     private View toolbar;
     private int countSelected;
-    private boolean isAllSelected;
+    protected boolean isAllSelected;
     private OnFragmentInteractionListener listener;
-    private Context context;
+    protected Context context;
 
     public SelectBarFragment(BaseViewModel<Model> viewModel, Fragment parentFragment) {
         this.viewModel = viewModel;
@@ -65,9 +66,14 @@ public class SelectBarFragment extends Fragment {
         }
     }
 
+    protected View getView(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.fragment_select_bar, container, false);
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_select_bar, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = getView(inflater, container);
+
         initializeViews(view);
         setButtonToolbar();
         setObserve();
@@ -113,7 +119,7 @@ public class SelectBarFragment extends Fragment {
         }
     }
 
-    private void setButtonClickListener(int buttonId, ImageButton button) {
+    protected void setButtonClickListener(int buttonId, ImageButton button) {
         button.setOnClickListener(view -> {
             if (buttonId == R.id.button_share) {
                 //TODO: add method share
@@ -142,13 +148,12 @@ public class SelectBarFragment extends Fragment {
 
     }
 
-    private void closeFragment() {
+    protected void closeFragment() {
         FragmentManager fragmentManager;
-        if(context instanceof AlbumActivity){
+        if (context instanceof AlbumActivity) {
             fragmentManager = ((AlbumActivity) context).getSupportFragmentManager();
             fragmentManager.popBackStack();
-        }
-        else if (context instanceof AlbumGridActivity){
+        } else if (context instanceof AlbumGridActivity) {
             fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
             fragmentManager.popBackStack();
         }

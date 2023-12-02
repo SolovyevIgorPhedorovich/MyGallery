@@ -1,9 +1,10 @@
-package com.example.mygallery.activities;
+package com.example.mygallery.activities.imageViewActivity;
 
 import android.os.Bundle;
 import android.widget.ImageButton;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.databinding.ActivityImageInCartViewBinding;
+import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
@@ -14,14 +15,16 @@ public class CartViewActivity extends ViewActivity {
     private ImageButton buttonRemoveFile,
             buttonReset;
     private ActivityImageInCartViewBinding binding;
+    private FileManager fileManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityImageInCartViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         onCreate();
+
+        this.fileManager = new FileManager(this, viewModel);
     }
 
     @Override
@@ -45,6 +48,9 @@ public class CartViewActivity extends ViewActivity {
 
         buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.run(this, v, viewModel, initialPosition));
 
-        buttonReset.setOnClickListener(v -> PopupWindowActionFileContextMenu.show(this, v, (Image) viewModel.getItem(initialPosition), viewModel, configurationViewPager));
+        buttonReset.setOnClickListener(v -> {
+            fileManager.setPosition(initialPosition);
+            fileManager.resetFile();
+        });
     }
 }

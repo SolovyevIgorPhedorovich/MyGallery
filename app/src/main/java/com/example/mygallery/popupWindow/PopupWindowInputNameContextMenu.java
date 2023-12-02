@@ -3,14 +3,13 @@ package com.example.mygallery.popupWindow;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.ImageViewActivity;
+import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.activities.imageViewActivity.ImageFileManager;
 import com.example.mygallery.databinding.PopupWindowNewNameBinding;
 import com.example.mygallery.managers.CreateAlbumManager;
@@ -29,7 +28,7 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
         initializedViews();
     }
 
-    private void initializedViews(){
+    private void initializedViews() {
         editText = binding.inputName;
     }
 
@@ -52,7 +51,7 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
 
     @Override
     protected boolean setConfiguration() {
-        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2* context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
+        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2 * context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
         popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));

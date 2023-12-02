@@ -69,6 +69,7 @@ public class BaseViewModel<T> extends ViewModel {
             service.removeItem(getSelectedItems());
         }
     }
+
     public boolean isEmpty() {
         return service.isEmpty();
     }

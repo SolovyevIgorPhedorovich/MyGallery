@@ -1,14 +1,14 @@
 package com.example.mygallery.viewPager;
 
-import android.content.Context;
 import androidx.viewpager2.widget.ViewPager2;
+import com.example.mygallery.DiffUtilCallback;
 import com.example.mygallery.adapters.imagepager.ImagePagerAdapter;
 import com.example.mygallery.adapters.imagepager.ImagePagerAdapterHelper;
 import com.example.mygallery.adapters.imagepager.SelectImagePagerAdapter;
 import com.example.mygallery.interfaces.TextViewUpdateListener;
 import com.example.mygallery.interfaces.ToggleMenuListener;
+import com.example.mygallery.interfaces.model.Model;
 
-import java.io.File;
 import java.util.List;
 
 public class ConfigurationViewPager {
@@ -22,63 +22,81 @@ public class ConfigurationViewPager {
         this.updateListener = listener;
         this.initialPosition = initialPosition;
 
-        onStart();
-        registerOnPage();
+        // Инициализируем ViewPager и настраиваем обработчики
+        initializeViewPager();
+        registerOnPageChangeCallback();
     }
 
-    private void onStart() {
+    // Инициализируем настройки ViewPager
+    private void initializeViewPager() {
         viewPager2.requestLayout();
         viewPager2.setPageTransformer(new ZoomOutPageTransformer());
 
-        if (updateListener != null)
+        // Обновляем TextView, если обработчик предоставлен
+        if (updateListener != null) {
             updateListener.updateTextView(initialPosition);
+        }
     }
 
-    //Установка адаптера для ViewPager
-    public void setAdapter(Context context, List<File> pathImages, ToggleMenuListener listener) {
-        adapter = new ImagePagerAdapter(context, pathImages, listener);
-        viewPager2.setAdapter(adapter);
+    // Устанавливаем адаптер для ViewPager с ImagePagerAdapter и ToggleMenuListener
+    public void setAdapter(List<Model> pathImages, ToggleMenuListener listener) {
+        adapter = new ImagePagerAdapter(pathImages, listener);
+        setAdapterAndViewPager(adapter);
+    }
 
+    // Устанавливаем адаптер и инициализируем ViewPager
+    private void setAdapterAndViewPager(ImagePagerAdapterHelper pagerAdapter) {
+        adapter = pagerAdapter;
+        viewPager2.setAdapter(adapter);
         viewPager2.setCurrentItem(initialPosition, false);
     }
 
-    public void setAdapter(Context context, List<File> pathImages, int statusBarHeight) {
-        adapter = new SelectImagePagerAdapter(context, pathImages, statusBarHeight);
-        viewPager2.setAdapter(adapter);
-
-        viewPager2.setCurrentItem(initialPosition, false);
-    }
-
+    // Получаем текущий адаптер
     public ImagePagerAdapterHelper getAdapter() {
         return adapter;
     }
 
-    public void updateAdapter(List<File> paths) {
-        adapter.setList(paths);
-        adapter.notifyDataSetChanged();
+    // Устанавливаем адаптер для ViewPager с SelectImagePagerAdapter и statusBarHeight
+    public void setAdapter(List<Model> pathImages) {
+        adapter = new SelectImagePagerAdapter(pathImages);
+        setAdapterAndViewPager(adapter);
     }
 
+    // Обновляем адаптер с новым списком изображений
+    public void updateAdapter(List<Model> imageList) {
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getList(), imageList);
+        adapter.setList(imageList);
+        callback.start(adapter);
+    }
 
-    //Обработка перелистывания pageViewer2
-    private void registerOnPage() {
+    // Регистрируем обратный вызов для событий изменения страницы
+    private void registerOnPageChangeCallback() {
         viewPager2.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                if (updateListener != null)
-                    updateListener.updateTextView(position);
-
-                if (initialPosition != position) {
-                    adapter.notifyItemChanged(initialPosition); // вынести в отдельный поток с задржкой
-                    initialPosition = position;
-                }
+                handlePageSelected(position);
             }
         });
     }
 
+    // Обрабатываем действия при выборе новой страницы
+    private void handlePageSelected(int position) {
+        // Обновляем TextView, если обработчик предоставлен
+        if (updateListener != null) {
+            updateListener.updateTextView(position);
+        }
+
+        // Уведомляем адаптер о изменении элемента и обновляем начальную позицию
+        if (initialPosition != position) {
+            adapter.notifyItemChanged(initialPosition);
+            initialPosition = position;
+        }
+    }
+
+    // Запускаем слайд-шоу, переходя к следующей странице
     public void slideShow() {
         int position = (initialPosition < adapter.getItemCount() - 1) ? initialPosition + 1 : 0;
         viewPager2.setCurrentItem(position);
         initialPosition = viewPager2.getCurrentItem();
     }
-
 }

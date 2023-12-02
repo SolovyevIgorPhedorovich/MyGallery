@@ -91,8 +91,8 @@ public class DatabaseManager extends SQLiteOpenHelper {
 
     // Закрытие базы данных
     @Override
-    public synchronized void close(){
-        if (mDataBase != null){
+    public synchronized void close() {
+        if (mDataBase != null) {
             mDataBase.close();
         }
         super.close();

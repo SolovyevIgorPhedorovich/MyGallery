@@ -1,4 +1,4 @@
-package com.example.mygallery.activities;
+package com.example.mygallery.activities.imageViewActivity;
 
 import android.content.Intent;
 import android.os.Build;
@@ -162,16 +162,21 @@ public abstract class ViewActivity extends AppCompatActivity {
     }
 
     //Функция возвращает имена файла
-    private void setNameItem(int position) {
+    protected void setNameItem(int position) {
         textView.setText(viewModel.getName(position));
         initialPosition = position;
     }
 
     private void setAdapter() {
-        configurationViewPager.setAdapter(this, viewModel.getPathList(), this::toggle);
+        configurationViewPager.setAdapter(viewModel.getList(), this::toggle);
     }
 
     private void setObserve() {
-        viewModel.data.observe(this, o -> configurationViewPager.updateAdapter(viewModel.getPathList()));
+        viewModel.data.observe(this, o -> {
+            if (o.isEmpty()) {
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+            configurationViewPager.updateAdapter(o);
+        });
     }
 }

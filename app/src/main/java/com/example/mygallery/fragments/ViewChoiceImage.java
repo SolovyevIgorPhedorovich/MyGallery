@@ -54,7 +54,7 @@ public class ViewChoiceImage extends Fragment {
         setClickListener();
 
         ConfigurationViewPager viewPager = new ConfigurationViewPager(view.findViewById(R.id.view_pager), currentPosition, this::setCurrentPosition);
-        viewPager.setAdapter(context, viewModel.getPathList(), 0);
+        viewPager.setAdapter(viewModel.getList());
         return view;
     }
 

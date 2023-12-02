@@ -15,7 +15,7 @@ public class LoadImage {
 
     public static void setImage(@NonNull File imageUri, ImageView imageView, Point imageSize) {
         RequestBuilder<Drawable> requestBuilder = Glide.with(imageView.getContext())
-                        .asDrawable().sizeMultiplier(0.5f);
+                .asDrawable().sizeMultiplier(0.5f);
         Glide.with(imageView)
                 .load(imageUri)
                 .thumbnail(requestBuilder) // загружаем миниатюру с размером 50% от исходного размера

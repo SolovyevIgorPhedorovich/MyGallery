@@ -3,6 +3,7 @@ package com.example.mygallery.models.constructors;
 import com.example.mygallery.models.Image;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class ImageFileConstructor {
 
@@ -22,9 +23,13 @@ public class ImageFileConstructor {
         image.isFavorite = isFavorite;
     }
 
-    public static Image initialized(int id, String name, File path, int size, boolean isFavorite) {
-        ImageFileConstructor imageConstructor = new ImageFileConstructor(id, name, path, size, isFavorite);
-        return imageConstructor.returnImage();
+    public static Image initialized(int id, String name, File path, int size, boolean isFavorite) throws FileNotFoundException {
+        if (path.exists()) {
+            ImageFileConstructor imageConstructor = new ImageFileConstructor(id, name, path, size, isFavorite);
+            return imageConstructor.returnImage();
+        } else {
+            throw new FileNotFoundException("Файл не найден: " + path);
+        }
     }
 
     private Image returnImage() {

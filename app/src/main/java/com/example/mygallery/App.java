@@ -30,24 +30,27 @@ public class App extends Application {
         instance = this;
         appContext = getApplicationContext();
 
+        initializeSharedPreferences();
+
+        initializeModels();
+        createTrashDirectory();
+    }
+
+    private void initializeSharedPreferences() {
         if (!SharedPreferencesHelper.areSharedPreferencesInitialized(appContext)) {
             SharedPreferencesHelper.initializeSharedPreferences(appContext);
         }
-
-        initializedModels();
-        createTrashDir();
     }
 
-    private void initializedModels() {
+    private void initializeModels() {
         albums = new AlbumService();
         images = new ImageService();
         cart = new CartService();
         favorites = new FavoritesService();
     }
 
-
-    // Создание корзины
-    private void createTrashDir() {
+    // Создание директории "Корзина"
+    private void createTrashDirectory() {
         File binFolder = new File(getFilesDir(), "Корзина");
         try {
             if (!binFolder.exists()) {

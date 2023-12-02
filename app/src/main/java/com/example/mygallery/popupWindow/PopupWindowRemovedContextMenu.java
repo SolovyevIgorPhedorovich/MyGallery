@@ -54,7 +54,7 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
 
     @Override
     protected boolean setConfiguration() {
-        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2* context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
+        popupWindow.setWidth(context.getResources().getDisplayMetrics().widthPixels - (2 * context.getResources().getDimensionPixelSize(R.dimen.layout_margin_10dp)));
         popupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
         popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.popupbg));

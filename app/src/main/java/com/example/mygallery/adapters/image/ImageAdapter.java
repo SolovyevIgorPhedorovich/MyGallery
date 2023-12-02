@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import com.example.mygallery.CalculateImageSize;
+import com.example.mygallery.ImageSizeCalculator;
 import com.example.mygallery.adapters.viewholder.ImageViewHolder;
 import com.example.mygallery.databinding.ItemGalleryBinding;
 import com.example.mygallery.interfaces.OnCheckedIsChoice;
@@ -29,9 +29,9 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     }
 
     private void calculatedImageSize(View view) {
-        CalculateImageSize calculateImageSize = new CalculateImageSize(context, view, spanCount);
-        calculateImageSize.squareShare();
-        this.imageSize = calculateImageSize.getResult();
+        ImageSizeCalculator imageSizeCalculator = new ImageSizeCalculator(context, view, spanCount);
+        imageSizeCalculator.calculateSquareShareSize();
+        this.imageSize = imageSizeCalculator.getResult();
     }
 
     private void setLayoutParams(View view) {

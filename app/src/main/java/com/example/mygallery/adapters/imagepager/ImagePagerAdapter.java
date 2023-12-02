@@ -1,18 +1,13 @@
 package com.example.mygallery.adapters.imagepager;
 
-import android.content.Context;
-import android.view.*;
-import android.widget.ImageView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import androidx.annotation.NonNull;
-import androidx.collection.SparseArrayCompat;
-import androidx.recyclerview.widget.RecyclerView;
-import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.ImagePagerViewHolder;
 import com.example.mygallery.interfaces.ToggleMenuListener;
-import com.example.mygallery.viewimage.LoadImage;
+import com.example.mygallery.interfaces.model.Model;
 import com.github.chrisbanes.photoview.PhotoView;
 
-import java.io.File;
 import java.util.List;
 
 public class ImagePagerAdapter extends ImagePagerAdapterHelper {
@@ -22,8 +17,8 @@ public class ImagePagerAdapter extends ImagePagerAdapterHelper {
     private boolean isImageScaled = false;
     private final ToggleMenuListener listener;
 
-    public ImagePagerAdapter(Context context, List<File> pathImages, ToggleMenuListener listener) {
-        super(context, pathImages);
+    public ImagePagerAdapter(List<Model> pathImages, ToggleMenuListener listener) {
+        super(pathImages);
         this.listener = listener;
     }
 
@@ -36,7 +31,7 @@ public class ImagePagerAdapter extends ImagePagerAdapterHelper {
                 holder.rotationAngle = 0f;
             else
                 holder.rotationAngle += 90f;
-            loadImage(pathImages.get(position), holder.imageView, holder.rotationAngle);
+            loadImage(imageList.get(position).getPath(), holder.imageView, holder.rotationAngle);
         }
     }
 
@@ -53,13 +48,18 @@ public class ImagePagerAdapter extends ImagePagerAdapterHelper {
             @Override
             public boolean onDoubleTap(@NonNull MotionEvent motionEvent) {
                 float optimalScale = calculateOptimalScale(imageView);
-                imageView.setMaximumScale(optimalScale + 1.5f);
+                imageView.setMaximumScale(optimalScale + 2.5f);
+
+                // Получаем координаты нажатия
+                float x = motionEvent.getX();
+                float y = motionEvent.getY();
+
                 if (isInterfaceVisible) {
                     listener.onToggleMenu();
                     isInterfaceVisible = false;
                 }
                 isImageScaled = !isImageScaled;
-                imageView.setScale(isImageScaled ? optimalScale : MIN_SCALE, true);
+                imageView.setScale(isImageScaled ? optimalScale : MIN_SCALE, x, y, true);
                 return true;
             }
 

@@ -23,7 +23,7 @@ public class ResolveInfoAdapter extends RecyclerView.Adapter<ResolveInfoAdapter.
     private final PackageManager packageManager;
     private final OnItemClickListener listener;
 
-    public ResolveInfoAdapter(List<ResolveInfo> resolveInfoList, PackageManager packageManager, OnItemClickListener listener){
+    public ResolveInfoAdapter(List<ResolveInfo> resolveInfoList, PackageManager packageManager, OnItemClickListener listener) {
         this.resolveInfoList = resolveInfoList;
         this.packageManager = packageManager;
         this.listener = listener;
@@ -46,7 +46,7 @@ public class ResolveInfoAdapter extends RecyclerView.Adapter<ResolveInfoAdapter.
         holder.appIcon.setImageDrawable(appIcon);
         holder.appName.setText(appName);
 
-        holder.itemView.setOnClickListener(v->listener.onItemClick(position));
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ResolveInfoAdapter extends RecyclerView.Adapter<ResolveInfoAdapter.
         return resolveInfoList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView appName;
         public ImageView appIcon;

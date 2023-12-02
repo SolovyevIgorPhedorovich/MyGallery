@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
-import com.example.mygallery.CalculateImageSize;
+import com.example.mygallery.ImageSizeCalculator;
 import com.example.mygallery.adapters.viewholder.AlbumViewHolder;
 import com.example.mygallery.databinding.AlbumImageViewBinding;
 import com.example.mygallery.interfaces.OnItemClickListener;
@@ -29,9 +29,9 @@ public class AlbumAdapter extends AlbumAdapterHelper<Model> {
     }
 
     private void calculatedImageSize(View view) {
-        CalculateImageSize calculateImageSize = new CalculateImageSize(context, view, spanCount);
-        calculateImageSize.rectangularShape();
-        this.imageSize = calculateImageSize.getResult();
+        ImageSizeCalculator imageSizeCalculator = new ImageSizeCalculator(context, view, spanCount);
+        imageSizeCalculator.calculateRectangularShapeSize();
+        this.imageSize = imageSizeCalculator.getResult();
     }
 
     private void setLayoutParams(View view) {

@@ -29,7 +29,7 @@ public class DragSelect {
         this.recyclerView = recyclerView;
     }
 
-    public void setAdapter(ImageAdapter<Model> adapter){
+    public void setAdapter(ImageAdapter<Model> adapter) {
         this.adapter = adapter;
     }
 
@@ -50,7 +50,8 @@ public class DragSelect {
     public void startSelected(int position, Fragment fragment) {
         if (!isStartedFragment) {
             FragmentNavigator.openSelectBarFragment(fragment, context, viewModel); // открываем фрагмент с выбором элемента
-            toolbar.setOnClickListener(v -> {});
+            toolbar.setOnClickListener(v -> {
+            });
             isStartedFragment = true; // устанавливаем флаг, что фрагмент запущен
         }
         startDragSelection(position); // запускаем процесс перетаскивания
@@ -70,13 +71,13 @@ public class DragSelect {
 
     public void updateCheckBoxAdapter(int position) {
         ImageViewHolder viewHolder = (ImageViewHolder) recyclerView.findViewHolderForAdapterPosition(position); // находим ViewHolder для указанной позиции
-        if (viewHolder!= null) {
+        if (viewHolder != null) {
             adapter.setCheckedState(viewHolder, position); // устанавливаем состояние выбора для ViewHolder
         }
     }
 
     public void toggle() {
-        isStartedFragment =!isStartedFragment; // переключаем флаг запущенности фрагмента
+        isStartedFragment = !isStartedFragment; // переключаем флаг запущенности фрагмента
     }
 
     private DragSelectTouchListener.OnDragSelectListener setOnDragSelectListener() {

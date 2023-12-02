@@ -6,7 +6,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="?attr/fullscreenBackgroundColor"
-             tools:context=".activities.ImageViewActivity">
+             tools:context=".activities.imageViewActivity.ImageViewActivity">
 
 	<androidx.viewpager2.widget.ViewPager2 android:id="@+id/view_pager"
 	                                       android:layout_width="match_parent"
@@ -77,7 +77,7 @@
 					android:layout_weight="1"
 					android:background="@color/transparent"
 					android:contentDescription="@string/button_context_menu_description"
-					app:srcCompat="@drawable/ui_menu_shape_square_4_24_regular"/>
+					app:srcCompat="@drawable/arrow_round_back_32_regular"/>
 
 		</LinearLayout>
 	</FrameLayout>

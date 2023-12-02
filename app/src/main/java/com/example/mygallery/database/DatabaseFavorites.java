@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import com.example.mygallery.interfaces.model.Model;
-import com.example.mygallery.models.constructors.FavoriteConstructor;
+import com.example.mygallery.models.constructors.ImageFileConstructor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ public class DatabaseFavorites extends DatabaseManager {
                         File path = new File(cursor.getString(cursor.getColumnIndexOrThrow("path")));
                         String name = path.getName();
                         try {
-                            pathFavorites.add(FavoriteConstructor.initialized(id, name, path, 0));
+                            pathFavorites.add(ImageFileConstructor.initialized(id, name, path, 0, true));
                         } catch (FileNotFoundException e) {
                             mDataBase.delete("favorites", "path=?", new String[]{String.valueOf(path)});
                         }
@@ -48,7 +48,7 @@ public class DatabaseFavorites extends DatabaseManager {
             if (openOrInitializeDatabase()) {
                 Cursor cursor = mDataBase.rawQuery("SELECT path FROM favorites WHERE path=?", new String[]{path.getAbsolutePath()});
 
-                if (cursor != null) {
+                if (cursor.getCount() != 0) {
                     cursor.close();
                     return true;
                 }
@@ -90,7 +90,7 @@ public class DatabaseFavorites extends DatabaseManager {
             if (openOrInitializeDatabase()) {
                 ContentValues values = new ContentValues();
                 values.put("path", image.getPath().getAbsolutePath());
-                mDataBase.insert("favorites", null, values);
+                mDataBase.insertOrThrow("favorites", null, values);
             }
         } catch (SQLiteConstraintException e) {
             removedFromFavorites(image.getPath());

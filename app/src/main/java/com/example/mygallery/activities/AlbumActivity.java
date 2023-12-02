@@ -36,21 +36,6 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityAlbumBinding binding;
 
-    private static int getImage(int menuId, boolean isSelected) {
-        int image = -1;
-        if (menuId == R.id.action_favorites) {
-            image = isSelected ? R.drawable.favorite_selected_32_regular :
-                    R.drawable.favorites_32_regular;
-        } else if (menuId == R.id.action_albums) {
-            image = isSelected ? R.drawable.album_selected_32_regular :
-                    R.drawable.album_image_32;
-        } else if (menuId == R.id.action_cart) {
-            image = isSelected ? R.drawable.trash_can_select_32_regular :
-                    R.drawable.trash_can_32;
-        }
-        return image;
-    }
-
     // Метод для инициализации элементов интерфейса
     private void initializeViews() {
         progressBar = binding.recyclerProgress;
@@ -115,26 +100,19 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
         }
     }
 
-    // Установка слушателя для нижней навигационной панели
-    private void setListenerBottomNavigationView(){
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            updateBottomNavigationVisuals(id);
-            if (id == R.id.action_albums) {
-                // Отобразить фрагмент с альбомами
-                fragmentNavigatorHelper.switchToFragment(AlbumRecyclerViewFragment.class);
-                return true;
-            } else if (id == R.id.action_favorites) {
-                // Отобразить фрагмент с избранными
-                fragmentNavigatorHelper.switchToFragment(FavoritesRecyclerViewFragment.class);
-                return true;
-            } else if (id == R.id.action_cart) {
-                // Отобразить фрагмент с корзиной
-                fragmentNavigatorHelper.switchToFragment(CartRecyclerViewFragment.class);
-                return true;
-            }
-            return false;
-        });
+    private static int getImage(int menuId, boolean isSelected) {
+        int image = -1;
+        if (menuId == R.id.action_favorites) {
+            image = isSelected ? R.drawable.favorite_selected_32_regular :
+                    R.drawable.favorites_32_regular;
+        } else if (menuId == R.id.action_albums) {
+            image = isSelected ? R.drawable.album_selected_32_regular :
+                    R.drawable.album_image_32;
+        } else if (menuId == R.id.action_cart) {
+            image = isSelected ? R.drawable.trash_can_select_32_regular :
+                    R.drawable.trash_can_32;
+        }
+        return image;
     }
 
     private void updateBottomNavigationVisuals(int selectedItemId) {
@@ -188,6 +166,28 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
             AlbumRecyclerViewFragment fragment = (AlbumRecyclerViewFragment) fragmentNavigatorHelper.getCurrentFragment();
             fragment.updateTypeDisplay();
         }
+    }
+
+    // Установка слушателя для нижней навигационной панели
+    private void setListenerBottomNavigationView() {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            updateBottomNavigationVisuals(id);
+            if (id == R.id.action_albums) {
+                // Отобразить фрагмент с альбомами
+                fragmentNavigatorHelper.switchToFragment(AlbumRecyclerViewFragment.class);
+                return true;
+            } else if (id == R.id.action_favorites) {
+                // Отобразить фрагмент с избранными
+                fragmentNavigatorHelper.switchToFragment(FavoritesRecyclerViewFragment.class);
+                return true;
+            } else if (id == R.id.action_cart) {
+                // Отобразить фрагмент с корзиной
+                fragmentNavigatorHelper.switchToFragment(CartRecyclerViewFragment.class);
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override

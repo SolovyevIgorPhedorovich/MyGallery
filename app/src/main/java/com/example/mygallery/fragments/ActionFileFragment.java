@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.ImageViewActivity;
+import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.adapters.album.FolderListAdapter;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.FileManager;
@@ -38,6 +38,7 @@ public class ActionFileFragment extends Fragment {
     private RecyclerView recyclerView;
     private AlbumViewModel albumViewModel;
     private OnFragmentInteractionListener listener;
+
     // Конструктор класса
     public ActionFileFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file) {
         this.typeAction = typeAction;

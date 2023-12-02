@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/black"
+			android:orientation="horizontal"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent">
+
+		<ImageButton
+				android:id="@+id/button_back"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_marginHorizontal="@dimen/layout_margin_2dp"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_back_description"
+				app:srcCompat="@drawable/close_32"/>
+
+		<TextView
+				android:id="@+id/select_info"
+				android:layout_width="0dp"
+				android:layout_height="match_parent"
+				android:layout_weight="1"
+				android:layout_marginEnd="@dimen/layout_margin_2dp"
+				android:textSize="@dimen/text_size_title"
+				android:gravity="center_vertical|start"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:background="@color/black"
+			android:paddingHorizontal="@dimen/padding_horizontal_tool_menu"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintEnd_toEndOf="parent">
+
+		<ImageButton
+				android:id="@+id/button_remove"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_weight="1"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_remove_description"
+				app:srcCompat="@drawable/trash_can_32"/>
+
+		<ImageButton
+				android:id="@+id/button_reset"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_weight="1"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_context_menu_description"
+				app:srcCompat="@drawable/arrow_round_back_32_regular"/>
+
+		<ImageButton
+				android:id="@+id/button_selected_all"
+				android:layout_width="@dimen/size_image_button"
+				android:layout_height="@dimen/size_image_button"
+				android:layout_weight="1"
+				android:background="@color/transparent"
+				android:contentDescription="@string/button_selected_all_description"
+				app:srcCompat="@drawable/selected_all"/>
+
+	</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

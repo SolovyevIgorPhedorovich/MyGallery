@@ -90,7 +90,7 @@ public abstract class BaseService<T> implements DataManager<T> {
     public abstract void getData();
 
     public void updateData(int id, T newItem) {
-        list.set(id, newItem);
+        list.set(id - 1, newItem);
         //sortListById(); //TODO: заменить на сортировку по параметру из SharedPreferences
         notifyChanges();
     }

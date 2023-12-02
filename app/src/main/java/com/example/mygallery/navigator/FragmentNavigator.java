@@ -6,12 +6,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import com.example.mygallery.fragments.ActionFileFragment;
-import com.example.mygallery.fragments.SelectBarFragment;
+import com.example.mygallery.fragments.CartRecyclerViewFragment;
+import com.example.mygallery.fragments.SelectBarFragment.SelectBarCartViewFragment;
+import com.example.mygallery.fragments.SelectBarFragment.SelectBarFragment;
 import com.example.mygallery.fragments.ViewChoiceImage;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.BaseViewModel;
+import com.example.mygallery.viewmodel.CartViewModel;
 
 public class FragmentNavigator {
 
@@ -52,9 +55,16 @@ public class FragmentNavigator {
 
     public static void openSelectBarFragment(Fragment fragment, Context context, BaseViewModel<Model> viewModel) {
         FragmentTransaction fragmentTransaction = getFragmentTransaction(context);
+        SelectBarFragment openFragment;
+
+        if (viewModel instanceof CartViewModel) {
+            openFragment = new SelectBarCartViewFragment(viewModel, fragment);
+        } else {
+            openFragment = new SelectBarFragment(viewModel, fragment);
+        }
 
         fragmentTransaction
-                .add(android.R.id.content, new SelectBarFragment(viewModel, fragment))
+                .add(android.R.id.content, openFragment)
                 .addToBackStack(null)
                 .commit();
     }

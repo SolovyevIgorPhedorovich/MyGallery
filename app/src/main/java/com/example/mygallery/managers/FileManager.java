@@ -9,7 +9,6 @@ import com.example.mygallery.R;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Cart;
-import com.example.mygallery.models.Favorite;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.models.Video;
 import com.example.mygallery.popupWindow.PopupWindowProgress;
@@ -38,14 +37,16 @@ public class FileManager {
     private PopupWindowProgress mPopupWindow;
     private int countDuplicateReplace = 0;
     private int position = -1;
-    private boolean isReplace = false;
     private boolean isMoveToCart = false;
+    private boolean isReset = false;
+    private boolean isReplace = false;
     private boolean isApplyAll = false;
     private boolean isCancel = false;
     private boolean isSkip = false;
     private boolean isDuplicate = false;
     private CountDownLatch latch;
     private OnFragmentInteractionListener listener;
+
     public FileManager(Context context, BaseViewModel<Model> viewModel) {
         cartPath = new File(context.getFilesDir(), "Корзина");
         this.context = context;
@@ -63,9 +64,9 @@ public class FileManager {
                 moveFileTo(viewModel.getItem(position), destPath);
             }
             if (!isCancel || viewModel.totalCheckedCount() != 0) {
-                updateViewModel();
                 updateMediaStoreWithNewFiles();
                 updateDatabaseWithNewData(currentModel.getPath().getParent(), String.valueOf(destPath));
+                updateViewModel();
             }
             reset();
         }).start();
@@ -115,18 +116,29 @@ public class FileManager {
     }
 
     public void renameFile(Model oldFile, String newName) {
-        File newPath = new File(viewModel.getPath(position).getParent() + "/" + newName);
+        File newPath = new File(oldFile.getPath().getParent(), newName + getFormatFile(oldFile.getName()));
 
         renameFileTo(oldFile.getPath(), newPath);
         updateViewModel(oldFile, getNewModel(oldFile, newPath));
         updateMediaStoreWithNewFiles();
     }
 
+    public void resetFile() {
+        isReset = true;
+        moveFile(null);
+    }
+
+    private String getFormatFile(String name) {
+        String[] parts = name.split("\\.");
+        return "." + parts[parts.length - 1];
+
+    }
+
     private File getDestFile(Model oldFile, File destPath) {
         if (isMoveToCart) {
-            String[] parts = oldFile.getName().split("\\.");
-            String extension = parts[parts.length - 1];
-            return new File(destPath, oldFile.getPath().hashCode() + "." + extension);
+            return new File(destPath, oldFile.getPath().hashCode() + getFormatFile(oldFile.getName()));
+        } else if (isReset) {
+            return ((Cart) oldFile).initial_path;
         } else {
             return new File(destPath, oldFile.getName());
         }
@@ -140,8 +152,6 @@ public class FileManager {
             newFile = ((Cart) oldFile).clone();
         } else if (oldFile instanceof Video) {
             newFile = ((Video) oldFile).clone();
-        } else if (oldFile instanceof Favorite) {
-            newFile = ((Favorite) oldFile).clone();
         }
         assert newFile != null;
         newFile.setPath(newPath);
@@ -309,6 +319,10 @@ public class FileManager {
     }
 
     private void updateDatabaseWithNewData(String curPath, String destPath) {
+        if (isReset) {
+            curPath = null;
+            updateCartDatabase();
+        }
         viewModel.updateDatabase(curPath, destPath, countDuplicateReplace);
     }
 
@@ -356,6 +370,9 @@ public class FileManager {
         isMoveToCart = false;
         isCancel = false;
         isApplyAll = false;
+        isReset = false;
+        isSkip = false;
+        isReplace = false;
         this.position = -1;
         if (listener != null) {
             handler.post(listener::onPermissionsGranted);

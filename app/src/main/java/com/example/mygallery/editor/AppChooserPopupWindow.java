@@ -11,7 +11,6 @@ import android.widget.Button;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.databinding.LayoutEditorChoiceBinding;
 import com.example.mygallery.managers.PopupWindowManager;
 
@@ -26,7 +25,7 @@ public class AppChooserPopupWindow extends PopupWindowManager {
     private final Context context;
     private int selectedPosition;
 
-    public AppChooserPopupWindow(Context context, List<ResolveInfo> resolveInfoList, PackageManager packageManager, SelectedApp listener){
+    public AppChooserPopupWindow(Context context, List<ResolveInfo> resolveInfoList, PackageManager packageManager, SelectedApp listener) {
         super(context);
         this.context = context;
         this.resolveInfoList = resolveInfoList;
@@ -36,17 +35,17 @@ public class AppChooserPopupWindow extends PopupWindowManager {
     }
 
 
-    private void setRecyclerView(){
+    private void setRecyclerView() {
         ResolveInfoAdapter adapter = new ResolveInfoAdapter(resolveInfoList, packageManager, this::setSelectedPosition);
         binding.editors.setAdapter(adapter);
         binding.editors.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
     }
 
-    private boolean isCheckBox(){
+    private boolean isCheckBox() {
         return binding.checkBox.isChecked();
     }
 
-    private void setSelectedPosition(int position){
+    private void setSelectedPosition(int position) {
         selectedPosition = position;
         binding.OK.setClickable(true);
     }

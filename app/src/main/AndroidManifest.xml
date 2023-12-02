@@ -38,21 +38,21 @@
 		</provider>
 
 		<activity
-				android:name=".activities.ImageViewActivity"
+				android:name=".activities.imageViewActivity.ImageViewActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
 				android:exported="false"
 				android:parentActivityName=".activities.AlbumActivity"
 				android:theme="@style/Theme.MyGallery.Fullscreen"
 				android:windowSoftInputMode="adjustPan"/>
 		<activity
-				android:name=".activities.CartViewActivity"
+				android:name=".activities.imageViewActivity.CartViewActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
 				android:exported="false"
 				android:parentActivityName=".activities.AlbumActivity"
 				android:theme="@style/Theme.MyGallery.Fullscreen"
 				android:windowSoftInputMode="adjustPan"/>
 		<activity
-				android:name=".activities.FavoritesViewActivity"
+				android:name=".activities.imageViewActivity.FavoritesViewActivity"
 				android:configChanges="orientation|keyboardHidden|screenSize"
 				android:exported="false"
 				android:parentActivityName=".activities.AlbumActivity"

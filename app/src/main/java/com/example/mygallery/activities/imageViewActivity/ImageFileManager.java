@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
-import com.example.mygallery.activities.ImageViewActivity;
 import com.example.mygallery.adapters.imagepager.ImagePagerAdapter;
 import com.example.mygallery.database.DatabaseAlbum;
 import com.example.mygallery.fragments.ActionFileFragment;
@@ -77,7 +76,6 @@ public class ImageFileManager {
         if (!newName.isEmpty()) {
 
             FileManager fileManager = new FileManager(context, viewModel);
-
             fileManager.renameFile(image, newName);
         }
     }
@@ -87,7 +85,7 @@ public class ImageFileManager {
     }
 
     public void rotation(ImagePagerAdapter adapter) {
-        adapter.rotateImage(image.id);
+        adapter.rotateImage(image.id - 1);
     }
 
     public void choose() {
@@ -95,7 +93,7 @@ public class ImageFileManager {
         DBManager.updateArtwork(image.path.getParent(), image.path.getAbsolutePath());
     }
 
-    public interface NewName{
+    public interface NewName {
         void setNewName(String newName);
     }
 }

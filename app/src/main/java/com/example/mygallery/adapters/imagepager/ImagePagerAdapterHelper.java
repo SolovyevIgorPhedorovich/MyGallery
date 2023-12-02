@@ -1,6 +1,5 @@
 package com.example.mygallery.adapters.imagepager;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +8,7 @@ import androidx.collection.SparseArrayCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.ImagePagerViewHolder;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewimage.LoadImage;
 import com.github.chrisbanes.photoview.PhotoView;
 import org.jetbrains.annotations.NotNull;
@@ -21,21 +21,21 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
     // Минимальный масштаб
     protected final float MIN_SCALE = 1.0f;
     protected final SparseArrayCompat<ImagePagerViewHolder> imageViewHolders;
-    protected final float screenWidth, screenHeight;
-    protected List<File> pathImages;
-    protected boolean isInterfaceVisible = true;
+    protected List<Model> imageList;
     protected boolean isImageScaled = false;
 
-    public ImagePagerAdapterHelper(Context context, List<File> pathImages) {
-        this.screenWidth = context.getResources().getDisplayMetrics().widthPixels;
-        this.screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+    public ImagePagerAdapterHelper(List<Model> imageList) {
         this.imageViewHolders = new SparseArrayCompat<>();
 
-        setList(pathImages);
+        setList(imageList);
     }
 
-    public void setList(List<File> pathImages) {
-        this.pathImages = pathImages;
+    public List<Model> getList() {
+        return imageList;
+    }
+
+    public void setList(List<Model> pathImages) {
+        this.imageList = pathImages;
     }
 
     @NonNull
@@ -48,7 +48,7 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ImagePagerViewHolder holder, int position) {
-        loadImage(pathImages.get(position), holder.imageView, 0f);
+        loadImage(imageList.get(position).getPath(), holder.imageView, 0f);
         setTouchListener(holder.imageView);
         imageViewHolders.put(position, holder);
     }
@@ -63,7 +63,7 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
 
     @Override
     public int getItemCount() {
-        return pathImages.size();
+        return imageList.size();
     }
 
     // Рассчитывает оптимальный масштаб с учетом угла поворота
@@ -72,12 +72,19 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
         float imageHeight = imageView.getDrawable().getIntrinsicHeight();
         float rotationAngle = imageView.getRotation();
 
-        if (imageWidth > screenWidth && imageHeight <= screenHeight) {
-            imageHeight -= imageWidth - screenWidth;
-            imageWidth = screenWidth;
-        } else if (imageHeight > screenHeight && imageWidth <= screenWidth) {
-            imageWidth -= imageHeight - screenHeight;
-            imageHeight = screenHeight;
+        float screenWidth = imageView.getWidth();
+        float screenHeight = imageView.getHeight();
+
+        if (imageHeight > screenHeight || imageWidth > screenWidth) {
+            float dimension = Math.max(imageHeight - screenHeight, imageWidth - screenWidth);
+            float ratio = imageWidth / imageHeight;
+            if (imageWidth - dimension == screenWidth) {
+                imageWidth -= dimension;
+                imageHeight = imageWidth / ratio;
+            } else if (imageHeight - dimension == screenHeight) {
+                imageHeight -= dimension;
+                imageWidth = imageHeight * ratio;
+            }
         }
 
         // Учитываем угол поворота
@@ -91,7 +98,8 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
         float scaleX = screenWidth / imageWidth;
         float scaleY = screenHeight / imageHeight;
 
-        // Возвращаем минимальное значение масштаба, чтобы изображение полностью уместилось
-        return Math.max(scaleX, scaleY);
+        float scale = Math.max(scaleX, scaleY);
+
+        return scale != 1f ? scale : 2f;
     }
 }

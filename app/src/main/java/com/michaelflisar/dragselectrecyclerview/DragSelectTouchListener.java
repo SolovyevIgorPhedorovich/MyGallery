@@ -33,7 +33,8 @@ public class DragSelectTouchListener implements RecyclerView.OnItemTouchListener
     private RecyclerView mRecyclerView;
     private OverScroller mScroller; //replaced ScrollerCompat with OverScroller
     // Definitions for touch auto scroll regions
-    private int mTopBoundFrom, mTopBoundTo, mBottomBoundFrom, mBottomBoundTo;    private final Runnable mScrollRunnable = new Runnable() {
+    private int mTopBoundFrom, mTopBoundTo, mBottomBoundFrom, mBottomBoundTo;
+    private final Runnable mScrollRunnable = new Runnable() {
         @Override
         public void run() {
             if (mScroller != null && mScroller.computeScrollOffset()) {
@@ -50,6 +51,7 @@ public class DragSelectTouchListener implements RecyclerView.OnItemTouchListener
     private boolean mScrollAboveTopRegion = true;
     private boolean mScrollBelowTopRegion = true;
     private boolean mDebug = false;
+
     public DragSelectTouchListener() {
         reset();
     }

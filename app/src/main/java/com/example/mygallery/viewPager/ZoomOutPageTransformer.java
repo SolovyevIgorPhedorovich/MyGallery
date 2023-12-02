@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 
+//https://developer.android.com/develop/ui/views/animations/screen-slide-2#java
 public class ZoomOutPageTransformer implements ViewPager2.PageTransformer {
     private final float MIN_SCALE = 0.98f; // Минимальный масштаб элемента
     private final float MIN_ALPHA = 0.8f; // Минимальная прозрачность элемента
