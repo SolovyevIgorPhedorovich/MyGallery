@@ -19,8 +19,8 @@ public abstract class RecyclerViewFragment extends Fragment {
     protected Context context;
     protected RecyclerView recyclerView;
     protected TextView textView;
-    protected BaseViewModel<Model> viewModel;
     protected SharedPreferencesHelper sharedPreferencesHelper;
+    protected BaseViewModel<Model> viewModel;
     protected FragmentRecyclerViewBinding binding;
 
     @Override
@@ -29,24 +29,24 @@ public abstract class RecyclerViewFragment extends Fragment {
         this.context = context;
     }
 
-    protected void initializedViews() {
-        textView = binding.fragmentText;
-        recyclerView = binding.recyclerViewList;
+    @Override
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentRecyclerViewBinding.inflate(inflater, container, false);
+        initializeViews();
+        configureRecyclerView();
+        setObserve();
+        return binding.getRoot();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        context = null; // Очищаем ссылку на контекст при отсоединении фрагмента
+        context = null;
     }
 
-    @Override
-    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentRecyclerViewBinding.inflate(inflater, container, false);
-        initializedViews();
-        configureRecyclerView(); // Конфигурирование RecyclerView
-        setObserve();
-        return binding.getRoot();
+    protected void initializeViews() {
+        textView = binding.fragmentText;
+        recyclerView = binding.recyclerViewList;
     }
 
     protected void openActivity(int position, Class<?> openClass) {
@@ -58,15 +58,14 @@ public abstract class RecyclerViewFragment extends Fragment {
 
     protected abstract void setObserve();
 
-    // Конфигурирование RecyclerView в зависимости от типа фрагмента
     protected abstract void configureRecyclerView();
 
     protected void hideTextInFragment() {
-        textView.setVisibility(View.GONE);
+        setTextViewVisibility(View.GONE);
     }
 
     protected void showTextInFragment() {
-        textView.setVisibility(View.VISIBLE);
+        setTextViewVisibility(View.VISIBLE);
     }
 
     protected void setTextFragment(int text) {
@@ -74,4 +73,8 @@ public abstract class RecyclerViewFragment extends Fragment {
     }
 
     protected abstract void viewFragmentText(Boolean isEmpty);
+
+    private void setTextViewVisibility(int visibility) {
+        textView.setVisibility(visibility);
+    }
 }

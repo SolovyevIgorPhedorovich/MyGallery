@@ -15,17 +15,16 @@ public class FileEditor {
 
     protected List<ResolveInfo> editors;
     protected final Intent editIntent;
+    protected Type type;
     private final Context context;
-    private final Type type;
     private final PackageManager packageManager;
     private final SharedPreferencesHelper sharedPreferencesHelper;
 
-    protected FileEditor(Context context, Type type) {
+    public FileEditor(Context context) {
         this.context = context;
-        this.type = type;
         this.packageManager = context.getPackageManager();
-        this.editIntent = new Intent(Intent.ACTION_EDIT);
         this.sharedPreferencesHelper = new SharedPreferencesHelper(context, SharedPreferencesHelper.SETTING_PREFERENCES);
+        this.editIntent = new Intent(Intent.ACTION_EDIT);
     }
 
     protected void getEditors() {
@@ -33,19 +32,23 @@ public class FileEditor {
     }
 
     protected void startEditor(View view) {
-        String key = null;
-        switch (type) {
-            case IMAGE:
-                key = SettingPreferences.DEFAULT_APP_EDIT_IMAGE_KEY;
-                break;
-            case VIDEO:
-                key = SettingPreferences.DEFAULT_APP_EDIT_VIDEO_KEY;
-        }
+        String key = getSettingKey();
         if (sharedPreferencesHelper.getString(key) == null) {
             getEditors();
-            AppChooserPopupWindow.show(context, view, editors, packageManager, (p, b) -> startApp(getPackageName(p, b)));
+            AppChooserPopupWindow.show(context, view, editors, packageManager, (position, isDefault) -> startApp(getPackageName(position, isDefault)));
         } else {
             startApp(getPackageName(key));
+        }
+    }
+
+    private String getSettingKey() {
+        switch (type) {
+            case IMAGE:
+                return SettingPreferences.DEFAULT_APP_EDIT_IMAGE_KEY;
+            case VIDEO:
+                return SettingPreferences.DEFAULT_APP_EDIT_VIDEO_KEY;
+            default:
+                throw new IllegalArgumentException("Unsupported type: " + type);
         }
     }
 
@@ -60,15 +63,7 @@ public class FileEditor {
     }
 
     private void setDefaultApp(String values) {
-        String key = null;
-        switch (type) {
-            case IMAGE:
-                key = SettingPreferences.DEFAULT_APP_EDIT_IMAGE_KEY;
-                break;
-            case VIDEO:
-                key = SettingPreferences.DEFAULT_APP_EDIT_VIDEO_KEY;
-                break;
-        }
+        String key = getSettingKey();
         if (key != null) {
             sharedPreferencesHelper.replaceString(key, values);
         }
@@ -76,7 +71,7 @@ public class FileEditor {
 
     private void startApp(String packageName) {
         editIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        editIntent.setPackage(packageName); //TODO: добавить обработку, ситуации если приложение по умолчанию было удалено с устройства
+        editIntent.setPackage(packageName);
         context.startActivity(editIntent);
     }
 }

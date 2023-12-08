@@ -5,12 +5,11 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.activities.imageViewActivity.ImageFileManager;
+import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.databinding.PopupWindowNewNameBinding;
 import com.example.mygallery.managers.CreateAlbumManager;
 import com.example.mygallery.managers.PopupWindowManager;
@@ -70,17 +69,17 @@ public class PopupWindowInputNameContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setButtonClickListener(Button button, int buttonId) {
-        button.setOnClickListener(view -> {
-            popupWindow.dismiss();
+    protected void handleButtonClick(int buttonId) {
+        popupWindow.dismiss();
             if (buttonId == R.id.OK) {
                 String newName = editText.getText().toString();
                 if (context instanceof ImageViewActivity) {
                     listener.setNewName(newName);
-                } else
-                    CreateAlbumManager.create(context, newName);
+                } else {
+                    CreateAlbumManager createAlbumManager = new CreateAlbumManager();
+                    createAlbumManager.create(context, newName);
+                }
             }
-        });
     }
 
     //Перерасчет позиции PopupWindow с учетом клавиатуры

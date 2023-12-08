@@ -9,7 +9,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,8 +16,8 @@ import com.example.mygallery.R;
 import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.adapters.album.FolderListAdapter;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
-import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.managers.FileManager;
 import com.example.mygallery.viewmodel.AlbumViewModel;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
@@ -26,28 +25,28 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-public class ActionFileFragment extends Fragment {
+public class AlbumSelectionFragment extends Fragment {
 
     private final Action typeAction;
     private final Model file;
     private final BaseViewModel<Model> viewModel;
+    private final OnFragmentInteractionListener listener;
+
     private View view;
     private Context context;
     private ImageButton closeFragment;
     private TextView textView;
     private RecyclerView recyclerView;
     private AlbumViewModel albumViewModel;
-    private OnFragmentInteractionListener listener;
 
-    // Конструктор класса
-    public ActionFileFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file) {
+    public AlbumSelectionFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file) {
+        this(typeAction, viewModel, file, null);
+    }
+
+    public AlbumSelectionFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
         this.typeAction = typeAction;
         this.file = file;
         this.viewModel = viewModel;
-    }
-
-    public ActionFileFragment(Action typeAction, BaseViewModel<Model> viewModel, Model file, OnFragmentInteractionListener listener) {
-        this(typeAction, viewModel, file);
         this.listener = listener;
     }
 
@@ -55,20 +54,11 @@ public class ActionFileFragment extends Fragment {
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
         this.context = context;
-
         albumViewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(AlbumViewModel.class);
     }
 
-    // Метод жизненного цикла onCreate
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_action_file, container, false);
 
         if (context instanceof ImageViewActivity) {
@@ -76,14 +66,8 @@ public class ActionFileFragment extends Fragment {
         }
 
         initializeViews();
-
-        // Установка текста
         setTextView();
-
-        // Создание и настройка адаптера для RecyclerView
         createRecyclerViewAdapter();
-
-        // Установка слушателя для кнопки закрытия
         setCloseFragmentListener();
 
         return view;
@@ -117,8 +101,7 @@ public class ActionFileFragment extends Fragment {
 
     // Закрытие фрагмента
     private void closeFragment() {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        fragmentManager.popBackStack();
+        getParentFragmentManager().popBackStack();
     }
 
     private void actionFile(int position) {

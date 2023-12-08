@@ -1,18 +1,13 @@
 package com.example.mygallery.models.services;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import com.example.mygallery.App;
 import com.example.mygallery.database.DatabaseAlbum;
 import com.example.mygallery.interfaces.model.DataListener;
 import com.example.mygallery.interfaces.model.DataManager;
 import com.example.mygallery.interfaces.model.Model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,23 +15,22 @@ import java.util.concurrent.Executors;
 public abstract class BaseService<T> implements DataManager<T> {
 
     private final Set<DataListener<T>> listeners;
+    protected final DatabaseAlbum databaseManager;
     protected List<T> list;
     protected Context context;
-    protected final DatabaseAlbum databaseManager;
-    private final Handler handler;
 
     public BaseService() {
         this.list = new ArrayList<>();
         this.listeners = new HashSet<>();
         this.context = App.getInstance().getAppContext();
         this.databaseManager = new DatabaseAlbum(context);
-        this.handler = new Handler(Looper.getMainLooper());
     }
 
-    @Override
-    public void setData(List<T> item) {
-        list = new ArrayList<>(item);
-        notifyChanges();
+    protected static ExecutorService executeInSingleThread(Runnable task) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(task);
+        executor.shutdown();
+        return executor;
     }
 
     @Override
@@ -52,6 +46,12 @@ public abstract class BaseService<T> implements DataManager<T> {
     @Override
     public void addItem(T item) {
         list.add(item);
+        notifyChanges();
+    }
+
+    @Override
+    public void setData(List<T> items) {
+        list = new ArrayList<>(items);
         notifyChanges();
     }
 
@@ -95,17 +95,9 @@ public abstract class BaseService<T> implements DataManager<T> {
         notifyChanges();
     }
 
-    private void updateId(int id) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        executor.submit(() -> {
-            for (int i = id; i < list.size(); i++) {
-                ((Model) list.get(i)).setId(++i);
-            }
-            notifyChanges();
-        });
-
-        executor.shutdown();
+    @Override
+    public T getItem(int position) {
+        return list.get(position);
     }
 
     public void addListener(DataListener<T> listener) {
@@ -117,31 +109,33 @@ public abstract class BaseService<T> implements DataManager<T> {
         listeners.remove(listener);
     }
 
-    private void notifyChanges() {
-        for (DataListener<T> listener : listeners)
-            listener.onDataChanged(list);
+    private void updateId(int id) {
+        executeInSingleThread(() -> {
+            for (int i = id; i < list.size(); i++) {
+                ((Model) list.get(i)).setId(++i);
+            }
+            notifyChanges();
+        });
     }
 
     private Runnable startUpdateDatabase(String curPath, String destPath, int count) {
         return () -> databaseManager.updateData(curPath, destPath, count);
     }
 
+    private void notifyChanges() {
+        for (DataListener<T> listener : listeners) {
+            listener.onDataChanged(list);
+        }
+    }
+
     public void updateDatabase(String curPath, String destPath, int count) {
-        handler.post(startUpdateDatabase(curPath, destPath, count));
+        executeInSingleThread(startUpdateDatabase(curPath, destPath, count));
     }
 
     private void sortListById() {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        executor.submit(() -> {
-            list.sort((item1, item2) -> {
-                int id1 = ((Model) item1).getId();
-                int id2 = ((Model) item2).getId();
-                return Integer.compare(id1, id2);
-            });
+        executeInSingleThread(() -> {
+            list.sort(Comparator.comparingInt(item -> ((Model) item).getId()));
             notifyChanges();
         });
-
-        executor.shutdown();
     }
 }

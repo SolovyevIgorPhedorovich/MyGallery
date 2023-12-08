@@ -5,8 +5,6 @@ import android.widget.ImageButton;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.databinding.ActivityImageInCartViewBinding;
 import com.example.mygallery.managers.FileManager;
-import com.example.mygallery.models.Image;
-import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
 import com.example.mygallery.viewmodel.CartViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
@@ -46,7 +44,7 @@ public class CartViewActivity extends ViewActivity {
     protected void setOnClickListenerButtons() {
         super.setOnClickListenerButtons();
 
-        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.run(this, v, viewModel, initialPosition));
+        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, initialPosition));
 
         buttonReset.setOnClickListener(v -> {
             fileManager.setPosition(initialPosition);

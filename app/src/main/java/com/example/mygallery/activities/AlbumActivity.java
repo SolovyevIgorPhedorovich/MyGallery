@@ -128,7 +128,6 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
         }
     }
 
-
     // Создание пунктов меню в панели инструментов
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -142,8 +141,10 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.action_create_album)
-            CreateAlbumManager.createAlbum(this, findViewById(itemId));
+        if (itemId == R.id.action_create_album) {
+            CreateAlbumManager createAlbumManager = new CreateAlbumManager();
+            createAlbumManager.createAlbum(this, findViewById(itemId));
+        }
         else if (itemId == R.id.action_view_type)
             replaceViewType();
         else if (itemId == R.id.action_open_context_menu)

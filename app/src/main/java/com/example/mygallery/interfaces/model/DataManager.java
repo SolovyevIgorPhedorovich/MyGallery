@@ -11,6 +11,8 @@ public interface DataManager<T> {
 
     void addItem(T item);
 
+    T getItem(int position);
+
     void removeItem(int position);
 
     void removeItem(List<T> positionList);

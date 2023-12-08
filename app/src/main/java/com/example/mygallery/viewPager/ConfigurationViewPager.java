@@ -64,8 +64,8 @@ public class ConfigurationViewPager {
 
     // Обновляем адаптер с новым списком изображений
     public void updateAdapter(List<Model> imageList) {
-        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getList(), imageList);
-        adapter.setList(imageList);
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.onGetDataList(), imageList);
+        adapter.onSetDataList(imageList);
         callback.start(adapter);
     }
 
@@ -86,9 +86,8 @@ public class ConfigurationViewPager {
             updateListener.updateTextView(position);
         }
 
-        // Уведомляем адаптер о изменении элемента и обновляем начальную позицию
+        // Обновляем начальную позицию на текущую
         if (initialPosition != position) {
-            adapter.notifyItemChanged(initialPosition);
             initialPosition = position;
         }
     }

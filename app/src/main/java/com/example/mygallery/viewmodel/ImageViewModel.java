@@ -33,6 +33,10 @@ public class ImageViewModel extends BaseViewModel<Model> {
         }
     }
 
+    public void setArtwork(File path) {
+        ((ImageService) service).setArtwork(path);
+    }
+
     public void setFavorites(Model image) {
         ((ImageService) service).setFavorites(image);
     }

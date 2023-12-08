@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.adapters.viewholder.ImageViewHolder;
+import com.example.mygallery.interfaces.OnAdapterInteraction;
 import com.example.mygallery.interfaces.OnCheckedIsChoice;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.viewimage.LoadImage;
@@ -16,49 +17,61 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageViewHolder> {
+public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageViewHolder> implements OnAdapterInteraction<T> {
 
+    // Обработчики событий
     protected final OnItemClickListener listener;
     protected final OnItemClickListener selectClickListener;
     protected final OnItemClickListener longClickListener;
     protected final OnCheckedIsChoice checked;
+
+    // Режим работы адаптера
     protected Mode mode;
     protected List<T> dataList;
+
+    // Состояние выбранных элементов
     protected SparseBooleanArray selectedItems;
 
+    // Конструктор
     public ImageAdapterHelper(List<T> dataList, OnItemClickListener listener, OnItemClickListener selectClickListener, OnItemClickListener longClickListener, OnCheckedIsChoice checked) {
         this.listener = listener;
         this.longClickListener = longClickListener;
         this.selectClickListener = selectClickListener;
         this.checked = checked;
-        setDataList(dataList);
+        onSetDataList(dataList);
     }
 
+    // Получение текущего режима работы адаптера
     public Mode getMode() {
         return mode;
     }
 
+    // Сброс состояния адаптера
     public void reset() {
         mode = Mode.VIEWING;
-        if (selectedItems != null)
-            selectedItems.clear();
-
+        clearSelectedItems();
         notifyDataSetChanged();
     }
 
+    // Получение выбранных элементов
     public SparseBooleanArray getSelectedItems() {
         return selectedItems;
     }
 
+    // Установка выбранных элементов
     public void setSelectedItems(SparseBooleanArray selectedItems) {
         this.selectedItems = selectedItems;
     }
 
-    public void setDataList(List<T> dataList) {
+    // Установка списка данных
+    @Override
+    public void onSetDataList(List<T> dataList) {
         this.dataList = new ArrayList<>(dataList);
     }
 
-    public List<T> getDataList() {
+    // Получение списка данных
+    @Override
+    public List<T> onGetDataList() {
         return dataList;
     }
 
@@ -67,6 +80,7 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         LoadImage.setImage(imagePath, imageView, imageSize);
     }
 
+    // Установка режима для ViewHolder
     protected void setMode(ImageViewHolder holder, int position) {
         switch (mode) {
             case VIEWING:
@@ -80,22 +94,22 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         }
     }
 
+    // Установка режима SELECTED для ViewHolder
     private void setSelectedMode(ImageViewHolder holder, int position) {
 
-        if (selectedItems != null)
+        if (selectedItems != null) {
             holder.checkBox.setChecked(selectedItems.get(position, false)); // Установите состояние CheckBox из модели данных
-
+        }
         holder.itemView.setOnClickListener(v -> selectClickListener.onItemClick(position));
-
         holder.itemView.setOnLongClickListener(v -> {
             longClickListener.onItemClick(position);
             return true;
         });
 
-
         holder.imageButton.setOnClickListener(v -> listener.onItemClick(position));
     }
 
+    // Установка режима VIEWING для ViewHolder
     private void setViewingMode(ImageViewHolder holder, int position) {
         holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
         holder.itemView.setOnLongClickListener(v -> {
@@ -106,6 +120,7 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         });
     }
 
+    // Выбор всех элементов
     public void selectedAll() {
         if (selectedItems != null && selectedItems.size() != getItemCount()) {
             for (int i = 0; i < getItemCount(); i++)
@@ -115,43 +130,58 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         }
     }
 
+    // Снятие выбора со всех элементов
     public void clearAll() {
-        if (selectedItems != null) {
-            for (int i = 0; i < getItemCount(); i++)
-                selectedItems.clear();
+        clearSelectedItems();
+        notifyDataSetChanged();
+    }
 
-            notifyDataSetChanged();
+    // Очистка выбранных элементов
+    private void clearSelectedItems() {
+        if (selectedItems != null) {
+            selectedItems.clear();
         }
     }
 
+    // Обновление выбранных элементов при изменении данных
     public void updateSelectedItems(List<T> selectedItemList) {
         int oldSize = selectedItems.size();
         int newSize = selectedItemList.size();
 
         if (newSize < oldSize) {
-            for (int a = 0, i = oldSize - 1; a <= i; a++, i--) {
-                int position1 = selectedItems.keyAt(a);
-                int position2 = selectedItems.keyAt(i);
-
-                if (!selectedItemList.contains(dataList.get(position1))) {
-                    notifyItemChanged(position1);
-                    break;
-                } else if (!selectedItemList.contains(dataList.get(position2))) {
-                    notifyItemChanged(position2);
-                    break;
-                }
-
-            }
+            updateForLessItems(selectedItemList, oldSize);
         } else if (newSize > oldSize) {
-            for (int i = 0; i < getItemCount(); i++) {
-                if (dataList.get(i).equals(selectedItemList.get(newSize - 1))) {
-                    notifyItemChanged(i);
-                    break;
-                }
+            updateForMoreItems(selectedItemList, newSize);
+        }
+    }
+
+    // Обновление для уменьшения количества выбранных элементов
+    private void updateForLessItems(List<T> selectedItemList, int oldSize) {
+        for (int a = 0, i = oldSize - 1; a <= i; a++, i--) {
+            int position1 = selectedItems.keyAt(a);
+            int position2 = selectedItems.keyAt(i);
+
+            if (!selectedItemList.contains(dataList.get(position1))) {
+                notifyItemChanged(position1);
+                break;
+            } else if (!selectedItemList.contains(dataList.get(position2))) {
+                notifyItemChanged(position2);
+                break;
             }
         }
     }
 
+    // Обновление для увеличения количества выбранных элементов
+    private void updateForMoreItems(List<T> selectedItemList, int newSize) {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (dataList.get(i).equals(selectedItemList.get(newSize - 1))) {
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+    // Обновление состояния CheckBox
     protected void updateSelectedItems(int position) {
         boolean currentValue = selectedItems.get(position, false);
         boolean actualityValue = checked.onChecked(position);
@@ -162,6 +192,7 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         }
     }
 
+    // Установка состояния CheckBox для ViewHolder
     public void setCheckedState(ImageViewHolder holder, int position) {
         holder.checkBox.setChecked(selectedItems.get(position, false)); // Обновите состояние CheckBox
     }
@@ -179,6 +210,7 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
         return dataList.size();
     }
 
+    // Перечисление режимов работы адаптера
     public enum Mode {
         SELECTED,
         VIEWING

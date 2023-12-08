@@ -10,9 +10,7 @@ public class AlbumService extends BaseService<Model> {
 
     @Override
     public void getData() {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        executor.submit(runGetData());
-        executor.shutdown();
+        executeInSingleThread(runGetData());
     }
 
     public void findAlbums() {

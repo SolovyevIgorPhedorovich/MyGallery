@@ -5,7 +5,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.core.content.ContextCompat;
@@ -13,9 +12,9 @@ import com.example.mygallery.R;
 import com.example.mygallery.managers.PopupWindowManager;
 
 public class PopupWindowProgress extends PopupWindowManager {
-    private static int MAX_FILE;
     private TextView textProgress;
     private ProgressBar progressBar;
+    private int maxFile;
 
     public PopupWindowProgress(Context context) {
         super(context);
@@ -24,38 +23,44 @@ public class PopupWindowProgress extends PopupWindowManager {
     public static PopupWindowProgress show(Context context, View view, int titleId, int maxFile) {
         PopupWindowProgress popupWindow = new PopupWindowProgress(context);
         initialize(context, popupWindow, view, titleId);
-        MAX_FILE = maxFile;
+        popupWindow.setMaxFile(maxFile);
         return popupWindow;
     }
 
     private static void initialize(Context context, PopupWindowProgress popupWindow, View view, int titleId) {
-        // Load the XML layout
+        // Загрузка макета XML
         LayoutInflater inflater = LayoutInflater.from(context);
         View menuView = inflater.inflate(R.layout.popup_window_progress, null);
 
-        // Set the title and content of the popup window
+        // Установка заголовка и содержимого PopupWindowProgress
         TextView textProcess = menuView.findViewById(R.id.popup_text);
         textProcess.setText(titleId);
         popupWindow.setContent(menuView);
 
-        // Set the position and show the popup window
+        // Установка позиции и отображение PopupWindowProgress
         popupWindow.setPosition(0, 50);
         popupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
 
-        // Initialize the views
-        popupWindow.initializeViews();
+        // Инициализация представлений
+        popupWindow.initializeViews(menuView);
     }
 
-    private void initializeViews() {
-        textProgress = popupWindow.getContentView().findViewById(R.id.count_file_progress);
-        progressBar = popupWindow.getContentView().findViewById(R.id.progress_bar);
+    private void initializeViews(View menuView) {
+        textProgress = menuView.findViewById(R.id.count_file_progress);
+        progressBar = menuView.findViewById(R.id.progress_bar);
     }
 
+    // Устанавливает максимальное количество файлов для отслеживания прогресса
+    private void setMaxFile(int maxFile) {
+        this.maxFile = maxFile;
+    }
+
+    //Обновляет прогресс и текст в PopupWindowProgress
     public void updateProgress() {
         int progress = progressBar.getProgress() + 1;
-        textProgress.setText(context.getString(R.string.count_file_progress_text).replace("{}", String.valueOf(progress)).replace("{}", String.valueOf(MAX_FILE)));
+        textProgress.setText(context.getString(R.string.count_file_progress_text).replace("{}", String.valueOf(progress)).replace("{}", String.valueOf(maxFile)));
         progressBar.setProgress(progress);
-        if (progress == MAX_FILE) {
+        if (progress == maxFile) {
             popupWindow.dismiss();
         }
     }
@@ -75,7 +80,6 @@ public class PopupWindowProgress extends PopupWindowManager {
     }
 
     @Override
-    protected void setButtonClickListener(Button button, int buttonId) {
-        // Add any button click listener here
+    protected void handleButtonClick(int buttonId) {
     }
 }

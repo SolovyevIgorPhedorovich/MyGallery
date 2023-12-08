@@ -12,22 +12,27 @@ public class AlbumViewModel extends BaseViewModel<Model> {
         super(service);
     }
 
+    // Метод для поиска индекса элемента в списке по пути изображения
     public int getPathListByPathImage(File pathImage) {
-        int position = -1;
-
+        // Перебор элементов списка
         for (int i = 0; i < size(); i++) {
-            if (isImage(pathImage, i))
-                position = i;
+            // Если текущий элемент является корневой директорией элемента, то запоминаем его индекс
+            if (isRootDirectoryForImage(pathImage, i))
+                return i;
         }
 
-        return position;
+        // Возвращаем индекс элемента в списке или -1, если не найден
+        return -1;
     }
 
+    // Метод для вызова поиска альбомов
     public void findAlbums() {
         ((AlbumService) service).findAlbums();
     }
 
-    private boolean isImage(File pathImage, int position) {
+    // Вспомогательный метод для проверки, корневой директории элемента
+    private boolean isRootDirectoryForImage(File pathImage, int position) {
+        // Сравниваем абсолютные пути элемента и указанного файла
         return getList().get(position).getPath().getAbsolutePath().equals(pathImage.getParent());
     }
 }

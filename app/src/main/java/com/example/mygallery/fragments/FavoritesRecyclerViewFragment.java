@@ -13,7 +13,7 @@ public class FavoritesRecyclerViewFragment extends ImageGrid {
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(FavoritesViewModel.class);
+        initializeViewModel();
     }
 
     @Override
@@ -24,12 +24,24 @@ public class FavoritesRecyclerViewFragment extends ImageGrid {
 
     @Override
     protected void viewFragmentText(Boolean isEmpty) {
-        if (!isEmpty)
+        if (!isEmpty) {
             hideTextInFragment();
-        else {
-            setTextFragment(R.string.empty_favorites);
-            showTextInFragment();
+        } else {
+            showEmptyFavoritesText();
         }
     }
 
+    private void initializeViewModel() {
+        viewModel = createViewModel();
+    }
+
+    private FavoritesViewModel createViewModel() {
+        ViewModelProvider.Factory factory = ViewModelFactory.factory(this);
+        return new ViewModelProvider(this, factory).get(FavoritesViewModel.class);
+    }
+
+    private void showEmptyFavoritesText() {
+        setTextFragment(R.string.empty_favorites);
+        showTextInFragment();
+    }
 }

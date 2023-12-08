@@ -8,17 +8,17 @@ public class CartConstructor {
 
     private final Cart cart;
 
-    private CartConstructor(int id, String name, File current_path, File initial_path, int deletion_date) {
+    private CartConstructor(int id, String name, File currentPath, File initialPath, int deletionDate) {
         cart = new Cart();
         cart.id = id;
         cart.name = name;
-        cart.current_path = current_path;
-        cart.initial_path = initial_path;
-        cart.deletion_date = deletion_date;
+        cart.currentPath = currentPath;
+        cart.initialPath = initialPath;
+        cart.deletionDate = deletionDate;
     }
 
-    public static Cart initialized(int id, String name, File current_path, File initial_path, int deletion_date) {
-        CartConstructor cartConstructor = new CartConstructor(id, name, current_path, initial_path, deletion_date);
+    public static Cart create(int id, String name, File currentPath, File initialPath, int deletion_date) {
+        CartConstructor cartConstructor = new CartConstructor(id, name, currentPath, initialPath, deletion_date);
         return cartConstructor.returnCart();
     }
 

@@ -3,6 +3,7 @@ package com.example.mygallery.scaning;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 
 import com.example.mygallery.database.DatabaseFavorites;
@@ -34,15 +35,17 @@ public class ScanMediaFile implements Runnable {
     }
 
     private void scanOneDirectory() {
-        queryMediaStoreForImages();
+        List<Model> imageList = queryMediaStoreForImages();
+        setService(imageList);
     }
 
-    private void queryMediaStoreForImages() {
+    // Получаем список изображений из хранилища медиафайлов
+    private List<Model> queryMediaStoreForImages() {
         List<Model> imageList = new ArrayList<>();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
-        String selection = MediaStore.Images.Media.DATA + " LIKE ? AND " + MediaStore.Images.Media.DATA + " NOT LIKE ?";
-        String[] selectionArgs = new String[]{path.getAbsolutePath() + "/%", path.getAbsolutePath() + "/%/%"};
+        String selection = path.equals(Environment.getExternalStorageDirectory()) ? MediaStore.Images.Media.DATA + " LIKE ?" : MediaStore.Images.Media.DATA + " LIKE ? AND " + MediaStore.Images.Media.DATA + " NOT LIKE ?";
+        String[] selectionArgs = path.equals(Environment.getExternalStorageDirectory()) ? new String[]{path.getAbsolutePath() + "/%"} : new String[]{path.getAbsolutePath() + "/%", path.getAbsolutePath() + "/%/%"};
         String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
 
         try (Cursor cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder)) {
@@ -50,10 +53,11 @@ public class ScanMediaFile implements Runnable {
                 int dataIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
                 int sizeIndex = cursor.getColumnIndex(MediaStore.Images.Media.SIZE);
                 while (cursor.moveToNext()) {
-                    File path = new File(cursor.getString(dataIndex));
+                    interrupt();
+                    File filePath = new File(cursor.getString(dataIndex));
                     int size = cursor.getInt(sizeIndex);
-                    String name = path.getName();
-                    Image image = setItemList(imageList.size() + 1, name, path, size);
+                    String name = filePath.getName();
+                    Image image = createImage(imageList.size(), name, filePath, size);
                     imageList.add(image);
                     if (imageList.size() % 50 == 0) {
                         setService(imageList);
@@ -62,16 +66,26 @@ public class ScanMediaFile implements Runnable {
             }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        setService(imageList);
+        return imageList;
     }
 
-    private Image setItemList(int id, String name, File path, int size) throws FileNotFoundException {
-        return ImageFileConstructor.initialized(id, name, path, size, databaseManager.checkFileFavorites(path));
+    private void interrupt() throws Exception {
+        if (Thread.interrupted()) {
+            // Обработка прерывания
+            throw new InterruptedException("Thread was interrupted");
+        }
     }
 
+    // Создаем объект Image с указанными параметрами
+    private Image createImage(int id, String name, File path, int size) throws FileNotFoundException {
+        return ImageFileConstructor.create(id + 1, name, path, size, databaseManager.checkFileFavorites(path));
+    }
+
+    // Устанавливаем список изображений в сервис
     private void setService(List<Model> imageList) {
         service.setData(imageList);
     }
 }
-

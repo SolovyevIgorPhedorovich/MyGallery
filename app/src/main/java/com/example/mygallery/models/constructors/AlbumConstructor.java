@@ -17,7 +17,7 @@ public class AlbumConstructor {
         album.artwork = artwork;
     }
 
-    public static Album initialized(int id, String name, File path, int count, File artwork) {
+    public static Album create(int id, String name, File path, int count, File artwork) {
         AlbumConstructor albumConstructor = new AlbumConstructor(id, name, path, count, artwork);
         return albumConstructor.getAlbum();
     }

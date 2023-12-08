@@ -4,16 +4,12 @@ import com.example.mygallery.interfaces.model.Model;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FavoritesService extends ImageService {
 
     @Override
     public void getData() {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> setData(databaseFavorites.getFavorites()));
-        executor.shutdown();
+        executeInSingleThread(() -> setData(databaseFavorites.getFavorites()));
     }
 
     public void updateDatabase(int position) {

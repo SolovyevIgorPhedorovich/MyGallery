@@ -23,7 +23,7 @@ public class ImageFileConstructor {
         image.isFavorite = isFavorite;
     }
 
-    public static Image initialized(int id, String name, File path, int size, boolean isFavorite) throws FileNotFoundException {
+    public static Image create(int id, String name, File path, int size, boolean isFavorite) throws FileNotFoundException {
         if (path.exists()) {
             ImageFileConstructor imageConstructor = new ImageFileConstructor(id, name, path, size, isFavorite);
             return imageConstructor.returnImage();

@@ -21,14 +21,14 @@ import com.example.mygallery.viewmodel.ImageViewModel;
 import java.util.List;
 
 public class ImageGrid extends RecyclerViewFragment implements OnFragmentInteractionListener {
-    private static final int spanCount = 4;
+    private static final int SPAN_COUNT = 4;
     private DragSelect dragSelect;
     private ImageAdapter<Model> adapter;
     private View toolbar;
 
     @Override
-    protected void initializedViews() {
-        super.initializedViews();
+    protected void initializeViews() {
+        super.initializeViews();
         toolbar = binding.toolbar;
     }
 
@@ -40,22 +40,44 @@ public class ImageGrid extends RecyclerViewFragment implements OnFragmentInterac
 
     @Override
     protected void configureRecyclerView() {
-        this.dragSelect = new DragSelect(context, toolbar, recyclerView);
-        dragSelect.setViewModel(viewModel);
-
         createAdapter();
-        dragSelect.setConfigDragSelectTouchListener();
-
-        recyclerView.addOnItemTouchListener(dragSelect.getDragSelectTouchListener());
-        recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
+        setupDragSelect();
+        setupRecyclerView();
     }
 
     @Override
     protected void viewFragmentText(Boolean isEmpty) {
+        // Implementation if needed
     }
 
     @Override
     public void onPermissionsGranted() {
+        handlePermissionsGranted();
+    }
+
+    private void setupDragSelect() {
+        dragSelect.setViewModel(viewModel);
+        dragSelect.setConfigDragSelectTouchListener();
+        recyclerView.addOnItemTouchListener(dragSelect.getDragSelectTouchListener());
+    }
+
+    private void createAdapter() {
+        dragSelect = new DragSelect(context, toolbar, recyclerView);
+
+        if (context instanceof CreatedAlbumActivity) {
+            adapter = new FileChoiceAdapter(context, viewModel.getList(), SPAN_COUNT, this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection, this::isChecked);
+        } else {
+            adapter = new ImageAdapter<>(context, viewModel.getList(), SPAN_COUNT, this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this), this::isChecked);
+        }
+        recyclerView.setAdapter(adapter);
+        dragSelect.setAdapter(adapter);
+    }
+
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new GridLayoutManager(context, SPAN_COUNT));
+    }
+
+    private void handlePermissionsGranted() {
         dragSelect.toggle();
         toolbar.setOnClickListener(null);
         viewModel.clearAll();
@@ -68,8 +90,8 @@ public class ImageGrid extends RecyclerViewFragment implements OnFragmentInterac
             return;
         }
 
-        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getDataList(), data);
-        adapter.setDataList(data);
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.onGetDataList(), data);
+        adapter.onSetDataList(data);
         callback.start(adapter);
         viewFragmentText(data.isEmpty());
     }
@@ -87,32 +109,24 @@ public class ImageGrid extends RecyclerViewFragment implements OnFragmentInterac
             adapter.updateSelectedItems(data.getSelectedItems());
     }
 
-    // Helper method to create the adapter
-    private void createAdapter() {
-        if (context instanceof CreatedAlbumActivity) {
-            adapter = new FileChoiceAdapter(context, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, dragSelect::startDragSelection, this::isChecked);
-        } else {
-            adapter = new ImageAdapter<>(context, viewModel.getList(), spanCount, this::openViewing, dragSelect::choiceItem, p -> dragSelect.startSelected(p, this), this::isChecked);
-        }
-        recyclerView.setAdapter(adapter);
-        dragSelect.setAdapter(adapter);
-    }
-
-    // Helper method to open the viewing activity
     private void openViewing(int position) {
         switch (adapter.getMode()) {
             case VIEWING:
-                if (viewModel instanceof ImageViewModel) {
-                    openActivity(position, ImageViewActivity.class);
-                } else if (viewModel instanceof CartViewModel) {
-                    openActivity(position, CartViewActivity.class);
-                } else if (viewModel instanceof FavoritesViewModel) {
-                    openActivity(position, FavoritesViewActivity.class);
-                }
+                handleViewingMode(position);
                 break;
             case SELECTED:
                 FragmentNavigator.openSelectedViewFragment(context, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
                 break;
+        }
+    }
+
+    private void handleViewingMode(int position) {
+        if (viewModel instanceof ImageViewModel) {
+            openActivity(position, ImageViewActivity.class);
+        } else if (viewModel instanceof CartViewModel) {
+            openActivity(position, CartViewActivity.class);
+        } else if (viewModel instanceof FavoritesViewModel) {
+            openActivity(position, FavoritesViewActivity.class);
         }
     }
 

@@ -35,7 +35,7 @@ public class DragSelect {
 
     public void setConfigDragSelectTouchListener() {
         dragSelectTouchListener
-                .withSelectListener(setOnDragSelectListener()) // устанавливаем слушатель событий перетаскивания
+                .withSelectListener(createOnDragSelectListener()) // устанавливаем слушатель событий перетаскивания
                 .withMaxScrollDistance(20) // устанавливаем максимальное расстояние прокрутки
                 .withTopOffset(0) // устанавливаем отступ сверху
                 .withBottomOffset(0) // устанавливаем отступ снизу
@@ -70,7 +70,7 @@ public class DragSelect {
     }
 
     public void updateCheckBoxAdapter(int position) {
-        ImageViewHolder viewHolder = (ImageViewHolder) recyclerView.findViewHolderForAdapterPosition(position); // находим ViewHolder для указанной позиции
+        ImageViewHolder viewHolder = findViewHolderForAdapterPosition(position);
         if (viewHolder != null) {
             adapter.setCheckedState(viewHolder, position); // устанавливаем состояние выбора для ViewHolder
         }
@@ -80,7 +80,7 @@ public class DragSelect {
         isStartedFragment = !isStartedFragment; // переключаем флаг запущенности фрагмента
     }
 
-    private DragSelectTouchListener.OnDragSelectListener setOnDragSelectListener() {
+    private DragSelectTouchListener.OnDragSelectListener createOnDragSelectListener() {
         return new DragSelectionProcessor(new DragSelectionProcessor.SelectedHandler() {
             @Override
             public void getSelection(SparseBooleanArray selectedItems) {
@@ -93,5 +93,10 @@ public class DragSelect {
                 choiceItem(position);
             }
         });
+    }
+
+    // находим ViewHolder для указанной позиции
+    private ImageViewHolder findViewHolderForAdapterPosition(int position) {
+        return (ImageViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
     }
 }

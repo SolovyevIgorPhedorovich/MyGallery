@@ -37,13 +37,6 @@ public class ChoiceImageListFragment extends Fragment {
         this.pathAlbum = new File(pathAlbum);
     }
 
-    private void initializeViews(View view) {
-        countChoiceFile = view.findViewById(R.id.count_selected);
-        fragmentTextView = view.findViewById(R.id.selected_info_text);
-        recyclerView = view.findViewById(R.id.selected_element);
-        buttonDone = view.findViewById(R.id.button_done_selected);
-    }
-
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
@@ -56,10 +49,17 @@ public class ChoiceImageListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_choice_list, container, false);
         initializeViews(view);
-        configureRecyclerView(); // Конфигурирование RecyclerView
+        configureRecyclerView();
         setObserve();
         setOnClickListener();
         return view;
+    }
+
+    private void initializeViews(View view) {
+        countChoiceFile = view.findViewById(R.id.count_selected);
+        fragmentTextView = view.findViewById(R.id.selected_info_text);
+        recyclerView = view.findViewById(R.id.selected_element);
+        buttonDone = view.findViewById(R.id.button_done_selected);
     }
 
     private void setOnClickListener() {
@@ -68,15 +68,20 @@ public class ChoiceImageListFragment extends Fragment {
 
     private void setObserve() {
         images.listener().observe(getViewLifecycleOwner(), imageMultiChoiceState -> {
-            DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.getList(), images.getSelectedItems());
-
-            adapter.setList(images.getSelectedItems());
-            callback.start(adapter);
-
-            int count = imageMultiChoiceState.totalCheckedCount();
-            countChoiceFile.setText(String.valueOf(count));
-            viewFragmentText(count == 0);
+            updateAdapterList();
+            updateCountAndVisibility(imageMultiChoiceState.totalCheckedCount());
         });
+    }
+
+    private void updateAdapterList() {
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.onGetDataList(), images.getSelectedItems());
+        adapter.onSetDataList(images.getSelectedItems());
+        callback.start(adapter);
+    }
+
+    private void updateCountAndVisibility(int count) {
+        countChoiceFile.setText(String.valueOf(count));
+        viewFragmentText(count == 0);
     }
 
     private void configureRecyclerView() {
@@ -85,15 +90,9 @@ public class ChoiceImageListFragment extends Fragment {
     }
 
     private void viewFragmentText(Boolean isEmpty) {
-        if (isEmpty) {
-            fragmentTextView.setVisibility(View.VISIBLE);
-            buttonDone.setClickable(false);
-            buttonDone.setAlpha(0.5f);
-        } else {
-            fragmentTextView.setVisibility(View.GONE);
-            buttonDone.setClickable(true);
-            buttonDone.setAlpha(1.0f);
-        }
+        fragmentTextView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        buttonDone.setClickable(!isEmpty);
+        buttonDone.setAlpha(isEmpty ? 0.5f : 1.0f);
     }
 
     private void setAdapter() {

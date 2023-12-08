@@ -2,13 +2,12 @@ package com.example.mygallery.multichoice;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import com.example.mygallery.interfaces.model.Model;
 
 import java.util.*;
 
 public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T> {
 
-    private final HashSet<T> selectedItems = new LinkedHashSet<>();
+    private final Set<T> selectedItems = new LinkedHashSet<>();
     private final MutableLiveData<MultiChoiceState<T>> liveData = new MutableLiveData<>();
     private boolean isAllSelected = false;
     private List<T> items = Collections.emptyList();
@@ -30,10 +29,11 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
 
     @Override
     public void toggle(T item) {
-        if (isChecked(item))
+        if (isChecked(item)) {
             clear(item);
-        else
+        } else {
             check(item);
+        }
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
 
     @Override
     public void check(T item) {
-        if (!exists(item)) return;
+        if (exists(item)) return;
         selectedItems.add(item);
         notifyUpdates();
 
@@ -58,7 +58,7 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
 
     @Override
     public void clear(T item) {
-        if (!exists(item)) return;
+        if (exists(item)) return;
         selectedItems.remove(item);
         notifyUpdates();
     }
@@ -74,11 +74,7 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
     }
 
     private boolean exists(T item) {
-        for (T image : items)
-            if (item.equals(image))
-                return true;
-
-        return false;
+        return !items.contains(item);
     }
 
     @Override
@@ -88,7 +84,6 @@ public class MultiChoice<T> implements MultiChoiceHandler<T>, MultiChoiceState<T
 
     private void notifyUpdates() {
         isAllSelected = totalCheckedCount() == items.size();
-
         liveData.setValue(this);
     }
 }

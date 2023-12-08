@@ -21,17 +21,19 @@ public class FolderListAdapter extends AlbumAdapterHelper<Model> {
 
     public FolderListAdapter(Context context, List<Model> dataList, OnItemClickListener listener) {
         super(dataList, listener);
-        this.imageSize = setImageSize(context);
+        this.imageSize = calculateImageSize(context);
     }
 
     public FolderListAdapter(Context context, List<Model> dataList, int exceptionFolder, OnItemClickListener listener) {
         this(context, dataList, listener);
-        this.exceptionFolder = exceptionFolder;
-        excludeFolder(exceptionFolder);
+        setExceptionFolder(exceptionFolder);
     }
 
-    private void excludeFolder(int position) {
-        dataList.remove(position);
+    private void setExceptionFolder(int position) {
+        if (position >= 0 && position < dataList.size()) {
+            dataList.remove(position);
+            exceptionFolder = position;
+        }
     }
 
     @NonNull
@@ -52,16 +54,15 @@ public class FolderListAdapter extends AlbumAdapterHelper<Model> {
 
         holder.itemView.setOnClickListener(v -> {
             int currentPosition = position;
-            if (exceptionFolder != -1 && position >= exceptionFolder)
+            if (exceptionFolder != -1 && position >= exceptionFolder) {
                 currentPosition = currentPosition + 1;
-
+            }
             listener.onItemClick(currentPosition);
         });
     }
 
-    private Point setImageSize(Context context) {
+    private Point calculateImageSize(Context context) {
         int imageSize = context.getResources().getDimensionPixelSize(R.dimen.size_image_in_list);
         return new Point(imageSize, imageSize);
     }
-
 }

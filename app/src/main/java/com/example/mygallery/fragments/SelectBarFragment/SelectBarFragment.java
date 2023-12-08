@@ -9,11 +9,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.AlbumActivity;
-import com.example.mygallery.activities.AlbumGridActivity;
-import com.example.mygallery.fragments.ActionFileFragment;
+import com.example.mygallery.fragments.AlbumSelectionFragment;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.navigator.FragmentNavigator;
@@ -26,8 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SelectBarFragment extends Fragment {
+
     protected final BaseViewModel<Model> viewModel;
-    private final Map<Integer, ImageButton> buttonToolbar;
+    protected final Map<Integer, ImageButton> buttonToolbar;
     private ImageButton buttonBack;
     private TextView textView;
     private View toolbar;
@@ -43,13 +41,6 @@ public class SelectBarFragment extends Fragment {
         this.isAllSelected = false;
         this.listener = (OnFragmentInteractionListener) parentFragment;
     }
-
-    private void initializeViews(View view) {
-        buttonBack = view.findViewById(R.id.button_back);
-        textView = view.findViewById(R.id.select_info);
-        toolbar = view.findViewById(R.id.toolbar);
-    }
-
 
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
@@ -73,13 +64,17 @@ public class SelectBarFragment extends Fragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = getView(inflater, container);
-
         initializeViews(view);
         setButtonToolbar();
         setObserve();
-
         buttonBack.setOnClickListener(v -> closeFragment());
         return view;
+    }
+
+    private void initializeViews(View view) {
+        buttonBack = view.findViewById(R.id.button_back);
+        textView = view.findViewById(R.id.select_info);
+        toolbar = view.findViewById(R.id.toolbar);
     }
 
     private void setText() {
@@ -88,16 +83,11 @@ public class SelectBarFragment extends Fragment {
     }
 
     private void setButtonToolbar() {
-        if (toolbar instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) toolbar;
-
+        if (toolbar instanceof ViewGroup viewGroup) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View childView = viewGroup.getChildAt(i);
-
-                if (childView instanceof ImageButton) {
-                    ImageButton button = (ImageButton) childView;
+                if (childView instanceof ImageButton button) {
                     int buttonId = button.getId();
-
                     buttonToolbar.put(buttonId, button);
                     setButtonClickListener(buttonId, button);
                 }
@@ -110,32 +100,34 @@ public class SelectBarFragment extends Fragment {
             if (entry.getKey() != R.id.button_selected_all) {
                 ImageButton button = entry.getValue();
                 button.setClickable(!isEmpty);
-                if (!isEmpty) {
-                    button.setAlpha(1.0f);
-                } else {
-                    button.setAlpha(0.5f);
-                }
+                button.setAlpha(isEmpty ? 0.5f : 1.0f);
             }
         }
     }
 
     protected void setButtonClickListener(int buttonId, ImageButton button) {
-        button.setOnClickListener(view -> {
-            if (buttonId == R.id.button_share) {
-                //TODO: add method share
-            } else if (buttonId == R.id.button_move) {
-                FragmentNavigator.openActionFragment(context, ActionFileFragment.Action.MOVE, viewModel, viewModel.getItem(0), this::closeFragment);
-            } else if (buttonId == R.id.button_selected_all) {
-                if (!isAllSelected)
-                    viewModel.selectAll();
-                else
-                    viewModel.clearAll();
-            } else if (buttonId == R.id.button_remove) {
-                PopupWindowRemovedContextMenu.run(context, view, viewModel, this::closeFragment);
-            } else if (buttonId == R.id.button_context_menu) {
-                PopupWindowSelectBarContextMenu.show(context, view, viewModel, viewModel.getItem(0), this::closeFragment);
-            }
-        });
+        button.setOnClickListener(view -> handleButtonClick(view, buttonId));
+    }
+
+    private void handleButtonClick(View view, int buttonId) {
+        if (buttonId == R.id.button_share) {
+            //TODO: add method share
+        } else if (buttonId == R.id.button_move) {
+            FragmentNavigator.openAlbumSelectionFragment(context, AlbumSelectionFragment.Action.MOVE, viewModel, viewModel.getItem(0), this::closeFragment);
+        } else if (buttonId == R.id.button_selected_all) {
+            handleSelectedAllButtonClick();
+        } else if (buttonId == R.id.button_remove) {
+            PopupWindowRemovedContextMenu.show(context, view, viewModel, this::closeFragment);
+        } else if (buttonId == R.id.button_context_menu) {
+            PopupWindowSelectBarContextMenu.show(context, view, viewModel, viewModel.getItem(0), this::closeFragment);
+        }
+    }
+
+    protected void handleSelectedAllButtonClick() {
+        if (!isAllSelected)
+            viewModel.selectAll();
+        else
+            viewModel.clearAll();
     }
 
     private void setObserve() {
@@ -145,17 +137,9 @@ public class SelectBarFragment extends Fragment {
             countSelected = o.totalCheckedCount();
             setText();
         });
-
     }
 
     protected void closeFragment() {
-        FragmentManager fragmentManager;
-        if (context instanceof AlbumActivity) {
-            fragmentManager = ((AlbumActivity) context).getSupportFragmentManager();
-            fragmentManager.popBackStack();
-        } else if (context instanceof AlbumGridActivity) {
-            fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
-            fragmentManager.popBackStack();
-        }
+        getParentFragmentManager().popBackStack();
     }
 }

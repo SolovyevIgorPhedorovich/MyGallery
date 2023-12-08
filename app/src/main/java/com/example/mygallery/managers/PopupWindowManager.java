@@ -46,33 +46,32 @@ public abstract class PopupWindowManager {
 
     public void setContent(View contentView) {
         popupWindow.setContentView(contentView);
-        if (!setConfiguration()) setDefaultConfiguration();
+        if (!setConfiguration()) {
+            setDefaultConfiguration();
+        }
     }
 
     // Показ PopupWindow с заданной позицией
     public void showPopupWindow(View anchorView, View viewMenu, int gravity) {
-        if (anchorView == null) anchorView = ((Activity) context).findViewById(android.R.id.content);
+        if (anchorView == null) {
+            anchorView = ((Activity) context).findViewById(android.R.id.content);
+        }
         popupWindow.showAtLocation(anchorView, gravity, x, y);
         setButtonListeners(viewMenu);
     }
 
     // Установка обработчиков для кнопок внутри PopupWindow
     private void setButtonListeners(View view) {
-        if (view instanceof ViewGroup) {
-            iterateButtons(view);
-        }
+        iterateButtons(view);
     }
 
     // Рекурсивный обход всех кнопок внутри ViewGroup
     private void iterateButtons(View view) {
-        if (view instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) view;
+        if (view instanceof ViewGroup viewGroup) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View childView = viewGroup.getChildAt(i);
                 if (childView instanceof Button) {
-                    Button button = (Button) childView;
-                    int buttonId = button.getId();
-                    setButtonClickListener(button, buttonId);
+                    setButtonClickHandler((Button) childView);
                 }
                 if (childView instanceof LinearLayout) {
                     iterateButtons(childView);
@@ -82,6 +81,11 @@ public abstract class PopupWindowManager {
     }
 
     // Установка обработчика нажатия для кнопки
-    protected abstract void setButtonClickListener(Button button, int buttonId);
+    private void setButtonClickHandler(Button button) {
+        int buttonId = button.getId();
+        button.setOnClickListener(v -> handleButtonClick(buttonId));
+    }
 
+    // Handle button click
+    protected abstract void handleButtonClick(int buttonId);
 }

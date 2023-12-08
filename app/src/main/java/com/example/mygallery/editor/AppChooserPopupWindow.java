@@ -7,7 +7,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.mygallery.R;
@@ -32,8 +31,8 @@ public class AppChooserPopupWindow extends PopupWindowManager {
         this.packageManager = packageManager;
         this.listener = listener;
         this.binding = LayoutEditorChoiceBinding.inflate(LayoutInflater.from(context));
+        setRecyclerView();
     }
-
 
     private void setRecyclerView() {
         ResolveInfoAdapter adapter = new ResolveInfoAdapter(resolveInfoList, packageManager, this::setSelectedPosition);
@@ -41,7 +40,7 @@ public class AppChooserPopupWindow extends PopupWindowManager {
         binding.editors.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
     }
 
-    private boolean isCheckBox() {
+    private boolean isCheckBoxChecked() {
         return binding.checkBox.isChecked();
     }
 
@@ -65,13 +64,11 @@ public class AppChooserPopupWindow extends PopupWindowManager {
     }
 
     @Override
-    protected void setButtonClickListener(Button button, int buttonId) {
-        button.setOnClickListener(view -> {
-            popupWindow.dismiss();
-            if (buttonId == R.id.OK) {
-                listener.selectedApp(selectedPosition, isCheckBox());
-            }
-        });
+    protected void handleButtonClick(int buttonId) {
+        popupWindow.dismiss();
+        if (buttonId == R.id.OK) {
+            listener.selectedApp(selectedPosition, isCheckBoxChecked());
+        }
     }
 
     public static AppChooserPopupWindow show(Context context, View view, List<ResolveInfo> resolveInfoList, PackageManager packageManager, SelectedApp listener) {
@@ -81,13 +78,9 @@ public class AppChooserPopupWindow extends PopupWindowManager {
     }
 
     private static void initialize(AppChooserPopupWindow popupWindow, View view) {
-        // Load the XML layout
         View viewContent = popupWindow.binding.getRoot();
-        //
         popupWindow.setContent(viewContent);
-        // Set the position and show the popup window
         popupWindow.setPosition(0, 0);
         popupWindow.showPopupWindow(view, viewContent, Gravity.BOTTOM);
-        popupWindow.setRecyclerView();
     }
 }

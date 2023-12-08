@@ -2,16 +2,19 @@ plugins {
     id 'com.android.application'
 }
 
+def gitCommitCount = Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+def sdk = 34
+
 android {
     namespace 'com.example.mygallery'
-    compileSdk 34
+    compileSdk sdk
 
     defaultConfig {
         applicationId "com.example.mygallery"
         minSdk 29
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        targetSdk sdk
+        versionCode gitCommitCount
+        versionName "0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -23,8 +26,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     buildFeatures {
         viewBinding true
@@ -41,10 +44,10 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'commons-io:commons-io:2.13.0'
     implementation 'dev.chrisbanes.insetter:insetter:0.6.1'
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation project(':photoview')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

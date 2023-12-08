@@ -22,6 +22,8 @@ import com.example.mygallery.viewmodel.AlbumViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
     private int spanCount;
     private OnItemClickListener listener;
@@ -37,9 +39,7 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(AlbumViewModel.class);
-        sharedPreferencesHelper = new SharedPreferencesHelper(context, SharedPreferencesHelper.ALBUM_PREFERENCES);
-
+        initializeViewModelAndPreferences(context);
         ((AlbumViewModel) viewModel).findAlbums();
     }
 
@@ -51,59 +51,59 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
 
     @Override
     protected void setObserve() {
-        viewModel.data.observe(getViewLifecycleOwner(), o -> {
-            if (adapter != null) {
-                Log.d("Update", "Данные обновлены");
-                DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.onGetDataList(), o);
-                adapter.onSetDataList(o);
-                callback.start(adapter);
-                viewFragmentText(o.isEmpty());
-                if (context instanceof OnFragmentInteractionListener) {
-                    ((OnFragmentInteractionListener) context).onPermissionsGranted();
-                }
-            }
-        });
+        viewModel.data.observe(getViewLifecycleOwner(), this::handleDataUpdate);
+    }
+
+    private void handleDataUpdate(List<Model> newData) {
+        if (adapter != null) {
+            Log.d("Update", "Данные обновлены");
+            updateAdapterData(newData);
+            viewFragmentText(newData.isEmpty());
+            notifyPermissionsGranted();
+        }
+    }
+
+    private void updateAdapterData(List<Model> newData) {
+        DiffUtilCallback<Model> callback = new DiffUtilCallback<>(adapter.onGetDataList(), newData);
+        adapter.onSetDataList(newData);
+        callback.start(adapter);
+    }
+
+    private void notifyPermissionsGranted() {
+        if (context instanceof OnFragmentInteractionListener) {
+            ((OnFragmentInteractionListener) context).onPermissionsGranted();
+        }
     }
 
     @Override
     protected void configureRecyclerView() {
-        if (sharedPreferencesHelper.getString(AlbumPreferences.DISPLAY_TYPE_KEY).equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES)) {
-            spanCount = 2;
-            createAlbumAdapter(setGridAdapter()); // Создание адаптера для альбомов
-        } else {
-            spanCount = 1;
-            createAlbumAdapter(setListAdapter());
-        }
+        String displayType = sharedPreferencesHelper.getString(AlbumPreferences.DISPLAY_TYPE_KEY);
+        spanCount = (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES)) ? 2 : 1;
+        createAlbumAdapter(getAlbumAdapter(displayType));
         recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
     }
 
-    // Создание адаптера для альбомов
+    private AlbumAdapterHelper<Model> getAlbumAdapter(String displayType) {
+        if (context instanceof AlbumSelected) {
+            return (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES))
+                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, listener)
+                    : new FolderListAdapter(context, viewModel.getList(), listener);
+        } else {
+            return (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES))
+                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class))
+                    : new FolderListAdapter(context, viewModel.getList(), p -> openActivity(p, AlbumGridActivity.class));
+        }
+    }
+
     private void createAlbumAdapter(AlbumAdapterHelper<Model> adapter) {
         this.adapter = adapter;
         recyclerView.setAdapter(adapter);
-    }
-
-    private AlbumAdapterHelper<Model> setListAdapter() {
-        if (context instanceof AlbumSelected) {
-            return new FolderListAdapter(context, viewModel.getList(), listener);
-        } else {
-            return new FolderListAdapter(context, viewModel.getList(), p -> openActivity(p, AlbumGridActivity.class));
-        }
-    }
-
-    private AlbumAdapterHelper<Model> setGridAdapter() {
-        if (context instanceof AlbumSelected) {
-            return new AlbumAdapter(context, viewModel.getList(), spanCount, listener);
-        } else {
-            return new AlbumAdapter(context, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class));
-        }
     }
 
     public void updateTypeDisplay() {
         configureRecyclerView();
     }
 
-    //Если adapter recyclerView пуст, то выводит текст
     @Override
     protected void viewFragmentText(Boolean isEmpty) {
         if (!isEmpty) {
@@ -112,5 +112,10 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
             setTextFragment(R.string.empty_album);
             showTextInFragment();
         }
+    }
+
+    private void initializeViewModelAndPreferences(Context context) {
+        viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(AlbumViewModel.class);
+        sharedPreferencesHelper = new SharedPreferencesHelper(context, SharedPreferencesHelper.ALBUM_PREFERENCES);
     }
 }

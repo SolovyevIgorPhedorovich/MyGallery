@@ -3,7 +3,6 @@ package com.example.mygallery.viewmodel;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.services.BaseService;
 import com.example.mygallery.models.services.FavoritesService;
-import com.example.mygallery.models.services.ImageService;
 
 import java.io.File;
 import java.util.ArrayList;

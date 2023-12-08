@@ -1,7 +1,6 @@
 package com.example.mygallery.multichoice;
 
 import androidx.lifecycle.LiveData;
-import kotlinx.coroutines.CoroutineScope;
 
 import java.util.List;
 

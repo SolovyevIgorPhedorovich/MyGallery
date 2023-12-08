@@ -25,7 +25,7 @@ public class FragmentNavigatorHelper {
     public void switchToFragment(Class<? extends Fragment> fragmentClass) {
         try {
             // Создаем экземпляр фрагмента
-            Fragment fragment = fragmentClass.newInstance();
+            Fragment fragment = fragmentClass.getConstructor().newInstance();
 
             // Проверяем, не переключаемся ли на текущий фрагмент
             if (currentFragment != null && fragmentClass.isInstance(currentFragment)) {

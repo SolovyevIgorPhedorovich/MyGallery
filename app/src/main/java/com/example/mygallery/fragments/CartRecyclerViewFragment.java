@@ -13,7 +13,7 @@ public class CartRecyclerViewFragment extends ImageGrid {
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(CartViewModel.class);
+        initializeViewModel();
     }
 
     @Override
@@ -24,13 +24,24 @@ public class CartRecyclerViewFragment extends ImageGrid {
 
     @Override
     protected void viewFragmentText(Boolean isEmpty) {
-        if (!isEmpty)
+        if (!isEmpty) {
             hideTextInFragment();
-        else {
-            setTextFragment(R.string.empty_cart);
+        } else {
+            setEmptyCartText();
             showTextInFragment();
         }
     }
 
+    private void initializeViewModel() {
+        viewModel = createViewModel();
+    }
 
+    private CartViewModel createViewModel() {
+        ViewModelProvider.Factory factory = ViewModelFactory.factory(this);
+        return new ViewModelProvider(this, factory).get(CartViewModel.class);
+    }
+
+    private void setEmptyCartText() {
+        setTextFragment(R.string.empty_cart);
+    }
 }

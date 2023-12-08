@@ -1,5 +1,6 @@
 package com.example.mygallery.activities.imageViewActivity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import androidx.core.content.FileProvider;
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.R;
 import com.example.mygallery.databinding.ActivityImageViewBinding;
 import com.example.mygallery.editor.ImageEditor;
+import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
@@ -15,10 +17,7 @@ import com.example.mygallery.viewmodel.ImageViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
 public class ImageViewActivity extends ViewActivity {
-    private ImageButton buttonRemoveFile,
-            buttonContextMenu,
-            buttonAddFavorites,
-            buttonEdit;
+    private ImageButton buttonRemoveFile, buttonContextMenu, buttonAddFavorites, buttonEdit;
     private ActivityImageViewBinding binding;
 
     protected boolean isFavorite = false;
@@ -26,7 +25,6 @@ public class ImageViewActivity extends ViewActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityImageViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         onCreate();
@@ -49,30 +47,47 @@ public class ImageViewActivity extends ViewActivity {
     @Override
     protected void setOnClickListenerButtons() {
         super.setOnClickListenerButtons();
+        setButtonEditClickListener();
+        setButtonRemoveFileClickListener();
+        setButtonAddFavoritesClickListener();
+        setButtonContextMenuClickListener();
+    }
 
-        buttonEdit.setOnClickListener(v -> new ImageEditor(this, v, FileProvider.getUriForFile(this, "com.example.mygallery.fileprovider", viewModel.getItem(initialPosition).getPath())));
+    private void setButtonEditClickListener() {
+        buttonEdit.setOnClickListener(v -> new ImageEditor(this, v, getFileUri()));
+    }
 
-        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.run(this, v, viewModel, initialPosition));
+    private void setButtonRemoveFileClickListener() {
+        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, initialPosition));
+    }
 
+    private void setButtonAddFavoritesClickListener() {
         buttonAddFavorites.setOnClickListener(v -> {
-            if (viewModel instanceof ImageViewModel) {
-                ((ImageViewModel) viewModel).setFavorites(viewModel.getItem(initialPosition));
-            } else if (viewModel instanceof FavoritesViewModel) {
-                ((FavoritesViewModel) viewModel).updateDatabase(initialPosition);
-            }
-            isFavorite = ((Image) viewModel.getItem(initialPosition)).isFavorite;
+            handleAddFavoritesClick();
             updateButtonFavorite();
         });
+    }
 
-        buttonContextMenu.setOnClickListener(v -> PopupWindowActionFileContextMenu.show(this, v, (Image) viewModel.getItem(initialPosition), viewModel, configurationViewPager));
+    private void setButtonContextMenuClickListener() {
+        buttonContextMenu.setOnClickListener(v -> PopupWindowActionFileContextMenu.show(this, v, getCurrentItem(), viewModel, configurationViewPager));
+    }
+
+    private Uri getFileUri() {
+        return FileProvider.getUriForFile(this, "com.example.mygallery.fileprovider", viewModel.getItem(initialPosition).getPath());
+    }
+
+    private void handleAddFavoritesClick() {
+        if (viewModel instanceof ImageViewModel) {
+            ((ImageViewModel) viewModel).setFavorites(viewModel.getItem(initialPosition));
+        } else if (viewModel instanceof FavoritesViewModel) {
+            ((FavoritesViewModel) viewModel).updateDatabase(initialPosition);
+        }
+        isFavorite = ((Image) viewModel.getItem(initialPosition)).isFavorite;
     }
 
     protected void updateButtonFavorite() {
-        if (isFavorite) {
-            buttonAddFavorites.setImageResource(R.drawable.favorite_selected_32_regular);
-        } else {
-            buttonAddFavorites.setImageResource(R.drawable.favorites_32_regular);
-        }
+        int resource = isFavorite ? R.drawable.favorite_selected_32_regular : R.drawable.favorites_32_regular;
+        buttonAddFavorites.setImageResource(resource);
     }
 
     @Override
@@ -80,5 +95,9 @@ public class ImageViewActivity extends ViewActivity {
         super.setNameItem(position);
         isFavorite = ((Image) viewModel.getItem(position)).isFavorite;
         updateButtonFavorite();
+    }
+
+    private Model getCurrentItem() {
+        return viewModel.getItem(initialPosition);
     }
 }

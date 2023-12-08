@@ -1,11 +1,9 @@
 package com.example.mygallery.models;
 
-import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Objects;
 
 public class Cart implements Model {
@@ -13,11 +11,11 @@ public class Cart implements Model {
 
     public String name;
 
-    public File current_path;
+    public File currentPath;
 
-    public File initial_path;
+    public File initialPath;
 
-    public long deletion_date;
+    public long deletionDate;
 
 
     @Override
@@ -32,7 +30,7 @@ public class Cart implements Model {
 
     @Override
     public File getPath() {
-        return current_path;
+        return currentPath;
     }
 
     @Override
@@ -42,42 +40,45 @@ public class Cart implements Model {
 
     @Override
     public void setPath(File path) {
-        this.current_path = path;
+        this.currentPath = path;
     }
 
     @Override
     public int getSize() {
+        // You can implement size calculation logic here if needed
         return 0;
     }
 
     @Override
     public String getDate() {
+        // You can implement date retrieval logic here if needed
         return null;
     }
 
     @Override
-    public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Cart other = (Cart) obj;
 
-        return Objects.equals(this.current_path, other.current_path);
-    }
-
-    @NotNull
-    public Cart clone() {
-        Cart cart = new Cart();
-        cart.id = this.id;
-        cart.name = this.name;
-        cart.current_path = this.current_path;
-        cart.initial_path = this.initial_path;
-        cart.deletion_date = this.deletion_date;
-        return cart;
+        return Objects.equals(currentPath, other.currentPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(current_path);
+        return Objects.hash(currentPath);
+    }
+
+    @NotNull
+    @Override
+    public Cart clone() {
+        Cart cart = new Cart();
+        cart.id = this.id;
+        cart.name = this.name;
+        cart.currentPath = this.currentPath;
+        cart.initialPath = this.initialPath;
+        cart.deletionDate = this.deletionDate;
+        return cart;
     }
 }

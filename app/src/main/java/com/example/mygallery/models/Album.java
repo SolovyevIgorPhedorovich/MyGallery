@@ -1,6 +1,5 @@
 package com.example.mygallery.models;
 
-import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,29 +42,37 @@ public class Album implements Model {
 
     @Override
     public int getSize() {
+        // You can implement size calculation logic here if needed
         return 0;
     }
 
     @Override
     public String getDate() {
+        // You can implement date retrieval logic here if needed
         return null;
     }
 
     @Override
-    public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Album other = (Album) obj;
 
-        return this.id == other.id
-                && Objects.equals(this.name, other.name)
-                && Objects.equals(this.path, other.path)
-                && Objects.equals(this.artwork, other.artwork)
-                && this.count == other.count;
+        return id == other.id &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(path, other.path) &&
+                Objects.equals(artwork, other.artwork) &&
+                count == other.count;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @NotNull
+    @Override
     public Album clone() {
         Album album = new Album();
         album.id = this.id;
@@ -74,10 +81,5 @@ public class Album implements Model {
         album.count = this.count;
         album.artwork = this.artwork;
         return album;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }

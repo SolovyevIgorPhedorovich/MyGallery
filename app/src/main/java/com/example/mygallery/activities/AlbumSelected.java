@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.mygallery.activities.CreatedAlbumActivity;
 import com.example.mygallery.databinding.ActivityAlbumGridBinding;
 import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 import com.example.mygallery.interfaces.OnItemClickListener;
@@ -16,7 +15,6 @@ import com.example.mygallery.viewmodel.ViewModelFactory;
 import java.io.File;
 
 public class AlbumSelected extends AppCompatActivity implements OnItemClickListener {
-    //private final CreatedAlbumActivity.SelectedAlbum listener;
     private ActivityAlbumGridBinding binding;
     private AlbumViewModel viewModel;
     private File selectedAlbumPath;

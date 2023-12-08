@@ -42,7 +42,7 @@ public class ViewChoiceImage extends Fragment {
         this.context = context;
     }
 
-    private void initializedViews(View view) {
+    private void initializeViews(View view) {
         backButton = view.findViewById(R.id.button_back);
         checkBox = view.findViewById(R.id.check_box);
     }
@@ -50,47 +50,47 @@ public class ViewChoiceImage extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_view_image, container, false);
-        initializedViews(view);
-        setClickListener();
+        initializeViews(view);
+        setClickListeners();
 
         ConfigurationViewPager viewPager = new ConfigurationViewPager(view.findViewById(R.id.view_pager), currentPosition, this::setCurrentPosition);
         viewPager.setAdapter(viewModel.getList());
         return view;
     }
 
-    private void setClickListener() {
-        checkBox.setOnClickListener(v -> choiceItem());
-        backButton.setOnClickListener(this::closeFragment);
+    private void setClickListeners() {
+        checkBox.setOnClickListener(v -> handleCheckBoxClick());
+        backButton.setOnClickListener(v -> closeFragment());
     }
 
-    private void closeFragment(View view) {
-        FragmentManager fragmentManager;
+    private void closeFragment() {
+        FragmentManager fragmentManager = null;
+
         if (context instanceof CreatedAlbumActivity) {
             fragmentManager = ((CreatedAlbumActivity) context).getSupportFragmentManager();
-            fragmentManager.popBackStack();
         } else if (context instanceof AlbumGridActivity) {
             fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
+        }
+
+        if (fragmentManager != null) {
             fragmentManager.popBackStack();
         }
     }
 
     private void setCurrentPosition(int position) {
         currentPosition = position;
-        updaterStateCheckBox(selectedItems.get(position, false));
+        updateCheckBoxState(selectedItems.get(position, false));
     }
 
-    private void updaterStateCheckBox(boolean isChecked) {
+    private void updateCheckBoxState(boolean isChecked) {
         checkBox.setChecked(isChecked);
     }
 
     private void updateSelectedItems() {
-        if (checkBox.isChecked())
-            selectedItems.put(currentPosition, true);
-        else
-            selectedItems.delete(currentPosition);
+        selectedItems.put(currentPosition, checkBox.isChecked());
     }
 
-    private void choiceItem() {
+    private void handleCheckBoxClick() {
         updateSelectedItems();
         viewModel.toggleSelection(viewModel.getItem(currentPosition));
         listener.onItemClick(currentPosition);

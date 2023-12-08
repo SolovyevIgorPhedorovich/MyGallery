@@ -5,7 +5,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import com.example.mygallery.R;
@@ -23,26 +22,24 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
         this.fileManager = new FileManager(context, viewModel, listener);
     }
 
-    public PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, int position) {
+    private PopupWindowRemovedContextMenu(Context context, BaseViewModel<Model> viewModel, int position) {
         super(context);
         this.fileManager = new FileManager(context, viewModel);
         fileManager.setPosition(position);
     }
 
-    public static void run(Context context, View view, BaseViewModel<Model> viewModel, int position) {
+    public static void show(Context context, View view, BaseViewModel<Model> viewModel, int position) {
         PopupWindowManager mPopupWindow = new PopupWindowRemovedContextMenu(context, viewModel, position);
-        initialized(context, mPopupWindow, view, 1);
+        initializePopup(context, mPopupWindow, view, 1);
     }
 
-    public static void run(Context context, View view, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
+    public static void show(Context context, View view, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
         PopupWindowManager mPopupWindow = new PopupWindowRemovedContextMenu(context, viewModel, listener);
-        initialized(context, mPopupWindow, view, viewModel.totalCheckedCount());
+        initializePopup(context, mPopupWindow, view, viewModel.totalCheckedCount());
     }
 
-    private static void initialized(Context context, PopupWindowManager mPopupWindow, View view, int countSelect) {
-        //Загрузка XML-макета
+    private static void initializePopup(Context context, PopupWindowManager mPopupWindow, View view, int countSelect) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        assert inflater != null;
         View menuView = inflater.inflate(R.layout.popup_window_removed_context_menu, null);
 
         ((TextView) menuView.findViewById(R.id.popup_text)).setText(context.getResources().getQuantityString(R.plurals.delete_elements, countSelect, countSelect));
@@ -67,12 +64,10 @@ public class PopupWindowRemovedContextMenu extends PopupWindowManager {
     }
 
     @Override
-    protected void setButtonClickListener(Button button, int buttonId) {
-        button.setOnClickListener(view -> {
-            popupWindow.dismiss();
-            if (buttonId == R.id.removed_button) {
-                fileManager.removedFile();
-            }
-        });
+    protected void handleButtonClick(int buttonId) {
+        popupWindow.dismiss();
+        if (buttonId == R.id.removed_button) {
+            fileManager.removedFile();
+        }
     }
 }

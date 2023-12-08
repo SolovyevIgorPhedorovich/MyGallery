@@ -1,6 +1,8 @@
 package com.example.mygallery.adapters.imagepager;
 
+import android.graphics.RectF;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -8,6 +10,7 @@ import androidx.collection.SparseArrayCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.ImagePagerViewHolder;
+import com.example.mygallery.interfaces.OnAdapterInteraction;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewimage.LoadImage;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -16,25 +19,23 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 
-public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<ImagePagerViewHolder> {
+public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<ImagePagerViewHolder> implements OnAdapterInteraction<Model> {
 
-    // Минимальный масштаб
-    protected final float MIN_SCALE = 1.0f;
     protected final SparseArrayCompat<ImagePagerViewHolder> imageViewHolders;
     protected List<Model> imageList;
-    protected boolean isImageScaled = false;
 
     public ImagePagerAdapterHelper(List<Model> imageList) {
         this.imageViewHolders = new SparseArrayCompat<>();
-
-        setList(imageList);
+        onSetDataList(imageList);
     }
 
-    public List<Model> getList() {
+    @Override
+    public List<Model> onGetDataList() {
         return imageList;
     }
 
-    public void setList(List<Model> pathImages) {
+    @Override
+    public void onSetDataList(List<Model> pathImages) {
         this.imageList = pathImages;
     }
 
@@ -48,58 +49,58 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ImagePagerViewHolder holder, int position) {
-        loadImage(imageList.get(position).getPath(), holder.imageView, 0f);
-        setTouchListener(holder.imageView);
-        imageViewHolders.put(position, holder);
+        loadImage(imageList.get(position).getPath(), holder.imageView, photoView -> onGlideResourceReady(photoView, holder));
+        setTouchListener(holder);
+        imageViewHolders.put(position, holder);// Сохраняем ViewHolder для данной позиции
     }
 
-    // Загружает изображение с учетом угла поворота
-    protected void loadImage(File imageUrl, PhotoView imageView, float rotationAngle) {
-        LoadImage.setImage(imageUrl, imageView, rotationAngle);
+    // Загружает изображение
+    protected void loadImage(File imageUrl, PhotoView imageView, OnGlideListener listener) {
+        LoadImage.setImage(imageUrl, imageView, listener);
     }
 
     // Устанавливает обработчик касаний для изображения
-    protected abstract void setTouchListener(PhotoView imageView);
+    protected void scaleImage(PhotoView photoView, MotionEvent e) {
+        try {
+            float scale = photoView.getScale();
+            float x = e.getX();
+            float y = e.getY();
+            if (scale < photoView.getMediumScale()) {
+                photoView.setScale(photoView.getMediumScale(), x, y, true);
+            } else {
+                photoView.setScale(photoView.getMinimumScale(), x, y, true);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            // Can sometimes happen when getX() and getY() is called
+        }
+    }
 
+    protected abstract void setTouchListener(ImagePagerViewHolder holder);
     @Override
     public int getItemCount() {
         return imageList.size();
     }
 
-    // Рассчитывает оптимальный масштаб с учетом угла поворота
-    protected float calculateOptimalScale(PhotoView imageView) {
-        float imageWidth = imageView.getDrawable().getIntrinsicWidth();
-        float imageHeight = imageView.getDrawable().getIntrinsicHeight();
-        float rotationAngle = imageView.getRotation();
-
-        float screenWidth = imageView.getWidth();
-        float screenHeight = imageView.getHeight();
-
-        if (imageHeight > screenHeight || imageWidth > screenWidth) {
-            float dimension = Math.max(imageHeight - screenHeight, imageWidth - screenWidth);
-            float ratio = imageWidth / imageHeight;
-            if (imageWidth - dimension == screenWidth) {
-                imageWidth -= dimension;
-                imageHeight = imageWidth / ratio;
-            } else if (imageHeight - dimension == screenHeight) {
-                imageHeight -= dimension;
-                imageWidth = imageHeight * ratio;
-            }
-        }
-
-        // Учитываем угол поворота
-        if (rotationAngle % 180 == 90) {
-            // Если угол поворота 90 градусов, меняем ширину и высоту местами
-            float temp = imageWidth;
-            imageWidth = imageHeight;
-            imageHeight = temp;
-        }
-
-        float scaleX = screenWidth / imageWidth;
-        float scaleY = screenHeight / imageHeight;
-
-        float scale = Math.max(scaleX, scaleY);
-
-        return scale != 1f ? scale : 2f;
+    protected void onGlideResourceReady(PhotoView photoView, ImagePagerViewHolder holder) {
+        calculatedScaleVerticalOrientation(photoView, holder);
     }
+
+    //Вычисляет вертикальную ориентацию масштабирования изображения
+    private void calculatedScaleVerticalOrientation(PhotoView photoView, ImagePagerViewHolder holder) {
+        photoView.post(() -> {
+            RectF displayRect = photoView.getDisplayRect();
+            float minScale = 1f;
+            float midScale = Math.max(photoView.getWidth() / displayRect.width(),
+                    photoView.getHeight() / displayRect.height());
+            midScale = (midScale == minScale) ? 3f : midScale;
+            float maxScale = Math.max(3 * midScale, 9f);
+            photoView.setScaleLevels(minScale, midScale, maxScale);
+            holder.setScaleVertical(minScale, midScale, maxScale);
+        });
+    }
+
+    public interface OnGlideListener {
+        void onGlideResourceReady(PhotoView photoView);
+    }
+
 }

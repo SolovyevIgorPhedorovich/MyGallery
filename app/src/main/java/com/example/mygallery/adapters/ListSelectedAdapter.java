@@ -3,52 +3,56 @@ package com.example.mygallery.adapters;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.mygallery.R;
+import com.example.mygallery.databinding.ViewHolderListSelectedBinding;
+import com.example.mygallery.interfaces.OnAdapterInteraction;
 import com.example.mygallery.interfaces.OnButtonClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewimage.LoadImage;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ListSelectedAdapter extends RecyclerView.Adapter<ListSelectedAdapter.ImageViewHolder> {
+public class ListSelectedAdapter extends RecyclerView.Adapter<ListSelectedAdapter.ImageViewHolder> implements OnAdapterInteraction<Model> {
+
     private final int imageSize;
     private final OnButtonClickListener listener;
     private List<Model> imageList;
 
     public ListSelectedAdapter(Context context, List<Model> imageList, OnButtonClickListener listener) {
-        setList(imageList);
+        onSetDataList(imageList);
         this.listener = listener;
         this.imageSize = context.getResources().getDimensionPixelSize(R.dimen.size_select_image);
     }
 
-    public List<Model> getList() {
+    @Override
+    public List<Model> onGetDataList() {
         return this.imageList;
     }
 
-    public void setList(List<Model> imageList) {
+    @Override
+    public void onSetDataList(List<Model> imageList) {
         this.imageList = imageList;
     }
 
     @NonNull
-    @NotNull
     @Override
-    public ImageViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_holder_list_selected, parent, false);
-        return new ImageViewHolder(itemView);
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        ViewHolderListSelectedBinding binding = ViewHolderListSelectedBinding.inflate(inflater, parent, false);
+        return new ImageViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull ImageViewHolder holder, int position) {
-        LoadImage.setImage(imageList.get(position).getPath(), holder.imageView, new Point(imageSize, imageSize));
+    public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
+        Model currentItem = imageList.get(position);
+        LoadImage.setImage(currentItem.getPath(), holder.imageView, new Point(imageSize, imageSize));
 
-        holder.imageButton.setOnClickListener(v -> listener.onGetItem(imageList.get(holder.getBindingAdapterPosition())));
+        holder.imageButton.setOnClickListener(v -> listener.onGetItem(currentItem));
     }
 
     @Override
@@ -61,10 +65,10 @@ public class ListSelectedAdapter extends RecyclerView.Adapter<ListSelectedAdapte
         ImageView imageView;
         ImageButton imageButton;
 
-        public ImageViewHolder(@NonNull @NotNull View itemView) {
-            super(itemView);
-            imageButton = itemView.findViewById(R.id.button_delete_on_selected);
-            imageView = itemView.findViewById(R.id.image_view);
+        public ImageViewHolder(ViewHolderListSelectedBinding binding) {
+            super(binding.getRoot());
+            imageButton = binding.buttonDeleteOnSelected;
+            imageView = binding.imageView;
         }
     }
 }

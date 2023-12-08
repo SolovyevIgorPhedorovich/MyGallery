@@ -3,6 +3,7 @@ package com.example.mygallery.adapters.imagepager;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import androidx.annotation.NonNull;
+import com.example.mygallery.adapters.viewholder.ImagePagerViewHolder;
 import com.example.mygallery.interfaces.model.Model;
 import com.github.chrisbanes.photoview.PhotoView;
 
@@ -14,29 +15,22 @@ public class SelectImagePagerAdapter extends ImagePagerAdapterHelper {
     }
 
     @Override
-    protected void setTouchListener(PhotoView imageView) {
-        imageView.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
+    protected void setTouchListener(ImagePagerViewHolder holder) {
+        PhotoView photoView = holder.imageView;
+        photoView.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
             @Override
-            public boolean onSingleTapConfirmed(@NonNull MotionEvent motionEvent) {
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                 return false;
             }
 
             @Override
-            public boolean onDoubleTap(@NonNull MotionEvent motionEvent) {
-                float optimalScale = calculateOptimalScale(imageView);
-                imageView.setMaximumScale(optimalScale + 2.5f);
-
-                // Получаем координаты нажатия
-                float x = motionEvent.getX();
-                float y = motionEvent.getY();
-
-                isImageScaled = !isImageScaled;
-                imageView.setScale(isImageScaled ? optimalScale : MIN_SCALE, x, y, true);
+            public boolean onDoubleTap(@NonNull MotionEvent e) {
+                scaleImage(photoView, e);
                 return true;
             }
 
             @Override
-            public boolean onDoubleTapEvent(@NonNull MotionEvent motionEvent) {
+            public boolean onDoubleTapEvent(@NonNull MotionEvent e) {
                 return false;
             }
         });

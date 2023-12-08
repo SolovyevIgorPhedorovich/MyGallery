@@ -1,11 +1,9 @@
 package com.example.mygallery.models;
 
-import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Objects;
 
 
@@ -14,7 +12,7 @@ public class Video implements Model {
 
     public String name;
 
-    public java.io.File path;
+    public File path;
 
     public int size;
     public boolean isFavorite;
@@ -53,20 +51,27 @@ public class Video implements Model {
 
     @Override
     public String getDate() {
+        // You can implement date retrieval logic here if needed
         return null;
     }
 
     @Override
-    public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Video other = (Video) obj;
 
-        return Objects.equals(this.path, other.path);
+        return Objects.equals(path, other.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
     @NotNull
+    @Override
     public Video clone() {
         Video video = new Video();
         video.id = this.id;
@@ -76,10 +81,5 @@ public class Video implements Model {
         video.isFavorite = this.isFavorite;
         video.time = this.time;
         return video;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(path);
     }
 }

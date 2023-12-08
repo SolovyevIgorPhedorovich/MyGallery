@@ -7,10 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import com.example.mygallery.ImageSizeCalculator;
+import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.AlbumViewHolder;
-import com.example.mygallery.databinding.AlbumImageViewBinding;
 import com.example.mygallery.interfaces.OnItemClickListener;
-
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Album;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +27,13 @@ public class AlbumAdapter extends AlbumAdapterHelper<Model> {
         this.spanCount = spanCount;
     }
 
-    private void calculatedImageSize(View view) {
+    private void calculateImageSize(View view) {
         ImageSizeCalculator imageSizeCalculator = new ImageSizeCalculator(context, view, spanCount);
         imageSizeCalculator.calculateRectangularShapeSize();
         this.imageSize = imageSizeCalculator.getResult();
     }
 
-    private void setLayoutParams(View view) {
+    private void setViewLayoutParams(View view) {
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
         layoutParams.width = imageSize.x;
         layoutParams.height = imageSize.y;
@@ -46,10 +45,9 @@ public class AlbumAdapter extends AlbumAdapterHelper<Model> {
     @NotNull
     @Override
     public AlbumViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        AlbumImageViewBinding binding = AlbumImageViewBinding.inflate(LayoutInflater.from(context), parent, false);
-        View itemView = binding.getRoot();
-        calculatedImageSize(itemView);
-        setLayoutParams(itemView);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_image_view, parent, false);
+        calculateImageSize(itemView);
+        setViewLayoutParams(itemView);
         return new AlbumViewHolder(itemView);
     }
 

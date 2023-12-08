@@ -14,6 +14,7 @@ import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.List;
 
 public class ImageAdapter<T> extends ImageAdapterHelper<T> {
@@ -28,10 +29,10 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
         mode = Mode.VIEWING;
     }
 
-    private void calculatedImageSize(View view) {
+    private Point calculateImageSize(View view) {
         ImageSizeCalculator imageSizeCalculator = new ImageSizeCalculator(context, view, spanCount);
         imageSizeCalculator.calculateSquareShareSize();
-        this.imageSize = imageSizeCalculator.getResult();
+        return imageSizeCalculator.getResult();
     }
 
     private void setLayoutParams(View view) {
@@ -47,7 +48,7 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     public ImageViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         ItemGalleryBinding binding = ItemGalleryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         View itemView = binding.getRoot();
-        calculatedImageSize(itemView);
+        imageSize = calculateImageSize(itemView);
         setLayoutParams(itemView);
         return new ImageViewHolder(binding);
     }
@@ -55,12 +56,15 @@ public class ImageAdapter<T> extends ImageAdapterHelper<T> {
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         setMode(holder, position);
-        setImage(((Model) dataList.get(position)).getPath(), holder.imageView, imageSize);
+        setImage(getItemPath(position), holder.imageView, imageSize);
 
         if (mode == Mode.SELECTED) {
             updateSelectedItems(position);
             setCheckedState(holder, position);
         }
+    }
 
+    private File getItemPath(int position) {
+        return ((Model) onGetDataList().get(position)).getPath();
     }
 }

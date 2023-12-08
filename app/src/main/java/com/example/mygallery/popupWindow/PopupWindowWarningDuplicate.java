@@ -6,7 +6,6 @@ import android.icu.text.SimpleDateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.mygallery.R;
@@ -19,14 +18,11 @@ import java.util.Date;
 import java.util.Locale;
 
 public class PopupWindowWarningDuplicate extends PopupWindowManager {
+
     private final Model originalFile;
     private final File targetPath;
     private final Callback callback;
-    private TextView nameDuplicate,
-            originalSize,
-            originalDateModified,
-            targetSize,
-            targetDateModified;
+    private TextView nameDuplicate, originalSize, originalDateModified, targetSize, targetDateModified;
     private ImageView originalImage, targetImage;
 
     public PopupWindowWarningDuplicate(Context context, Model originalFile, File targetPath, Callback callback) {
@@ -38,22 +34,18 @@ public class PopupWindowWarningDuplicate extends PopupWindowManager {
 
     public static PopupWindowWarningDuplicate show(Context context, View view, Model originalFile, File targetPath, Callback callback) {
         PopupWindowWarningDuplicate popupWindow = new PopupWindowWarningDuplicate(context, originalFile, targetPath, callback);
-        initialize(context, popupWindow, view);
+        initializePopupWindow(context, popupWindow, view);
         return popupWindow;
     }
 
-    private static void initialize(Context context, PopupWindowWarningDuplicate popupWindow, View view) {
-        // Load the XML layout
+    private static void initializePopupWindow(Context context, PopupWindowWarningDuplicate popupWindow, View view) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View menuView = inflater.inflate(R.layout.popup_window_warning_form, null);
-
         popupWindow.setContent(menuView);
 
-        // Set the position and show the popup window
         popupWindow.setPosition(0, 50);
         popupWindow.showPopupWindow(view, menuView, Gravity.BOTTOM);
 
-        // Initialize the views
         popupWindow.initializeViews();
         popupWindow.setText();
         popupWindow.setImage();
@@ -67,23 +59,21 @@ public class PopupWindowWarningDuplicate extends PopupWindowManager {
 
     @Override
     protected void setAnimation() {
-
     }
 
     @Override
-    protected void setButtonClickListener(Button button, int buttonId) {
-        button.setOnClickListener(view -> {
-            popupWindow.dismiss();
-            if (buttonId == R.id.replace_button) {
-                callback.onResume();
-            } else if (buttonId == R.id.cancel_button) {
-                callback.onCancel();
-            }
-        });
+    protected void handleButtonClick(int buttonId) {
+        popupWindow.dismiss();
+        if (buttonId == R.id.replace_button) {
+            callback.onResume();
+        } else if (buttonId == R.id.cancel_button) {
+            callback.onCancel();
+        }
     }
 
     protected void setText() {
-        nameDuplicate.setText(context.getResources().getString(R.string.file_already_exists, originalFile.getName()));
+        String fileAlreadyExists = context.getResources().getString(R.string.file_already_exists, originalFile.getName());
+        nameDuplicate.setText(fileAlreadyExists);
         originalSize.setText(context.getResources().getString(R.string.size, originalFile.getSize() + " байт"));
         originalDateModified.setText(context.getResources().getString(R.string.modified, originalFile.getDate()));
         targetSize.setText(context.getResources().getString(R.string.size, targetPath.length() + " байт"));

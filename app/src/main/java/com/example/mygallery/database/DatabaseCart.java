@@ -11,42 +11,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseCart extends DatabaseManager {
-    private static String CURRENT_PATH;
+    private static final String TABLE_NAME_CART = "cart";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_CURRENT_PATH = "current_path";
+    private static final String COLUMN_INITIAL_PATH = "initial_path";
+    private static final String COLUMN_DELETION_DATE = "deletion_date";
+    private final String cartDirectory;
 
     public DatabaseCart(Context context) {
         super(context);
-        CURRENT_PATH = context.getFilesDir() + "/Корзина/";
+        // Инициализация директории для корзины
+        this.cartDirectory = context.getFilesDir() + "/Корзина/";
     }
 
-    public List<Model> getCartFile() {
-        List<Model> pathFavorites = new ArrayList<>();
+    // Получение элементов из корзины
+    public List<Model> getCartItems() {
+        List<Model> cartItems = new ArrayList<>();
         try {
             if (openOrInitializeDatabase()) {
-                Cursor cursor = mDataBase.rawQuery("SELECT * FROM cart", null);
+                // Выполнение запроса к базе данных для получения данных
+                Cursor cursor = mDataBase.rawQuery("SELECT * FROM " + TABLE_NAME_CART, null);
                 if (cursor != null) {
+                    // Обработка результатов запроса
                     while (cursor.moveToNext()) {
-                        int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                        File current_path = new File(cursor.getString(cursor.getColumnIndexOrThrow("current_path")));
-                        File initial_path = new File(cursor.getString(cursor.getColumnIndexOrThrow("initial_path")));
-                        int deletion_date = cursor.getInt(cursor.getColumnIndexOrThrow("deletion_date"));
-                        String name = current_path.getName();
-                        pathFavorites.add(CartConstructor.initialized(id, name, current_path, initial_path, deletion_date));
+                        cartItems.add(createModelFromCursor(cursor));
                     }
                     cursor.close();
                 }
             }
         } finally {
+            // Закрытие базы данных в блоке finally для гарантированного выполнения
             close();
         }
-        return pathFavorites;
+        return cartItems;
     }
 
-    public void removeFile(List<Model> initialPathList) {
+    // Удаление файлов из корзины
+    public void removeFiles(List<Model> models) {
         try {
             if (openOrInitializeDatabase()) {
                 mDataBase.beginTransaction();
-                for (Model initialPath : initialPathList) {
-                    remove(initialPath.getPath());
+                for (Model model : models) {
+                    removeFile(model.getPath());
                 }
                 mDataBase.setTransactionSuccessful();
             }
@@ -56,6 +62,7 @@ public class DatabaseCart extends DatabaseManager {
         }
     }
 
+    // Удаление файла из корзины
     public void removeFile(File initialPath) {
         try {
             if (openOrInitializeDatabase()) {
@@ -64,10 +71,6 @@ public class DatabaseCart extends DatabaseManager {
         } finally {
             close();
         }
-    }
-
-    private void remove(File initialPath) {
-        mDataBase.delete("cart", "current_path=?", new String[]{String.valueOf(initialPath)});
     }
 
     // Добавление файла в корзину
@@ -81,12 +84,13 @@ public class DatabaseCart extends DatabaseManager {
         }
     }
 
-    public void addToCart(List<Model> initialPathList) {
+    // Добавление файлов в корзину
+    public void addToCart(List<Model> models) {
         try {
             if (openOrInitializeDatabase()) {
                 mDataBase.beginTransaction();
-                for (Model initialPath : initialPathList) {
-                    add(initialPath.getPath());
+                for (Model model : models) {
+                    add(model.getPath());
                 }
                 mDataBase.setTransactionSuccessful();
             }
@@ -96,16 +100,33 @@ public class DatabaseCart extends DatabaseManager {
         }
     }
 
+    // Создание объекта Model на основе данных из курсора
+    private Model createModelFromCursor(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+        File currentPath = new File(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CURRENT_PATH)));
+        File initialPath = new File(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_INITIAL_PATH)));
+        int deletionDate = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETION_DATE));
+        String name = currentPath.getName();
+        return CartConstructor.create(id, name, currentPath, initialPath, deletionDate);
+    }
+
+    // Удаление файла из базы данных
+    private void remove(File initialPath) {
+        mDataBase.delete(TABLE_NAME_CART, COLUMN_CURRENT_PATH + "=?", new String[]{String.valueOf(initialPath)});
+    }
+
+    // Добавление файла в базу данных
+    private void add(File initialPath) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CURRENT_PATH, cartDirectory + initialPath.hashCode() + getFormat(initialPath.getName()));
+        values.put(COLUMN_INITIAL_PATH, initialPath.getAbsolutePath());
+        values.put(COLUMN_DELETION_DATE, System.currentTimeMillis());
+        mDataBase.insert(TABLE_NAME_CART, null, values);
+    }
+
+    // Получение формата файла
     private String getFormat(String oldName) {
         String[] parts = oldName.split("\\.");
         return "." + parts[parts.length - 1];
-    }
-
-    private void add(File initialPath) {
-        ContentValues values = new ContentValues();
-        values.put("current_path", CURRENT_PATH + initialPath.hashCode() + getFormat(initialPath.getName()));
-        values.put("initial_path", initialPath.getAbsolutePath());
-        values.put("deletion_date", System.currentTimeMillis());
-        mDataBase.insert("cart", null, values);
     }
 }

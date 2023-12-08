@@ -1,7 +1,6 @@
 package com.example.mygallery.models;
 
 import android.icu.text.SimpleDateFormat;
-import androidx.annotation.Nullable;
 import com.example.mygallery.interfaces.model.Model;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,16 +60,22 @@ public class Image implements Model {
     }
 
     @Override
-    public boolean equals(@Nullable @org.jetbrains.annotations.Nullable Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Image other = (Image) obj;
 
-        return Objects.equals(this.path, other.path);
+        return Objects.equals(path, other.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
     @NotNull
+    @Override
     public Image clone() {
         Image image = new Image();
         image.id = this.id;
@@ -79,10 +84,5 @@ public class Image implements Model {
         image.size = this.size;
         image.isFavorite = this.isFavorite;
         return image;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(path);
     }
 }

@@ -3,7 +3,6 @@ package com.example.mygallery.fragments;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.mygallery.activities.CreatedAlbumActivity;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import com.example.mygallery.viewmodel.ImageViewModel;
@@ -27,15 +26,12 @@ public class ImageRecyclerViewFragment extends ImageGrid {
     @Override
     public void onAttach(@NonNull @NotNull Context context) {
         super.onAttach(context);
-        if (viewModel == null) {
-            viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(ImageViewModel.class);
-        }
+        initializeViewModel();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (!viewModel.isEmpty() && context instanceof CreatedAlbumActivity) return;
         if (viewModel instanceof ImageViewModel && viewModel.isEmpty()) {
             ((ImageViewModel) viewModel).scanMediaAlbum(albumPath);
         }
@@ -45,5 +41,11 @@ public class ImageRecyclerViewFragment extends ImageGrid {
     public void onDestroy() {
         super.onDestroy();
         viewModel.clear();
+    }
+
+    private void initializeViewModel() {
+        if (viewModel == null) {
+            viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(ImageViewModel.class);
+        }
     }
 }

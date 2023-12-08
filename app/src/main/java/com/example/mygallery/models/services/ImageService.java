@@ -13,65 +13,73 @@ import java.util.concurrent.Executors;
 
 public class ImageService extends BaseService<Model> {
 
-    protected final DatabaseCart databaseCart;
+    private static ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private final DatabaseCart databaseCart;
     protected final DatabaseFavorites databaseFavorites;
 
     public ImageService() {
         super();
-        databaseCart = new DatabaseCart(context);
-        databaseFavorites = new DatabaseFavorites(context);
+        this.databaseCart = new DatabaseCart(context);
+        this.databaseFavorites = new DatabaseFavorites(context);
     }
 
     @Override
     public void getData() {
+        // Implementation for getData if needed
     }
 
     public void moveToCart(int position) {
         File path = new File(list.get(position).getPath().getPath());
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
+        executeInSingleThread(() -> {
             databaseCart.addToCart(path);
-            databaseFavorites.removedFromFavorites(path);
+            databaseFavorites.removeFromFavorites(path);
         });
-        executor.shutdown();
     }
 
     public void moveToCart(List<Model> pathList) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
+        executeInSingleThread(() -> {
             databaseCart.addToCart(pathList);
-            databaseFavorites.removedFromFavorites(pathList);
+            databaseFavorites.removeFromFavorites(pathList);
         });
-        executor.shutdown();
+    }
+
+    @Override
+    public void clear() {
+        shutdownNow();
+        super.clear();
     }
 
     public void updateFavorites(int position, File newPath) {
         File path = new File(list.get(position).getPath().getPath());
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
-            databaseFavorites.updatePath(path, newPath);
-        });
-        executor.shutdown();
+        executeInSingleThread(() -> databaseFavorites.updatePath(path, newPath));
     }
 
     public void updateFavorites(List<Model> pathList, List<File> newPathList) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
-            databaseFavorites.updatePath(pathList, newPathList);
-        });
-        executor.shutdown();
+        executeInSingleThread(() -> databaseFavorites.updatePath(pathList, newPathList));
     }
 
     public void setFavorites(Model image) {
         ((Image) image).isFavorite = !((Image) image).isFavorite;
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> databaseFavorites.addToFavorites(image));
-        executor.shutdown();
+        executeInSingleThread(() -> databaseFavorites.addToFavorites(image));
     }
 
     public void scanMediaAlbum(File path) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(new ScanMediaFile(context, this, path));
-        executor.shutdown();
+        shutdownAndExecuteNew(new ScanMediaFile(context, this, path));
+    }
+
+    public void setArtwork(File path) {
+        databaseManager.setArtwork(path);
+    }
+
+    // Завершаем текущую задачу, если она активна
+    private void shutdownNow() {
+        executor.shutdownNow();
+    }
+
+    public void shutdownAndExecuteNew(Runnable newTask) {
+        shutdownNow();
+        // Создаем новый ExecutorService, чтобы можно было запустить новую задачу
+        executor = executeInSingleThread(newTask);
     }
 }

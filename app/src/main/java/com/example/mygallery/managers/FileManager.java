@@ -55,95 +55,149 @@ public class FileManager {
         this.handler = new Handler(Looper.getMainLooper());
     }
 
-    public void moveFile(File destPath) {
-        new FileOperationThread(() -> {
-            Model currentModel = viewModel.getItem(position != -1 ? position : 0);
-            if (viewModel.totalCheckedCount() != 0) {
-                moveFilesTo(destPath);
-            } else if (position != -1) {
-                moveFileTo(viewModel.getItem(position), destPath);
-            }
-            if (!isCancel || viewModel.totalCheckedCount() != 0) {
-                updateMediaStoreWithNewFiles();
-                updateDatabaseWithNewData(currentModel.getPath().getParent(), String.valueOf(destPath));
-                updateViewModel();
-            }
-            reset();
-        }).start();
-    }
-
     public FileManager(Context context, BaseViewModel<Model> viewModel, OnFragmentInteractionListener listener) {
         this(context, viewModel);
         this.listener = listener;
     }
 
+    /**
+     * Метод для перемещения файла в указанный путь.
+     *
+     * @param destPath Путь, куда нужно переместить файл.
+     */
+    public void moveFile(File destPath) {
+        new FileOperationThread(() -> {
+            // Получение текущей модели из ViewModel
+            Model currentModel = viewModel.getItem(position != -1 ? position : 0);
+
+            // Проверка, есть ли выбранные элементы для перемещения
+            if (viewModel.totalCheckedCount() != 0) {
+                moveFilesTo(destPath);
+            } else if (position != -1) {
+                moveFileTo(viewModel.getItem(position), destPath);
+            }
+
+            // Если операция не отменена или есть выбранные элементы, обновление хранилища медиафайлов
+            // и базы данных с новыми файлами, а также обновление ViewModel
+            if (!isCancel || viewModel.totalCheckedCount() != 0) {
+                updateMediaStoreWithNewFiles();
+                updateDatabaseWithNewData(currentModel.getPath().getParent(), String.valueOf(destPath));
+                updateViewModel();
+            }
+            // Сброс состояния
+            reset();
+        }).start();
+    }
+
+    /**
+     * Метод для установки позиции в списке.
+     *
+     * @param position Позиция в списке, на которую нужно установить курсор.
+     */
     public void setPosition(int position) {
         this.position = position;
     }
 
+    /**
+     * Метод для копирования файла в указанный путь.
+     *
+     * @param destPath Путь, куда нужно скопировать файл.
+     */
     public void copyFile(File destPath) {
         new FileOperationThread(() -> {
+            // Проверка, есть ли выбранные элементы для копирования
             if (viewModel.totalCheckedCount() != 0) {
                 copyFilesTo(destPath);
             } else if (position != -1) {
                 copyFileTo(viewModel.getItem(position), destPath);
             }
+
+            // Если операция не отменена или есть выбранные элементы, обновление хранилища медиафайлов
+            // и базы данных с новыми файлами
             if (!isCancel || viewModel.totalCheckedCount() != 0) {
                 updateMediaStoreWithNewFiles();
                 updateDatabaseWithNewData(null, String.valueOf(destPath));
             }
+            // Сброс состояния
             reset();
         }).start();
     }
 
+    /**
+     * Метод для удаления файла или файлов.
+     * Если ViewModel является CartViewModel, то операция удаления выполняется над корзиной,
+     * иначе файл перемещается в корзину.
+     */
     public void removedFile() {
         if (viewModel instanceof CartViewModel) {
             new FileOperationThread(() -> {
+                // Проверка, есть ли выбранные элементы для удаления
                 if (viewModel.totalCheckedCount() != 0) {
                     removedFilesFrom();
                 } else if (position != -1) {
                     Model model = viewModel.getItem(position);
                     removedFileFrom(model.getPath());
                 }
+
+                // Обновление базы данных корзины и ViewModel
                 updateCartDatabase();
                 updateViewModel();
+
+                // Сброс состояния
                 reset();
             }).start();
         } else {
+            // Установка флага для перемещения в корзину и вызов метода moveFile
             isMoveToCart = true;
             moveFile(cartPath);
         }
     }
 
+    /**
+     * Метод для переименования файла.
+     *
+     * @param oldFile Старый файл, который нужно переименовать.
+     * @param newName Новое имя файла.
+     */
     public void renameFile(Model oldFile, String newName) {
+        // Формирование нового пути с новым именем файла
         File newPath = new File(oldFile.getPath().getParent(), newName + getFormatFile(oldFile.getName()));
 
+        // Вызов метода для переименования файла
         renameFileTo(oldFile.getPath(), newPath);
+
+        // Обновление ViewModel с новой моделью и обновление хранилища медиафайлов
         updateViewModel(oldFile, getNewModel(oldFile, newPath));
         updateMediaStoreWithNewFiles();
     }
 
+    /**
+     * Метод для сброса файла.
+     * Устанавливает флаг сброса и вызывает метод moveFile с аргументом null.
+     */
     public void resetFile() {
         isReset = true;
         moveFile(null);
     }
 
+    // Получение расширения файла из его имени
     private String getFormatFile(String name) {
         String[] parts = name.split("\\.");
         return "." + parts[parts.length - 1];
-
     }
 
+    // Получение пути для нового файла в целевой директории
     private File getDestFile(Model oldFile, File destPath) {
         if (isMoveToCart) {
             return new File(destPath, oldFile.getPath().hashCode() + getFormatFile(oldFile.getName()));
         } else if (isReset) {
-            return ((Cart) oldFile).initial_path;
+            return ((Cart) oldFile).initialPath;
         } else {
             return new File(destPath, oldFile.getName());
         }
     }
 
+    // Получение новой модели файла с обновленным путем
     private Model getNewModel(Model oldFile, File newPath) {
         Model newFile = null;
         if (oldFile instanceof Image) {
@@ -158,9 +212,11 @@ public class FileManager {
         return newFile;
     }
 
+    // Перемещение файла в целевую директорию
     private void moveFileTo(Model oldFile, File destPath) {
         File finalDestPath = getDestFile(oldFile, destPath);
         if (!isMoveToCart && finalDestPath.exists()) {
+            // Обработка ситуации, если файл с таким именем уже существует
             handleDuplicatesFile(oldFile, finalDestPath, Operation.MOVE);
         } else {
             isDuplicate = false;
@@ -168,6 +224,7 @@ public class FileManager {
         }
     }
 
+    // Перемещение выбранных файлов в целевую директорию
     private void moveFilesTo(File destPath) {
         showProcess(R.string.moving);
         for (Model file : viewModel.getSelectedItems()) {
@@ -181,16 +238,18 @@ public class FileManager {
         }
     }
 
-    // Копирование файла
+    // Копирование файла в целевую директорию
     private void copyFileTo(Model file, File destPath) {
         File finalDestPath = new File(destPath, file.getName());
         if (finalDestPath.exists()) {
+            // Обработка ситуации, если файл с таким именем уже существует
             handleDuplicatesFile(file, finalDestPath, Operation.COPY);
         } else {
             copyFileTo(file.getPath(), finalDestPath);
         }
     }
 
+    // Копирование файла с текущего пути на новый
     private void copyFileTo(File curPath, File destPath) {
         try {
             FileUtils.copyFile(curPath, destPath);
@@ -200,6 +259,7 @@ public class FileManager {
         }
     }
 
+    // Копирование выбранных файлов в целевую директорию
     private void copyFilesTo(File destPath) {
         showProcess(R.string.coping);
         for (Model file : viewModel.getSelectedItems()) {
@@ -213,6 +273,7 @@ public class FileManager {
         }
     }
 
+    // Удаление файла из директории
     private void removedFileFrom(File pathFile) {
         try {
             FileUtils.delete(pathFile);
@@ -221,6 +282,7 @@ public class FileManager {
         }
     }
 
+    // Удаление выбранных файлов из директории
     private void removedFilesFrom() {
         showProcess(R.string.removing);
         for (Model file : viewModel.getSelectedItems()) {
@@ -229,7 +291,7 @@ public class FileManager {
         }
     }
 
-    // Переименование файла
+    // Переименование файла, заменяя его старый путь новым
     private void renameFileTo(File oldPath, File newPath) {
         try {
             FileUtils.copyFile(oldPath, newPath);
@@ -242,50 +304,68 @@ public class FileManager {
         }
     }
 
+    // Обработка отмены операции
     private boolean handlerCancel(Model file) {
+        // Если есть файлы для обновления, пропустить текущий файл и вернуть true
         if (!updatePaths.isEmpty()) {
             skip(file);
             return true;
         } else {
+            // Нет файлов для обновления, вернуть false
             return false;
         }
     }
 
+    // Обработка дубликатов файлов
     private void handleDuplicates(Model file) {
+        // Если файл является дубликатом и требуется пропустить
         if (isDuplicate && isSkip) {
             skip(file);
         } else if (isDuplicate && isReplace) {
+            // Если файл является дубликатом и требуется заменить, увеличить счетчик
             countDuplicateReplace++;
         }
     }
 
+    // Обработка дубликатов файла при операции
     private void handleDuplicatesFile(Model file, File finalDestPath, Operation operation) {
+        // Установка флага дубликата в true
         isDuplicate = true;
 
         if (isApplyAll && isSkip) {
+            // Если выбрано "Применить ко всем" и требуется пропустить
         } else if (isApplyAll && isReplace) {
+            // Если выбрано "Применить ко всем" и требуется заменить
             if (operation == Operation.COPY) {
+                // Если операция копирования, скопировать файл
                 copyFileTo(file.getPath(), finalDestPath);
             } else if (operation == Operation.MOVE) {
+                // Если операция перемещения, переименовать файл
                 renameFileTo(file.getPath(), finalDestPath);
             }
         } else if (viewModel.totalCheckedCount() > 1) {
+            // Если выбрано более одного файла, показать предупреждение о дубликатах в группе
             showWarningDuplicateGroup(file, finalDestPath, operation);
         } else {
+            // Если выбран только один файл, показать предупреждение о дубликате
             showWarningDuplicate(file, finalDestPath, operation);
         }
     }
 
+    // Пропустить файл
     private void skip(Model file) {
         latch = new CountDownLatch(1);
         handler.post(() -> {
+            // Переключение выделения для файла в модели представления
             viewModel.toggleSelection(file);
             latch.countDown();
         });
+        // Ожидание завершения операции
         awaitLatch();
     }
 
     private String[] getMIMEtypes() {
+        // Получение массива MIME-типов для каждого пути в списке обновлений
         String[] mimeType = new String[updatePaths.size()];
         for (int i = 0; i < updatePaths.size(); i++) {
             mimeType[i] = getMIME(updatePaths.get(i).getPath());
@@ -294,8 +374,8 @@ public class FileManager {
     }
 
     // Удаление файла
-
     private String getMIME(String path) {
+        // Получение MIME-типа файла по указанному пути
         String mimeType = null;
         try {
             URL url = new URL("file://" + path);
@@ -307,10 +387,14 @@ public class FileManager {
         return mimeType;
     }
 
+    // Обновление MediaStore новыми файлами
     private void updateMediaStoreWithNewFiles() {
         new Thread(() -> {
+            // Преобразование списка путей в массив строк
             String[] pathList = updatePaths.stream().map(File::toString).toArray(String[]::new);
+            // Получение MIME-типов для обновленных файлов
             String[] mimeList = getMIMEtypes();
+            // Сканирование файлов в MediaStore
             MediaScannerConnection.scanFile(context, pathList, mimeList, (s, uri) -> {
                 updatePaths.clear();
                 Log.d("MediaScanUpdate", "Обновление завершено");
@@ -318,44 +402,55 @@ public class FileManager {
         }).start();
     }
 
+    // Обновление базы данных новыми данными
     private void updateDatabaseWithNewData(String curPath, String destPath) {
+        // Если требуется сбросить состояние, сбросить текущий путь и обновить базу данных корзины
         if (isReset) {
             curPath = null;
             updateCartDatabase();
         }
+        // Обновление базы данных с использованием ViewModel
         viewModel.updateDatabase(curPath, destPath, countDuplicateReplace);
     }
 
+    // Обновление базы данных корзины
     private void updateCartDatabase() {
         ((CartViewModel) viewModel).updateDatabase(position);
     }
 
+    // Обновление ViewModel
     private void updateViewModel() {
         latch = new CountDownLatch(1);
         handler.post(() -> {
+            // Если требуется переместить в корзину
             if (isMoveToCart) {
+                // Обновление ViewModel в зависимости от типа ViewModel
                 if (viewModel instanceof ImageViewModel) {
                     ((ImageViewModel) viewModel).moveToCart(position);
                 } else if (viewModel instanceof FavoritesViewModel) {
                     ((FavoritesViewModel) viewModel).moveToCart(position);
                 }
             } else {
+                // Обновление ViewModel в зависимости от типа ViewModel и действия пользователя
                 if (viewModel instanceof ImageViewModel) {
                     ((ImageViewModel) viewModel).updateFavorites(position, updatePaths);
                 } else if (viewModel instanceof FavoritesViewModel) {
                     ((FavoritesViewModel) viewModel).updateFavorites(position, updatePaths);
                 }
             }
+            // Удаление элемента в ViewModel и сигнализация о завершении операции
             viewModel.removeItem(position);
             latch.countDown();
         });
         awaitLatch();
     }
 
+    // Обновление ViewModel с использованием старого и нового файла
     private void updateViewModel(Model oldFile, Model newFile) {
         viewModel.updateData(oldFile.getId(), newFile);
     }
 
+    // Ожидание завершения latch
     private void awaitLatch() {
         if (latch != null) {
             try {
@@ -366,7 +461,9 @@ public class FileManager {
         }
     }
 
+    // Сброс состояния
     private void reset() {
+        // Сброс всех флагов состояния и позиции
         isMoveToCart = false;
         isCancel = false;
         isApplyAll = false;
@@ -374,13 +471,18 @@ public class FileManager {
         isSkip = false;
         isReplace = false;
         this.position = -1;
+        // Вызов обработчика события, если он установлен
         if (listener != null) {
             handler.post(listener::onPermissionsGranted);
         }
     }
 
+    // Метод для отображения предупреждения о дублировании файла
     private void showWarningDuplicate(Model file, File finalDestPath, Operation operation) {
+        // Создаем счетчик для ожидания завершения действий в PopupWindow
         latch = new CountDownLatch(1);
+
+        // Постинг в основной поток для отображения предупреждения о дублировании
         handler.post(() -> PopupWindowWarningDuplicate.show(context, null, file, finalDestPath, new PopupWindowWarningDuplicate.Callback() {
             @Override
             public void onResume() {
@@ -395,11 +497,17 @@ public class FileManager {
                 latch.countDown();
             }
         }));
+
+        // Ожидаем завершения операции в PopupWindow
         awaitLatch();
     }
 
+    // Метод для отображения предупреждения о дублировании группы файлов
     private void showWarningDuplicateGroup(Model file, File finalDestPath, Operation operation) {
+        // Создаем счетчик для ожидания завершения действий в PopupWindow
         latch = new CountDownLatch(1);
+
+        // Постинг в основной поток для отображения предупреждения о дублировании группы
         handler.post(() -> PopupWindowWarningGroupDuplicate.show(context, null, file, finalDestPath, new PopupWindowWarningGroupDuplicate.Callback() {
             @Override
             public void onResume(boolean isChecked) {
@@ -425,33 +533,52 @@ public class FileManager {
                 latch.countDown();
             }
         }));
+
+        // Ожидаем завершения операции в PopupWindow
         awaitLatch();
     }
 
+    // Метод для отображения процесса с заданным текстом
     private void showProcess(int idText) {
+        // Создаем счетчик для ожидания завершения действий в PopupWindow
         latch = new CountDownLatch(1);
+
+        // Постинг в основной поток для отображения процесса
         handler.post(() -> {
+            // Отображаем окно с прогрессом
             mPopupWindow = PopupWindowProgress.show(context, null, idText, viewModel.totalCheckedCount());
             latch.countDown();
         });
+
+        // Ожидаем завершения операции в PopupWindow
         awaitLatch();
     }
 
+    // Метод для обновления прогресса в PopupWindow
     private void updateProgressBar() {
+        // Создаем счетчик для ожидания завершения действий в PopupWindow
         latch = new CountDownLatch(1);
+
+        // Постинг в основной поток для обновления прогресса
         handler.post(() -> {
+            // Обновляем прогресс в PopupWindow
             mPopupWindow.updateProgress();
             latch.countDown();
         });
+
+        // Ожидаем завершения операции в PopupWindow
         awaitLatch();
     }
 
+    // Метод для выполнения операции (копирование или перемещение)
     private void runOperation(Model file, File finalDestPath, Operation operation) {
         switch (operation) {
             case COPY:
+                // Копирование файла
                 copyFileTo(file.getPath(), finalDestPath);
                 break;
             case MOVE:
+                // Перемещение файла
                 renameFileTo(file.getPath(), finalDestPath);
                 break;
         }
