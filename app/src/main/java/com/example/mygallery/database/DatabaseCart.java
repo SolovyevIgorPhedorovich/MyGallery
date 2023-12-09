@@ -7,6 +7,7 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.constructors.CartConstructor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,12 +108,17 @@ public class DatabaseCart extends DatabaseManager {
         File initialPath = new File(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_INITIAL_PATH)));
         int deletionDate = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DELETION_DATE));
         String name = currentPath.getName();
-        return CartConstructor.create(id, name, currentPath, initialPath, deletionDate);
+        try {
+            return CartConstructor.create(id, name, currentPath, initialPath, deletionDate);
+        } catch (FileNotFoundException e) {
+            remove(currentPath);// Если файл не найден, удаляем его из базы данных
+        }
+        return null;
     }
 
     // Удаление файла из базы данных
-    private void remove(File initialPath) {
-        mDataBase.delete(TABLE_NAME_CART, COLUMN_CURRENT_PATH + "=?", new String[]{String.valueOf(initialPath)});
+    private void remove(File currentPath) {
+        mDataBase.delete(TABLE_NAME_CART, COLUMN_CURRENT_PATH + "=?", new String[]{String.valueOf(currentPath)});
     }
 
     // Добавление файла в базу данных

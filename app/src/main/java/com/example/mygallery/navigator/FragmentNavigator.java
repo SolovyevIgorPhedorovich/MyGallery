@@ -50,9 +50,9 @@ public class FragmentNavigator {
     }
 
     // Открытие фрагмента для выбора элемента изображения
-    public static void openSelectedViewFragment(Context context, int position, BaseViewModel<Model> viewModel, SparseBooleanArray selectedItems, OnItemClickListener listener) {
+    public static void openSelectedViewFragment(Context context, Fragment fragment, int position, BaseViewModel<Model> viewModel, SparseBooleanArray selectedItems, OnItemClickListener listener) {
         FragmentTransaction fragmentTransaction = getFragmentTransaction(context);
-        openFragment(fragmentTransaction, new ViewChoiceImage(position, viewModel, selectedItems, listener));
+        openFragment(fragmentTransaction, new ViewChoiceImage(fragment, position, viewModel, selectedItems, listener));
         commitFragmentTransaction(fragmentTransaction);
     }
 

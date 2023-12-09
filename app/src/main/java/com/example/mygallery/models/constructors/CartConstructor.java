@@ -3,6 +3,7 @@ package com.example.mygallery.models.constructors;
 import com.example.mygallery.models.Cart;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class CartConstructor {
 
@@ -17,9 +18,13 @@ public class CartConstructor {
         cart.deletionDate = deletionDate;
     }
 
-    public static Cart create(int id, String name, File currentPath, File initialPath, int deletion_date) {
-        CartConstructor cartConstructor = new CartConstructor(id, name, currentPath, initialPath, deletion_date);
-        return cartConstructor.returnCart();
+    public static Cart create(int id, String name, File currentPath, File initialPath, int deletion_date) throws FileNotFoundException {
+        if (currentPath.exists()) {
+            CartConstructor cartConstructor = new CartConstructor(id, name, currentPath, initialPath, deletion_date);
+            return cartConstructor.returnCart();
+        } else {
+            throw new FileNotFoundException("Файл не найден: " + currentPath);
+        }
     }
 
     private Cart returnCart() {

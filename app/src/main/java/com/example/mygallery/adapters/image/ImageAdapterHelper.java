@@ -106,12 +106,12 @@ public abstract class ImageAdapterHelper<T> extends RecyclerView.Adapter<ImageVi
             return true;
         });
 
-        holder.imageButton.setOnClickListener(v -> listener.onItemClick(position));
+        holder.imageButton.setOnClickListener(v -> listener.onItemClick(holder.getAbsoluteAdapterPosition()));
     }
 
     // Установка режима VIEWING для ViewHolder
     private void setViewingMode(ImageViewHolder holder, int position) {
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(holder.getAbsoluteAdapterPosition()));
         holder.itemView.setOnLongClickListener(v -> {
             mode = Mode.SELECTED;
             longClickListener.onItemClick(position);

@@ -66,7 +66,7 @@ public class DragSelect {
     }
 
     public void choiceItem(int position) {
-        viewModel.toggleSelection(viewModel.getItem(position)); // изменяем выбор элемента
+        viewModel.toggleSelection(position); // изменяем выбор элемента
     }
 
     public void updateCheckBoxAdapter(int position) {

@@ -108,7 +108,7 @@ public class ImageFileManager {
 
     // Поворот изображения в адаптере
     public void rotation(ImagePagerAdapter adapter) {
-        adapter.rotateImage(data.getId() - 1);
+        adapter.rotateImage(viewModel.searchById(data.getId()));
     }
 
     // Выбор изображения (обновление альбома)

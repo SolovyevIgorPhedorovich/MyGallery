@@ -15,12 +15,12 @@ public class ConfigurationViewPager {
     private final ViewPager2 viewPager2;
     private final TextViewUpdateListener updateListener;
     private ImagePagerAdapterHelper adapter;
-    private int initialPosition;
+    private int currentPosition;
 
-    public ConfigurationViewPager(ViewPager2 viewPager2, int initialPosition, TextViewUpdateListener listener) {
+    public ConfigurationViewPager(ViewPager2 viewPager2, int currentPosition, TextViewUpdateListener listener) {
         this.viewPager2 = viewPager2;
         this.updateListener = listener;
-        this.initialPosition = initialPosition;
+        this.currentPosition = currentPosition;
 
         // Инициализируем ViewPager и настраиваем обработчики
         initializeViewPager();
@@ -34,7 +34,7 @@ public class ConfigurationViewPager {
 
         // Обновляем TextView, если обработчик предоставлен
         if (updateListener != null) {
-            updateListener.updateTextView(initialPosition);
+            updateListener.updateTextView(currentPosition);
         }
     }
 
@@ -48,7 +48,7 @@ public class ConfigurationViewPager {
     private void setAdapterAndViewPager(ImagePagerAdapterHelper pagerAdapter) {
         adapter = pagerAdapter;
         viewPager2.setAdapter(adapter);
-        viewPager2.setCurrentItem(initialPosition, false);
+        viewPager2.setCurrentItem(currentPosition, false);
     }
 
     // Получаем текущий адаптер
@@ -87,15 +87,14 @@ public class ConfigurationViewPager {
         }
 
         // Обновляем начальную позицию на текущую
-        if (initialPosition != position) {
-            initialPosition = position;
+        if (currentPosition != position) {
+            currentPosition = position;
         }
     }
 
     // Запускаем слайд-шоу, переходя к следующей странице
     public void slideShow() {
-        int position = (initialPosition < adapter.getItemCount() - 1) ? initialPosition + 1 : 0;
+        int position = (currentPosition < adapter.getItemCount() - 1) ? currentPosition + 1 : 0;
         viewPager2.setCurrentItem(position);
-        initialPosition = viewPager2.getCurrentItem();
     }
 }

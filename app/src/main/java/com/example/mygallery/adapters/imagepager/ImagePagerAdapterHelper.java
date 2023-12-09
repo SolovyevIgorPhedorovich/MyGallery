@@ -17,6 +17,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<ImagePagerViewHolder> implements OnAdapterInteraction<Model> {
@@ -36,7 +37,7 @@ public abstract class ImagePagerAdapterHelper extends RecyclerView.Adapter<Image
 
     @Override
     public void onSetDataList(List<Model> pathImages) {
-        this.imageList = pathImages;
+        this.imageList = new ArrayList<>(pathImages);
     }
 
     @NonNull

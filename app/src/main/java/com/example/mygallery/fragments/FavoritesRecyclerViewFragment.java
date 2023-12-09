@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.R;
+import com.example.mygallery.activities.imageViewActivity.FavoritesViewActivity;
 import com.example.mygallery.viewmodel.FavoritesViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,11 @@ public class FavoritesRecyclerViewFragment extends ImageGrid {
     private FavoritesViewModel createViewModel() {
         ViewModelProvider.Factory factory = ViewModelFactory.factory(this);
         return new ViewModelProvider(this, factory).get(FavoritesViewModel.class);
+    }
+
+    @Override
+    protected void handleViewingMode(int position) {
+        openActivity(position, FavoritesViewActivity.class);
     }
 
     private void showEmptyFavoritesText() {

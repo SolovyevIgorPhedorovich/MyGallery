@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.services.BaseService;
-import com.example.mygallery.models.services.ImageService;
 import com.example.mygallery.multichoice.MultiChoice;
 import com.example.mygallery.multichoice.MultiChoiceState;
 
@@ -94,8 +93,8 @@ public class BaseViewModel<T extends Model> extends ViewModel {
     }
 
     // Получаем ID элемента по указанному позиции
-    public int getId(int position) {
-        return service.getList().get(position).getId();
+    public int searchById(int id) {
+        return service.searchById(id);
     }
 
     // Получаем имя элемента по указанному позиции
@@ -116,6 +115,10 @@ public class BaseViewModel<T extends Model> extends ViewModel {
     }
 
     // Переключаем состояние выбора указанного элемента в MultiChoice
+    public void toggleSelection(int position) {
+        multiChoice.toggle(getItem(position));
+    }
+
     public void toggleSelection(T item) {
         multiChoice.toggle(item);
     }

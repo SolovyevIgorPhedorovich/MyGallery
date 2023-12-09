@@ -107,7 +107,7 @@ public class AlbumSelectionFragment extends Fragment {
     private void actionFile(int position) {
         FileManager fileManager = new FileManager(context, viewModel, listener);
         File destPath = albumViewModel.getPath(position);
-        fileManager.setPosition(position);
+        fileManager.setPosition(viewModel.searchById(file.getId()));
 
         switch (typeAction) {
             case MOVE:

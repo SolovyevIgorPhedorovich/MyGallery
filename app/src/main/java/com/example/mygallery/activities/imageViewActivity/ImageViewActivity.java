@@ -12,7 +12,6 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
-import com.example.mygallery.viewmodel.FavoritesViewModel;
 import com.example.mygallery.viewmodel.ImageViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
@@ -58,7 +57,7 @@ public class ImageViewActivity extends ViewActivity {
     }
 
     private void setButtonRemoveFileClickListener() {
-        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, initialPosition));
+        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, currentPosition));
     }
 
     private void setButtonAddFavoritesClickListener() {
@@ -73,16 +72,16 @@ public class ImageViewActivity extends ViewActivity {
     }
 
     private Uri getFileUri() {
-        return FileProvider.getUriForFile(this, "com.example.mygallery.fileprovider", viewModel.getItem(initialPosition).getPath());
+        return FileProvider.getUriForFile(this, "com.example.mygallery.fileprovider", viewModel.getItem(currentPosition).getPath());
     }
 
-    private void handleAddFavoritesClick() {
-        if (viewModel instanceof ImageViewModel) {
-            ((ImageViewModel) viewModel).setFavorites(viewModel.getItem(initialPosition));
-        } else if (viewModel instanceof FavoritesViewModel) {
-            ((FavoritesViewModel) viewModel).updateDatabase(initialPosition);
-        }
-        isFavorite = ((Image) viewModel.getItem(initialPosition)).isFavorite;
+    protected void handleAddFavoritesClick() {
+        ((ImageViewModel) viewModel).setFavorites(viewModel.getItem(currentPosition));
+        getFavorite();
+    }
+
+    protected void getFavorite() {
+        isFavorite = ((Image) viewModel.getItem(currentPosition)).isFavorite;
     }
 
     protected void updateButtonFavorite() {
@@ -98,6 +97,6 @@ public class ImageViewActivity extends ViewActivity {
     }
 
     private Model getCurrentItem() {
-        return viewModel.getItem(initialPosition);
+        return viewModel.getItem(currentPosition);
     }
 }

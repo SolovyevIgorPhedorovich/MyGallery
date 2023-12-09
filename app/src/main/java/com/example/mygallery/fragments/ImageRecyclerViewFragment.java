@@ -3,6 +3,7 @@ package com.example.mygallery.fragments;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
+import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import com.example.mygallery.viewmodel.ImageViewModel;
@@ -41,6 +42,11 @@ public class ImageRecyclerViewFragment extends ImageGrid {
     public void onDestroy() {
         super.onDestroy();
         viewModel.clear();
+    }
+
+    @Override
+    protected void handleViewingMode(int position) {
+        openActivity(position, ImageViewActivity.class);
     }
 
     private void initializeViewModel() {

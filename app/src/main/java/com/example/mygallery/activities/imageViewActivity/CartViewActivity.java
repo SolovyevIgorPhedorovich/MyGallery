@@ -44,10 +44,10 @@ public class CartViewActivity extends ViewActivity {
     protected void setOnClickListenerButtons() {
         super.setOnClickListenerButtons();
 
-        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, initialPosition));
+        buttonRemoveFile.setOnClickListener(v -> PopupWindowRemovedContextMenu.show(this, v, viewModel, currentPosition));
 
         buttonReset.setOnClickListener(v -> {
-            fileManager.setPosition(initialPosition);
+            fileManager.setPosition(currentPosition);
             fileManager.resetFile();
         });
     }

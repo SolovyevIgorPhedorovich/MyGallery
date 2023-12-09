@@ -1,6 +1,5 @@
 package com.example.mygallery.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -8,38 +7,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.mygallery.R;
-import com.example.mygallery.activities.AlbumGridActivity;
-import com.example.mygallery.activities.CreatedAlbumActivity;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.viewPager.ConfigurationViewPager;
 import com.example.mygallery.viewmodel.BaseViewModel;
-import org.jetbrains.annotations.NotNull;
 
 public class ViewChoiceImage extends Fragment {
     private final BaseViewModel<Model> viewModel;
     private final SparseBooleanArray selectedItems;
     private final OnItemClickListener listener;
-    private Context context;
+    private final Fragment fragment;
     private int currentPosition;
     private CheckBox checkBox;
     private ImageButton backButton;
 
-    public ViewChoiceImage(int position, BaseViewModel<Model> viewModel, SparseBooleanArray selectedItems, OnItemClickListener listener) {
+    public ViewChoiceImage(Fragment fragment, int position, BaseViewModel<Model> viewModel, SparseBooleanArray selectedItems, OnItemClickListener listener) {
         this.currentPosition = position;
         this.viewModel = viewModel;
         this.selectedItems = selectedItems;
         this.listener = listener;
-    }
-
-    @Override
-    public void onAttach(@NonNull @NotNull Context context) {
-        super.onAttach(context);
-        this.context = context;
+        this.fragment = fragment;
     }
 
     private void initializeViews(View view) {
@@ -64,17 +54,8 @@ public class ViewChoiceImage extends Fragment {
     }
 
     private void closeFragment() {
-        FragmentManager fragmentManager = null;
-
-        if (context instanceof CreatedAlbumActivity) {
-            fragmentManager = ((CreatedAlbumActivity) context).getSupportFragmentManager();
-        } else if (context instanceof AlbumGridActivity) {
-            fragmentManager = ((AlbumGridActivity) context).getSupportFragmentManager();
-        }
-
-        if (fragmentManager != null) {
-            fragmentManager.popBackStack();
-        }
+        FragmentManager fragmentManager = fragment.getParentFragmentManager();
+        fragmentManager.popBackStack();
     }
 
     private void setCurrentPosition(int position) {
@@ -92,7 +73,7 @@ public class ViewChoiceImage extends Fragment {
 
     private void handleCheckBoxClick() {
         updateSelectedItems();
-        viewModel.toggleSelection(viewModel.getItem(currentPosition));
+        viewModel.toggleSelection(currentPosition);
         listener.onItemClick(currentPosition);
     }
 }

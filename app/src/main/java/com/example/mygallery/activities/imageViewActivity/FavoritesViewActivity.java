@@ -10,4 +10,10 @@ public class FavoritesViewActivity extends ImageViewActivity {
     protected void initializeViewModel() {
         viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(FavoritesViewModel.class);
     }
+
+    @Override
+    protected void handleAddFavoritesClick() {
+        ((FavoritesViewModel) viewModel).updateDatabase(currentPosition);
+        getFavorite();
+    }
 }

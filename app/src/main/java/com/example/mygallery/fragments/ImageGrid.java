@@ -3,10 +3,7 @@ package com.example.mygallery.fragments;
 import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.mygallery.DiffUtilCallback;
-import com.example.mygallery.activities.imageViewActivity.CartViewActivity;
 import com.example.mygallery.activities.CreatedAlbumActivity;
-import com.example.mygallery.activities.imageViewActivity.FavoritesViewActivity;
-import com.example.mygallery.activities.imageViewActivity.ImageViewActivity;
 import com.example.mygallery.adapters.FileChoiceAdapter;
 import com.example.mygallery.adapters.image.ImageAdapter;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
@@ -14,13 +11,10 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.multichoice.DragSelect;
 import com.example.mygallery.multichoice.MultiChoiceState;
 import com.example.mygallery.navigator.FragmentNavigator;
-import com.example.mygallery.viewmodel.CartViewModel;
-import com.example.mygallery.viewmodel.FavoritesViewModel;
-import com.example.mygallery.viewmodel.ImageViewModel;
 
 import java.util.List;
 
-public class ImageGrid extends RecyclerViewFragment implements OnFragmentInteractionListener {
+public abstract class ImageGrid extends RecyclerViewFragment implements OnFragmentInteractionListener {
     private static final int SPAN_COUNT = 4;
     private DragSelect dragSelect;
     private ImageAdapter<Model> adapter;
@@ -115,20 +109,12 @@ public class ImageGrid extends RecyclerViewFragment implements OnFragmentInterac
                 handleViewingMode(position);
                 break;
             case SELECTED:
-                FragmentNavigator.openSelectedViewFragment(context, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
+                FragmentNavigator.openSelectedViewFragment(context, this, position, viewModel, adapter.getSelectedItems(), dragSelect::updateCheckBoxAdapter);
                 break;
         }
     }
 
-    private void handleViewingMode(int position) {
-        if (viewModel instanceof ImageViewModel) {
-            openActivity(position, ImageViewActivity.class);
-        } else if (viewModel instanceof CartViewModel) {
-            openActivity(position, CartViewActivity.class);
-        } else if (viewModel instanceof FavoritesViewModel) {
-            openActivity(position, FavoritesViewActivity.class);
-        }
-    }
+    protected abstract void handleViewingMode(int position);
 
     private boolean isChecked(int position) {
         return viewModel.isChecked(position);

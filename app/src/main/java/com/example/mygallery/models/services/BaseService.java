@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public abstract class BaseService<T> implements DataManager<T> {
+public abstract class BaseService<T extends Model> implements DataManager<T> {
 
     private final Set<DataListener<T>> listeners;
     protected final DatabaseAlbum databaseManager;
@@ -65,15 +65,33 @@ public abstract class BaseService<T> implements DataManager<T> {
     @Override
     public void removeItem(List<T> selectItemList) {
         int min = list.size();
-        int i = 0;
         for (T item : selectItemList) {
-            int id = ((Model) item).getId();
-            list.remove(id - i - 1);
-            ++i;
+            int id = item.getId();
+            list.remove(searchById(id));
             min = Math.min(id, min);
         }
         updateId(min);
         notifyChanges();
+    }
+
+    public int searchById(int id) {
+        int left = 0;
+        int right = list.size() - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            int currentId = list.get(mid).getId();
+
+            if (currentId == id) {
+                return mid; // Элемент найден, возвращаем позицию
+            } else if (currentId < id) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return -1; // Элемент не найден
     }
 
     @Override
@@ -112,7 +130,7 @@ public abstract class BaseService<T> implements DataManager<T> {
     private void updateId(int id) {
         executeInSingleThread(() -> {
             for (int i = id; i < list.size(); i++) {
-                ((Model) list.get(i)).setId(++i);
+                list.get(i).setId(++i);
             }
             notifyChanges();
         });
@@ -134,7 +152,7 @@ public abstract class BaseService<T> implements DataManager<T> {
 
     private void sortListById() {
         executeInSingleThread(() -> {
-            list.sort(Comparator.comparingInt(item -> ((Model) item).getId()));
+            list.sort(Comparator.comparingInt(Model::getId));
             notifyChanges();
         });
     }

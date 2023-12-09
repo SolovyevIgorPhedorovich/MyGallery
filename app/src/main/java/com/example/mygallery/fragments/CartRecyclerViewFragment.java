@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.mygallery.R;
+import com.example.mygallery.activities.imageViewActivity.CartViewActivity;
 import com.example.mygallery.viewmodel.CartViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,11 @@ public class CartRecyclerViewFragment extends ImageGrid {
     private CartViewModel createViewModel() {
         ViewModelProvider.Factory factory = ViewModelFactory.factory(this);
         return new ViewModelProvider(this, factory).get(CartViewModel.class);
+    }
+
+    @Override
+    protected void handleViewingMode(int position) {
+        openActivity(position, CartViewActivity.class);
     }
 
     private void setEmptyCartText() {

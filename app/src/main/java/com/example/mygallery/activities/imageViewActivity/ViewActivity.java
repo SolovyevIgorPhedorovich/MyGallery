@@ -25,7 +25,7 @@ import dev.chrisbanes.insetter.Insetter;
  */
 public abstract class ViewActivity extends AppCompatActivity {
     protected BaseViewModel<Model> viewModel;
-    protected int initialPosition;
+    protected int currentPosition;
     protected ConfigurationViewPager configurationViewPager;
     private ViewPager2 viewPager;
     private ImageButton imageButtonBack;
@@ -164,7 +164,7 @@ public abstract class ViewActivity extends AppCompatActivity {
     //Функция возвращает имена файла
     protected void setNameItem(int position) {
         textView.setText(viewModel.getName(position));
-        initialPosition = position;
+        currentPosition = position;
     }
 
     private void setAdapter() {
