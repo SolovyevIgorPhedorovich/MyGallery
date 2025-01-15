@@ -12,11 +12,12 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Image;
 import com.example.mygallery.popupWindow.PopupWindowActionFileContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
+import com.example.mygallery.share.ShareFile;
 import com.example.mygallery.viewmodel.ImageViewModel;
 import com.example.mygallery.viewmodel.ViewModelFactory;
 
 public class ImageViewActivity extends ViewActivity {
-    private ImageButton buttonRemoveFile, buttonContextMenu, buttonAddFavorites, buttonEdit;
+    private ImageButton buttonRemoveFile, buttonContextMenu, buttonAddFavorites, buttonEdit, buttonShare;
     private ActivityImageViewBinding binding;
 
     protected boolean isFavorite = false;
@@ -36,6 +37,7 @@ public class ImageViewActivity extends ViewActivity {
         buttonContextMenu = binding.buttonContextMenu;
         buttonAddFavorites = binding.buttonAddFavorites;
         buttonEdit = binding.buttonEdit;
+        buttonShare = binding.buttonShare;
     }
 
     @Override
@@ -46,10 +48,18 @@ public class ImageViewActivity extends ViewActivity {
     @Override
     protected void setOnClickListenerButtons() {
         super.setOnClickListenerButtons();
+        setButtonShareClickListener();
         setButtonEditClickListener();
         setButtonRemoveFileClickListener();
         setButtonAddFavoritesClickListener();
         setButtonContextMenuClickListener();
+    }
+
+    private void setButtonShareClickListener(){
+        buttonShare.setOnClickListener(v -> {
+            ShareFile shareFile = new ShareFile(this);
+            shareFile.shareFile(getFileUri());
+        });
     }
 
     private void setButtonEditClickListener() {
