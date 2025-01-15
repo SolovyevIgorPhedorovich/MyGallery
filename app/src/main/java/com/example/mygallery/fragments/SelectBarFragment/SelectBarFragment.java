@@ -1,6 +1,7 @@
 package com.example.mygallery.fragments.SelectBarFragment;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import com.example.mygallery.R;
 import com.example.mygallery.fragments.AlbumSelectionFragment;
@@ -16,11 +18,13 @@ import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.navigator.FragmentNavigator;
 import com.example.mygallery.popupWindow.PopupWindowRemovedContextMenu;
 import com.example.mygallery.popupWindow.PopupWindowSelectBarContextMenu;
+import com.example.mygallery.share.ShareFile;
 import com.example.mygallery.viewmodel.BaseViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SelectBarFragment extends Fragment {
 
@@ -111,7 +115,8 @@ public class SelectBarFragment extends Fragment {
 
     private void handleButtonClick(View view, int buttonId) {
         if (buttonId == R.id.button_share) {
-            //TODO: add method share
+            ShareFile shareFile = new ShareFile(context);
+            shareFile.shareFiles(viewModel.getSelectedItems().stream().map(image-> FileProvider.getUriForFile(context, "com.example.mygallery.fileprovider", image.getPath())).collect(Collectors.toList()));
         } else if (buttonId == R.id.button_move) {
             FragmentNavigator.openAlbumSelectionFragment(context, AlbumSelectionFragment.Action.MOVE, viewModel, viewModel.getItem(0), this::closeFragment);
         } else if (buttonId == R.id.button_selected_all) {
