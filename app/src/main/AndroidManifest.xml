@@ -80,6 +80,14 @@
 				android:name=".activities.AlbumSelected"
 				android:exported="false"
 				android:parentActivityName=".activities.CreatedAlbumActivity"/>
+		<activity
+			android:name=".activities.AlbumSyncActivity"
+			android:exported="false"
+			android:parentActivityName=".activities.AlbumActivity"/>
+		<activity
+			android:name=".activities.AlbumNextcloud"
+			android:exported="false"
+			android:parentActivityName=".activities.AlbumActivity"/>
 	</application>
 
 </manifest>

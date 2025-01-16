@@ -21,6 +21,7 @@ import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.managers.CreateAlbumManager;
 import com.example.mygallery.navigator.FragmentNavigatorHelper;
 import com.example.mygallery.popupWindow.PopupWindowAlbumContextMenu;
+import com.example.mygallery.popupWindow.PopupWindowSyncMenu;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -144,6 +145,9 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
         if (itemId == R.id.action_create_album) {
             CreateAlbumManager createAlbumManager = new CreateAlbumManager();
             createAlbumManager.createAlbum(this, findViewById(itemId));
+        }
+        else if (itemId == R.id.action_sync){
+            PopupWindowSyncMenu.run(this, findViewById(R.id.action_sync));
         }
         else if (itemId == R.id.action_view_type)
             replaceViewType();
