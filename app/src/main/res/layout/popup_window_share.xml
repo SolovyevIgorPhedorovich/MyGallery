@@ -38,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:contentDescription="TODO"
             app:srcCompat="@drawable/baseline_arrow_downward_24" />
 
         <Button

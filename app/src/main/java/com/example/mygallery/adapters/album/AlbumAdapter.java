@@ -1,5 +1,7 @@
 package com.example.mygallery.adapters.album;
 
+import static com.example.mygallery.viewimage.LoadImage.setImage;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.example.mygallery.ImageSizeCalculator;
 import com.example.mygallery.R;
 import com.example.mygallery.adapters.viewholder.AlbumViewHolder;
+import com.example.mygallery.interfaces.OnCheckedIsChoice;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
 import com.example.mygallery.models.Album;
@@ -21,8 +24,8 @@ public class AlbumAdapter extends AlbumAdapterHelper<Model> {
     private final int spanCount;
     private Point imageSize;
 
-    public AlbumAdapter(Context context, List<Model> dataList, int spanCount, OnItemClickListener listener) {
-        super(dataList, listener);
+    public AlbumAdapter(Context context, List<Model> dataList, int spanCount, OnItemClickListener listener, OnCheckedIsChoice checked) {
+        super(dataList, listener, checked);
         this.context = context;
         this.spanCount = spanCount;
     }

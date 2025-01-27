@@ -16,6 +16,7 @@ import com.example.mygallery.adapters.album.FolderListAdapter;
 import com.example.mygallery.interfaces.OnFragmentInteractionListener;
 import com.example.mygallery.interfaces.OnItemClickListener;
 import com.example.mygallery.interfaces.model.Model;
+import com.example.mygallery.multichoice.DragSelect;
 import com.example.mygallery.sharedpreferences.SharedPreferencesHelper;
 import com.example.mygallery.sharedpreferences.values.AlbumPreferences;
 import com.example.mygallery.viewmodel.AlbumViewModel;
@@ -26,6 +27,7 @@ import java.util.List;
 
 public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
     private int spanCount;
+    private DragSelect dragSelect;
     private OnItemClickListener listener;
     private AlbumAdapterHelper<Model> adapter;
 
@@ -81,16 +83,17 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
         spanCount = (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES)) ? 2 : 1;
         createAlbumAdapter(getAlbumAdapter(displayType));
         recyclerView.setLayoutManager(new GridLayoutManager(context, spanCount));
+        setupDragSelect();
     }
 
     private AlbumAdapterHelper<Model> getAlbumAdapter(String displayType) {
         if (context instanceof AlbumSelected) {
             return (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES))
-                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, listener)
+                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, listener, this::isChecked)
                     : new FolderListAdapter(context, viewModel.getList(), listener);
         } else {
             return (displayType.equals(AlbumPreferences.DISPLAY_TYPE_GRID_VALUES))
-                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class))
+                    ? new AlbumAdapter(context, viewModel.getList(), spanCount, p -> openActivity(p, AlbumGridActivity.class), this::isChecked)
                     : new FolderListAdapter(context, viewModel.getList(), p -> openActivity(p, AlbumGridActivity.class));
         }
     }
@@ -117,5 +120,15 @@ public class AlbumRecyclerViewFragment extends RecyclerViewFragment {
     private void initializeViewModelAndPreferences(Context context) {
         viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(AlbumViewModel.class);
         sharedPreferencesHelper = new SharedPreferencesHelper(context, SharedPreferencesHelper.ALBUM_PREFERENCES);
+    }
+
+    private void setupDragSelect() {
+//        dragSelect.setViewModel(viewModel);
+//        dragSelect.setConfigDragSelectTouchListener();
+//        recyclerView.addOnItemTouchListener(dragSelect.getDragSelectTouchListener());
+    }
+
+    private boolean isChecked(int position) {
+        return viewModel.isChecked(position);
     }
 }

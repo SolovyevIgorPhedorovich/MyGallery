@@ -3,21 +3,18 @@ package com.example.mygallery.activities;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mygallery.databinding.ActivityAlbumSelectBinding;
+import com.example.mygallery.fragments.AlbumRecyclerViewFragment;
 import com.example.mygallery.navigator.FragmentNavigatorHelper;
+import com.example.mygallery.viewmodel.AlbumViewModel;
+import com.example.mygallery.viewmodel.ViewModelFactory;
 
 public class AlbumSyncActivity extends AppCompatActivity {
-
-    private static final int PERMISSION_REQUEST_CODE = 123;
-
     FragmentNavigatorHelper fragmentNavigatorHelper;
     private ActivityAlbumSelectBinding binding;
-
-    // Метод для инициализации элементов интерфейса
-    private void initializeViews() {
-
-    }
+    private AlbumViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,16 +22,21 @@ public class AlbumSyncActivity extends AppCompatActivity {
         binding = ActivityAlbumSelectBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        fragmentNavigatorHelper = new FragmentNavigatorHelper(getSupportFragmentManager(), binding.fragmentContainer.getId());
+        initializeViewModel();
+        setupUI();
 
-        // Инициализация элементов интерфейса
-        initializeViews();
     }
 
-    // Действия после возобновления активности
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void initializeViewModel() {
+        viewModel = new ViewModelProvider(this, ViewModelFactory.factory(this)).get(AlbumViewModel.class);
+    }
+
+    private void setupUI() {
+        AlbumRecyclerViewFragment fragment = new AlbumRecyclerViewFragment(this);
+        getSupportFragmentManager().beginTransaction()
+                .add(binding.fragmentContainer.getId(), fragment)
+                .commit();
+
     }
 
 

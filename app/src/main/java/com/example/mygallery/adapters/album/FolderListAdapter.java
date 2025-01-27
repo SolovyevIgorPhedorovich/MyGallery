@@ -1,5 +1,7 @@
 package com.example.mygallery.adapters.album;
 
+import static com.example.mygallery.viewimage.LoadImage.setImage;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.view.LayoutInflater;
