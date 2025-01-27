@@ -8,6 +8,13 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_cloud_sync_24"
+        android:title="Синхронизация с облаком"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_view_type"
         android:icon="@drawable/display_grid_32"
         android:title="Тип отображения"
@@ -17,5 +24,5 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
         android:id="@+id/action_open_context_menu"
         android:icon="@drawable/context_menu"
         android:title="Ещё"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 </menu>

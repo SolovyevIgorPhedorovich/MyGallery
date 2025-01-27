@@ -8,6 +8,13 @@
             app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_cloud_sync_24"
+        android:title="Синхронизация с облаком"
+        app:showAsAction="always" />
+    <item
             android:id="@+id/action_view_type"
             android:icon="@drawable/display_list_32"
             android:title="Тип отображения"
