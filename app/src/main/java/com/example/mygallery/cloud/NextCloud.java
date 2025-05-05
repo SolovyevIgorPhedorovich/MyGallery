@@ -8,13 +8,14 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 public class NextCloud {
 
-    private static final String BASE_URL = "https://nc.local/remove.php/dav/files/";
+    private static final String BASE_URL = "https://nc.local/remote.php/dav/files/";
     private final String username;
     private final String password;
     private final ApiServices apiService;
@@ -36,16 +37,37 @@ public class NextCloud {
         return "Basic " + android.util.Base64.encodeToString(credentials.getBytes(), android.util.Base64.NO_WRAP);
     }
 
-    public Call<List<String>> getFile(){
+    public void uploadFile(File file, UploadCallback callback) {
+        RequestBody requestFile = RequestBody.create(file, MediaType.parse("application/octet-stream"));
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        apiService.uploadFile(getAuthHeader(), body).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onError(new Exception("Upload failed: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callback.onError(t);
+            }
+        });
+    }
+
+    public Call<ResponseBody> downloadFile(String fileName) {
+        return apiService.downloadFile(getAuthHeader(), fileName);
+    }
+
+    public Call<List<String>> getFile() {
         return apiService.getFiles(getAuthHeader());
     }
 
-    public Call<ResponseBody> uploadImage(String filePath) {
-        File file = new File(filePath);
-        RequestBody requestFile = RequestBody.create(file, MediaType.parse("image/*"));
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-
-        return apiService.uploadFile(getAuthHeader(), body);
+    public interface UploadCallback {
+        void onSuccess();
+        void onError(Throwable error);
     }
-
 }

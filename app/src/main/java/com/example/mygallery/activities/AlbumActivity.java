@@ -36,6 +36,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
     FragmentNavigatorHelper fragmentNavigatorHelper;
     private SharedPreferencesHelper sharedPreferencesHelper;
     private ActivityAlbumBinding binding;
+    BaseViewModel<ImageModel> viewModel = new ViewModelProvider(activity).get(GalleryViewModel.class);
 
     // Метод для инициализации элементов интерфейса
     private void initializeViews() {
@@ -147,7 +148,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFragmentIntera
             createAlbumManager.createAlbum(this, findViewById(itemId));
         }
         else if (itemId == R.id.action_sync){
-            PopupWindowSyncMenu.run(this, findViewById(R.id.action_sync));
+            PopupWindowSyncMenu.run(this, findViewById(R.id.action_sync), viewModel);
         }
         else if (itemId == R.id.action_view_type)
             replaceViewType();
